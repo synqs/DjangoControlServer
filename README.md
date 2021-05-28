@@ -8,6 +8,7 @@ This is a minimalistic control server for small lab devices.
 
 ## road map/ideas
 - [ ] classes for admin, client and devices
+- [ ] apps: temp_control, pd_monitor, rp_control
 
 ## how to 
 1. download the github repo on your local computer
