@@ -1,9 +1,21 @@
+<h2>Device Index</h2>
+
 {% if device_list %}
-	<ul>
-	{% for device in device_list %}
-		<li><a href="{% url 'pd_monitor:detail' device.id %}">{{ device.name }}</a></li>
-	{% endfor %}
-	</ul>
+	<table border="1">
+		<thead><tr>
+			<th>Device</th><th>Decription</th><th>IP</th><th>Current Value</th>
+		</thead></tr>
+		<tbody> 
+			{% for device in device_list %}
+				<tr>
+				<td><a href="{% url 'pd_monitor:detail' device.id %}">{{ device.name }}</a></td>
+				<td>{{ device.description }}</td>
+				<td>{{ device.ip }}</td>
+				<td>{{ device.value }}</td>
+				</tr>
+			{% endfor %}
+		</tbody>
+	</table>
 {% else %}
 	<p>No devices are available.</p>
 {% endif %}
