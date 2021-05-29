@@ -1,0 +1,9 @@
+{% if device_list %}
+	<ul>
+	{% for device in device_list %}
+		<li><a href="{% url 'pd_monitor:detail' device.id %}">{{ device.device_name }}</a></li>
+	{% endfor %}
+	</ul>
+{% else %}
+	<p>No devices are available.</p>
+{% endif %}

@@ -37,8 +37,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    
-    'pd_monitor',
+
+    'apps/pd_monitor',
 ]
 
 MIDDLEWARE = [
