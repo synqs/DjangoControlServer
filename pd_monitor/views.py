@@ -3,8 +3,8 @@ from .models import Device
 
 # Create your views here.
 def index(request):
-	devices = Device.objects.all()
-	context = {'devices' : devices}
+	device_list = Device.objects.all()
+	context = {'device_list' : device_list}
 	return render(request, 'pd_monitor/index.html', context)
 
 def detail(request, device_id):
