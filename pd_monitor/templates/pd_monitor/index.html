@@ -1,9 +1,16 @@
+{% load static %}<!DOCTYPE html>
+<html>
 <h2>Device Index</h2>
 
+<div class="container">
+	<ol class="breadcrumb my-4">
+		<li class="breadcrumb-item actiave">Devices</li>
+	</ol>
+
 {% if device_list %}
-	<table border="1">
-		<thead><tr>
-			<th>Device</th><th>Decription</th><th>IP</th><th>Current Value</th>
+	<table class="table">
+		<thead class="thad-inverse"><tr>
+			<th>Device</th><th>Decription</th><th>IP</th><th class="align-middle">Current Value</th>
 		</thead></tr>
 		<tbody> 
 			{% for device in device_list %}
@@ -19,3 +26,4 @@
 {% else %}
 	<p>No devices are available.</p>
 {% endif %}
+</html>
