@@ -1,29 +1,37 @@
-{% load static %}<!DOCTYPE html>
+{% load static %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'pd_monitor/linkstyle.css' %}">
 <html>
-<h2>Device Index</h2>
+	<head>
+		<meta charset="utf-8>
+		<title>Device Index<title>
+		<!-- link rel="stylesheet" href="{% static 'pd_monitor/bootstrap.min.css' %}" -->
+	</head>
+	<body> <!--
+		<div class="container">
+			<ol class="breadcrumb my-4">
+				<li class="breadcrumb-item active">Devices</li>
+			</ol -->
 
-<div class="container">
-	<ol class="breadcrumb my-4">
-		<li class="breadcrumb-item actiave">Devices</li>
-	</ol>
-
-{% if device_list %}
-	<table class="table">
-		<thead class="thad-inverse"><tr>
-			<th>Device</th><th>Decription</th><th>IP</th><th class="align-middle">Current Value</th>
-		</thead></tr>
-		<tbody> 
-			{% for device in device_list %}
-				<tr>
-				<td><a href="{% url 'pd_monitor:detail' device.id %}">{{ device.name }}</a></td>
-				<td>{{ device.description }}</td>
-				<td>{{ device.ip }}</td>
-				<td>{{ device.value }}</td>
-				</tr>
-			{% endfor %}
-		</tbody>
-	</table>
-{% else %}
-	<p>No devices are available.</p>
-{% endif %}
+			
+			<table class="table">
+				<thead class="thead-inverse"><tr>
+					<th>Device</th>
+					<th>Decription</th>
+					<th>IP</th>
+					<th>Current Value</th>
+				</tr></thead>
+				<tbody> 
+					{% for device in device_list %}
+					<tr>
+					<td><a href="{% url 'pd_monitor:detail' device.id %}">{{ device.name }}</a></td>
+					<td>{{ device.description }}</td>
+					<td>{{ device.ip }}</td>
+					<td>{{ device.value }}</td>
+					</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+		<!--/div-->
+	</body>
 </html>
