@@ -1,20 +1,17 @@
 {% load static %}<!DOCTYPE html>
 <html>
 	<head>
-	<meta charset="uft-8">
-	<br><title>Device Index</title>
+	<meta charset="uft-8" class="font-monospace">
 	<link rel="stylesheet" href="{% static '/bootstrap.min.css' %}">
 	</head>
-	<body>
+	<body><font face="monospace">
 		<div class="container">
-			<ol class="breadcrumb">
-				<li class="breadcrumb-item active">Device Index</li>
-			</ol>
-			{% if device_table %}
+			<br><h1 class="breadcrumb">Device Index</h1>
+			{% if device_list %}
 			<table class="table table-striped">
 				<thead class="thead-dark">
 					<tr>
-					<th>Device</th>
+					<th>Name</th>
 					<th>Status</th>
 					<th>IP</th>
 					<th>Current Value</th>
@@ -38,5 +35,5 @@
 				<p>No devices available.</p>
 			{% endif %}
 		</div>
-	</body>
+	</font></body>
 </html>

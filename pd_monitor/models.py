@@ -10,8 +10,8 @@ class Device(models.Model):
 	ip = models.CharField(max_length=20, blank=True)		# device ip
 	port = models.CharField(max_length=4, blank=True)		# device port (incl. default=80 for YUN ?)
 
-	value = models.FloatField(null=True)				# here, this is a voltage
-	
+	value = models.FloatField(default=True, blank=True)				# here, this is a voltage
+
 	added_by = models.ForeignKey(User, related_name='devices', on_delete=models.CASCADE, blank=True, null=True)
 
 	def __str__(self):
