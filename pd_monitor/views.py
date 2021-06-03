@@ -20,3 +20,7 @@ def remove_device(request, device_id):
 	new_device_list = Device.objects.all()
 	context = {'device_list' : new_device_list}
 	return render(request, 'pd_monitor/index.html', context)
+
+def goto_js(request):
+	mess = Device.objects.all()
+	return render(request, 'pd_monitor/js_test.html', {'mess' : mess})

@@ -1,15 +1,17 @@
-{% load static %}<!DOCTYPE html>
+<!DOCTYPE html>
+<!-- <script src="https://unpkg.com/vue@next"></script> -->
+<script src="https://unpkg.com/vue@2.6.13/dist/vue.js"></script>
+<!-- <script src="https://unpkg.com/browse/vue@3.0.11/dist/vue.global.js"></script> -->
 <html>
 	<head>
-	<meta charset="uft-8" class="font-monospace">
-	<link rel="stylesheet" href="{% static '/bootstrap.min.css' %}">
+	<meta charset="uft-8">
 	</head>
 	<body><font face="monospace">
 		<div class="container">
-			<br><h1 class="breadcrumb">Device Index</h1>
+			<br><h1>Device Index</h1>
 			{% if device_list %}
-			<table class="table table-striped">
-				<thead class="thead-dark">
+			<table>
+				<thead>
 					<tr>
 					<th>Name</th>
 					<th>Status</th>
@@ -21,7 +23,7 @@
 					{% for device in device_list %}
 					<tr>
 					<td>
-						<a href="{% url 'pd_monitor:detail' device.id %}">{{ device.name }}
+						<a href="{% url 'pd_monitor:detail' device.id %}">{{ device.name }}</a>
 						<small class="text-muted d-block">{{ device.description }}</small>
 					</td>
 					<td>0</td>
@@ -35,9 +37,5 @@
 				<p>No devices available.</p>
 			{% endif %}
 		</div>
-		<form action="{% url 'pd_monitor:goto_js' %}" method="post">
-			{% csrf_token %}
-			<input type="submit" value="JS site" class="btn btn-warning">
-		</form>
 	</font></body>
 </html>
