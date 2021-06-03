@@ -1,4 +1,5 @@
 from django.shortcuts import render, get_object_or_404
+from django.core.serializers import json
 from .models import Device
 
 # Create your views here.
@@ -14,13 +15,12 @@ def detail(request, device_id):
 
 def remove_device(request, device_id):
 	device = get_object_or_404(Device, pk=device_id)
-	# impletement closing connection to device
 	device.delete()
-	# return HttpResponseRedirect(reverse('pd_monitor:index')
 	new_device_list = Device.objects.all()
 	context = {'device_list' : new_device_list}
 	return render(request, 'pd_monitor/index.html', context)
 
-def goto_js(request):
-	mess = Device.objects.all()
-	return render(request, 'pd_monitor/js_test.html', {'mess' : mess})
+def index_js(request):
+	device_list = Device.objects.all()
+	context
+	return render(request, 'pd_monitor/js_test.html', context)
