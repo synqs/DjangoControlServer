@@ -1,24 +1,27 @@
-<!doctype html>
+<!DOCTYPE html>
 
 <html>
 	<head>
-    	<meta charset="utf-8">
-    	<title></title>
-    	<meta name="viewport" content="width=device-width, initial-scale=1">
-  	</head>
+	<meta charset="uft-8">
+	</head>
+	<body><font face=monospace>
+		<p>test.</p>
+		<div id="app">
+			<h1>[[ message ]]</h1>
+			<h1>[[ device_list ]]</h1>
+		</div>
 
-	<body>
-	<div id="app">
-		<h1>{{ message }}</h1>
-	</div>
-
-	<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script> 
-
-	<script>
-		var myObject = new Vue({
-    			el: '#app',
-    			data: {message: 'Hello Vue!'}
-		})
-	</script>
-	</body>
+		<!-- <script src="https://unpkg.com/vue@3.0.11/dist/vue.global.js"></script> -->
+		<script src="https://unpkg.com/vue@next"></script> 
+		<script>
+			var myObject = new Vue({
+    				el: '#app',
+				delimiters: ['[[', ']]'],
+				data: {
+					message: 'Hello Vue!',
+					device_list: 'device_list',
+				}
+			})
+		</script>
+	</font></body>
 </html>
