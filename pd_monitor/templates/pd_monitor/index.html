@@ -35,7 +35,7 @@
 				<p>No devices available.</p>
 			{% endif %}
 		</div>
-		<form action="{% url 'pd_monitor:goto_js' %}" method="post">
+		<form action="{% url 'pd_monitor:index_js' %}" method="post">
 			{% csrf_token %}
 			<input type="submit" value="JS index" class="btn btn-warning">
 		</form>
