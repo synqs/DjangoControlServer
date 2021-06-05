@@ -1,41 +1,13 @@
-<!DOCTYPE html>
-<!-- <script src="https://unpkg.com/vue@next"></script> -->
-<script src="https://unpkg.com/vue@2.6.13/dist/vue.js"></script>
-<!-- <script src="https://unpkg.com/browse/vue@3.0.11/dist/vue.global.js"></script> -->
-<html>
-	<head>
-	<meta charset="uft-8">
-	</head>
-	<body><font face="monospace">
-		<div class="container">
-			<br><h1>Device Index</h1>
-			{% if device_list %}
-			<table>
-				<thead>
-					<tr>
-					<th>Name</th>
-					<th>Status</th>
-					<th>IP</th>
-					<th>Current Value</th>
-					</tr>
-				</thead>
-				<tbody> 
-					{% for device in device_list %}
-					<tr>
-					<td>
-						<a href="{% url 'pd_monitor:detail' device.id %}">{{ device.name }}</a>
-						<small class="text-muted d-block">{{ device.description }}</small>
-					</td>
-					<td>0</td>
-					<td>{{ device.ip }}</td>
-					<td>{{ device.value }}</td>
-					</tr>
-					{% endfor %}
-				</tbody>
-			</table>
-			{% else %}
-				<p>No devices available.</p>
-			{% endif %}
-		</div>
-	</font></body>
-</html>
+{% extends 'masterpage.html' %}
+{% block app_content %}
+{% load static %}
+
+
+<script src="{% static '/index.js' %}"></script>
+	
+<br><h1>Device Index</h1>
+<div id="device_index_table">
+	<p> [[ title ]] </p>
+</div>
+
+{% endblock %}
