@@ -1,13 +1,19 @@
-{% extends 'masterpage.html' %}
-{% block app_content %}
+{% extends 'pd_monitor/masterpage.html' %}
 {% load static %}
+{% block content %}
 
-
-<script src="{% static '/index.js' %}"></script>
-	
-<br><h1>Device Index</h1>
-<div id="device_index_table">
-	<p> [[ title ]] </p>
+<div id="app">
+	<app-test/>
 </div>
 
+<script type="text/javascript" src="{% static 'index.js' %}"></script>
+{% endblock %}
+
+{% block redirect %}
+<div class="container">
+<form action="{% url 'pd_monitor:index' %}" method="post">
+		{% csrf_token %}
+		<input type="submit" value="HMTL index" class="btn btn-warning">
+</form>
+</div>
 {% endblock %}

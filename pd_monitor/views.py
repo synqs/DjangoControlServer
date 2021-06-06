@@ -23,4 +23,4 @@ def remove_device(request, device_id):
 def index_js(request):
 	device_list = Device.objects.all()
 	context = {'device_list' : device_list}
-	return render(request, 'pd_monitor/index_js.html', context)
+	return render(request, 'pd_monitor/index_js.html')
