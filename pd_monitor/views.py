@@ -1,17 +1,19 @@
 from django.shortcuts import render, get_object_or_404
+from django.views import generic
 from django.core.serializers import json
 from .models import Device
 
 # Create your views here.
-def index(request):
-	device_list = Device.objects.all()
-	context = {'device_list' : device_list}
-	return render(request, 'pd_monitor/index.html', context)
+class IndexView(generic.ListView):
 
-def detail(request, device_id):
-	device = get_object_or_404(Device, pk=device_id)
-	context = {'device' : device}
-	return render(request, 'pd_monitor/detail.html', context)
+class DetailView(generic.DetailView):
+	model = Device
+
+def add_device(request):
+	device = Objects
+	new_device_list = Device.objects.all()
+	context = {'device_list' : new_device_list}
+	return render(request, 'pd_monitor/index.html', context)
 
 def remove_device(request, device_id):
 	device = get_object_or_404(Device, pk=device_id)
