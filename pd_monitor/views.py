@@ -10,8 +10,8 @@ class IndexView(generic.ListView):
 class DetailView(generic.DetailView):
 	model = Device
 
-def add_device(request):
-	device = Objects
+def add_device(request, device_name):
+	device = Device.objects.create(name=device_name)
 	new_device_list = Device.objects.all()
 	context = {'device_list' : new_device_list}
 	return render(request, 'pd_monitor/device_list.html', context)

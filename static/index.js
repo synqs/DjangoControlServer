@@ -1,7 +1,7 @@
 Vue.component('app-test', {
 	data: function () {
 		return {
-			message-test : 'Test Vue!'
+			message-test : 'Let's test Vue!'
 		}
 	},
 	template: `
