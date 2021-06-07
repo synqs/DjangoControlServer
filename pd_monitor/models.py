@@ -18,10 +18,10 @@ class Device(models.Model):
 		return self.name
 	
 	def http_str(self):
-		return "http://" + self.ip + ":" self.port
+		return "http://" + self.ip + ":" + self.port
 	
 	def all_val(self):
 		return self.http_str() + "arduino/read/all"
 	
 	def pin_val(self, inputpin):
-		    return self.http_str() + "arduino/read/" + 
+		    return self.http_str() + "arduino/read/" + inputpin 

@@ -5,6 +5,7 @@ from .models import Device
 
 # Create your views here.
 class IndexView(generic.ListView):
+	model = Device
 
 class DetailView(generic.DetailView):
 	model = Device
