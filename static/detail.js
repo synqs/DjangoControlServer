@@ -1,0 +1,9 @@
+Vue.compnent({
+});
+
+var detail = new Vue({
+	el: '#app',
+	data: {details : 'device details'},
+	template: {<p> [[ details ]] </p>},
+	delimiters: ['[[', ']]']
+)}
