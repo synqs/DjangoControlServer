@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html>
 	<head>
     	<meta charset="UTF-8">
@@ -15,15 +14,15 @@
 	<!--  javascript -->
   	<script src="https://unpkg.com/vue@latest/dist/vue.min.js"></script>
  	<script src="https://unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.min.js"></script>
-  	<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 
     	<title>DjangoControlServer</title>
 	</head>
 
-	<body>
+	<body><font face="monospace">
 		<div class="breadcrumb"><h1 class="breadcrumb">DjangoControlServer</h1></div>
-
-		{% block content %} {% endblock %}
-		{% block redirect %} {% endblock %}
-	</body>
+		<div class="container">
+			{% block content %} {% endblock %}
+			{% block redirect %} {% endblock %}
+		</div>
+	</font></body>
 </html>

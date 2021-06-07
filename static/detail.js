@@ -1,3 +1,5 @@
+document.getElementById("jstest") = "JavaScript is imported in detail!";
+/*
 Vue.compnent({
 });
 
@@ -7,3 +9,4 @@ var detail = new Vue({
 	template: {<p> [[ details ]] </p>},
 	delimiters: ['[[', ']]']
 )}
+*/

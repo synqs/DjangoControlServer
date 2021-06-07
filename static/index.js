@@ -1,6 +1,8 @@
+document.getElementById("jstest") = "JavaScript is imported!"
+/*
 Vue.component('app-test', {
-	props: ['todo'],
-  	template: `<li>{{ todo.text }}</li>`
+	props: ['item'],
+  	template: `<li>{{ item.name }}</li>`,
 });
 
 var app = Vue.createApp({
@@ -14,3 +16,4 @@ var app = Vue.createApp({
     }
   }
 }).mount('#app');
+*/

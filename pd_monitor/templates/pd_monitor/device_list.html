@@ -1,13 +1,11 @@
 {% extends 'pd_monitor/masterpage.html' %}
 {% load static %}
 {% block content %}
-{% if device_list %}
-	<div id="app">
-		<app-test/>
-	</div>
-{% else %}
-	<p> No devices available. </p>
-{% endif %}
+<p id="jstest"></p>
+	<!-- div id="app">
+		<app-test v-for="device in devices" v-bind:item="device" v-bind:key="item.id">
+		</app-test>
+	</div -->
 
 <script type="text/javascript" src="{% static 'index.js' %}"></script>
 {% endblock %}
