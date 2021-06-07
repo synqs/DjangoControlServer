@@ -1,14 +1,16 @@
 Vue.component('app-test', {
-	data: function () {
-		return {
-			message-test : 'Let's test Vue!'
-		}
-	},
-	template: `
-		<p> Why do we do this ? {{ message-test }} </p>
-	`,
+	props: ['todo'],
+  	template: `<li>{{ todo.text }}</li>`
 });
 
-var app = new Vue({
-  el: '#app',
-});
+var app = Vue.createApp({
+  data() {
+    return {
+      devices: [
+        { id: 0, name: 'device0' },
+        { id: 1, name: 'device1' },
+        { id: 2, name: 'device2' }
+      ]
+    }
+  }
+}).mount('#app');
