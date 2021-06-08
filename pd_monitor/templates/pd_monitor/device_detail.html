@@ -1,33 +1,30 @@
-<!-- This template is still only in html -->
-
-{% extends "masterpage.html" %}
-{% load static %}
+{% extends "pd_monitor/masterpage.html" %}
 
 {% block content %}
-<div class="container"><br>
-	{% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
-	<table class="table table-striped">
-		<thead class="thead-dark">
-			<tr>
-			<th colspan="2"><h2>{{ device.name }}</h2></th>
-			</tr>
-		</thead>
-		<tbody>
-			<tr><td>Description</td><td>{{ device.description }}</td></tr>
-			<tr><td>Address</td><td>{{ device.ip }}:{{ device.port }}</td></tr>
-			<tr><td>Sleeptime</td><td>{{ device.sleeptime }} sec</td></tr>
-		</tbody>
-	</table>
-</div>
+{% load static %}
+
+<p id="jstest"></p>
+
+<script type="text/javascript" src="{% static 'detail.js' %}"></script>
+
+{% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+<table class="table table-striped">
+	<thead class="thead-dark">
+		<tr>
+		<th colspan="2"><h2>{{ device.name }}</h2></th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr><td>Description</td><td>{{ device.description }}</td></tr>
+		<tr><td>Address</td><td>{{ device.ip }}:{{ device.port }}</td></tr>
+		<tr><td>Sleeptime</td><td>{{ device.sleeptime }} sec</td></tr>
+	</tbody>
+</table>
 {% endblock %}
 
 {% block redirect %}
-<form action="{% url 'pd_monitor:index' %}" method="post">
+<form action="{% url 'pd_monitor:index' %}">
 	{% csrf_token %}
-	<input type="submit" value="Back to Index" class="btn btn-primary>
-</form>
-<form action="{% url 'pd_monitor:remove_device' device.id %}" method="post">
-	{% csrf_token %}
-	<input type="submit" value="Remove" class="btn btn-warning">
+	<input type="submit" value="Back to Index" class="btn btn-primary">
 </form>
 {% endblock %}

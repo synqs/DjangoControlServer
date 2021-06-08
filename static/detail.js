@@ -1,4 +1,4 @@
-document.getElementById("jstest") = "JavaScript is imported in detail!";
+document.getElementById("jstest").innerHTML = "JavaScript is imported in detail!";
 /*
 Vue.compnent({
 });

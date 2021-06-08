@@ -1,19 +1,32 @@
-document.getElementById("jstest") = "JavaScript is imported!"
-/*
-Vue.component('app-test', {
-	props: ['item'],
-  	template: `<li>{{ item.name }}</li>`,
+var myObject = new Vue({
+    	el: '#app',
+    	data: {
+		devices: [
+        		{ id: 0, name: 'device0' },
+        		{ id: 1, name: 'device1' },
+        		{ id: 2, name: 'device2' }
+      		]
+	},
+	delimiters: ['[[', ']]']
 });
 
-var app = Vue.createApp({
+const ComponentsApp = {
   data() {
     return {
-      devices: [
-        { id: 0, name: 'device0' },
-        { id: 1, name: 'device1' },
-        { id: 2, name: 'device2' }
+      groceryList: [
+        { id: 0, text: 'Vegetables' },
+        { id: 1, text: 'Cheese' },
+        { id: 2, text: 'Whatever else humans are supposed to eat' }
       ]
     }
   }
-}).mount('#app');
-*/
+};
+
+const apptest = Vue.createApp(ComponentsApp)
+
+app.component('todo-item', {
+  props: ['todo'],
+  template: `<li>{{ todo.text }}</li>`
+});
+
+apptest.mount('#components-app');
