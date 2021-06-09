@@ -1,15 +1,10 @@
 var myObject = new Vue({
     	el: '#app',
-    	data: {
-		devices: [
-        		{ id: 0, name: 'device0' },
-        		{ id: 1, name: 'device1' },
-        		{ id: 2, name: 'device2' }
-      		]
-	},
+    	data: { message : "JS imported" },
 	delimiters: ['[[', ']]']
 });
 
+/*
 const ComponentsApp = {
   data() {
     return {
@@ -21,10 +16,9 @@ const ComponentsApp = {
     }
   }
 };
+const apptest = new Vue(ComponentsApp)
 
-const apptest = Vue.createApp(ComponentsApp)
-
-app.component('todo-item', {
+apptest.component('todo-item', {
   props: ['todo'],
   template: `<li>{{ todo.text }}</li>`
 });
