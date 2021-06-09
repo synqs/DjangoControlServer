@@ -3,55 +3,48 @@
 {% block content %}
 {% load static %}
 
-<div id="app">
- <p> [[ message ]] </p>
-</div>
-<script type="module" src="https://unpkg.com/vue@next"></script>
-<script>
-const app = new Vue({
-    	el: '#app',
-    	data: { message : 'JS imported' },
-	delimiters: ['[[', ']]']
-});
-</script>
- 
-<!--script type="text/javascript" src="{% static 'index.js' %}"></script-->
+{% if device_list %}
+	<table class="table table-striped">
+		<thead class="thead-dark">
+			<tr>
+			<th>Name</th>
+			<th>Status</th>
+			<th>IP</th>
+			<th>Current Value</th>
+			</tr>
+		</thead>
+		<tbody> 
+		{% for device in device_list %}
+			<tr>
+			<td>
+				<a href="{% url 'pd_monitor:detail' device.id %}">{{ device.name }}
+				<small class="text-muted d-block">{{ device.description }}</small>
+			</td>
+			<td>0</td>
+			<td>{{ device.ip }}</td>
+			<td>{{ device.value }}</td>
+			</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+{% else %}
+	<p>No devices available.</p>
+{% endif %}
 
+<!--script type="text/javascript" src="{% static 'index.js' %}"></script-->
 {% endblock %}
+
+
 
 
 {% block redirect %}
 <form action="{% url 'pd_monitor:refresh' %}">
+	{% csrf_token %}
 	<input type="submit" value="Refresh"></input>
+</form>
+
+form action="{% url 'pd_monitor:jstest' %}">
+	{% csrf_token %}
+	<input type="submit" value="JS Tests"></input>
 </form> 
 {% endblock %}
-
-
-<!-- IGNORED SINCE OUTSIDE BLOCK DECLARATION -->
-{% if device_list %}
-		<table class="table table-striped">
-			<thead class="thead-dark">
-				<tr>
-				<th>Name</th>
-				<th>Status</th>
-				<th>IP</th>
-				<th>Current Value</th>
-				</tr>
-			</thead>
-			<tbody> 
-			{% for device in device_list %}
-				<tr>
-				<td>
-					<a href="{% url 'pd_monitor:detail' device.id %}">{{ device.name }}
-					<small class="text-muted d-block">{{ device.description }}</small>
-				</td>
-				<td>0</td>
-				<td>{{ device.ip }}</td>
-				<td>{{ device.value }}</td>
-				</tr>
-				{% endfor %}
-			</tbody>
-		</table>
-	{% else %}
-		<p>No devices available.</p>
-	{% endif %}

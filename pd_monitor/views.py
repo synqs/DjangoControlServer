@@ -27,3 +27,6 @@ def remove_device(request, device_id):
 	new_device_list = Device.objects.all()
 	context = {'device_list' : new_device_list}
 	return render(request, 'pd_monitor/device_list.html', context)
+	
+def refresh(request):
+	return render(request, 'pd_monitor/jstest.html')
