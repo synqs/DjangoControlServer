@@ -36,14 +36,13 @@
 
 
 
-
 {% block redirect %}
-<form action="{% url 'pd_monitor:refresh' %}">
+<form action="{% url 'pd_monitor:index' %}">
 	{% csrf_token %}
 	<input type="submit" value="Refresh"></input>
 </form>
 
-form action="{% url 'pd_monitor:jstest' %}">
+<form action="{% url 'pd_monitor:jstest' %}">
 	{% csrf_token %}
 	<input type="submit" value="JS Tests"></input>
 </form> 

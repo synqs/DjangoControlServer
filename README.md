@@ -15,4 +15,4 @@ This is a minimalistic control server for small lab devices.
 2. navigate to the root directory of the repo
 3. run `python manage.py runserver`
 
-For more information refer to the [Django documentation](https://docs.djangoproject.com/en/3.2/) webpage
+For more information refer to the [Django documentation](https://docs.djangoproject.com/en/3.2/) webpage 

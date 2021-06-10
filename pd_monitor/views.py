@@ -4,16 +4,14 @@ from django.core.serializers import json
 from .models import Device
 
 # Create your views here.
-#class IndexView(generic.ListView):
-#	model = Device
+class IndexView(generic.ListView):
+	model = Device
 
 class DetailView(generic.DetailView):
 	model = Device
 
-def refresh(request):
-	device_list = Device.objects.all()
-	context = {'device_list' : device_list}
-	return render(request, 'pd_monitor/device_list.html', context)
+def jstest(request):
+	return render(request, 'pd_monitor/jstest.html')
 
 def add_device(request, device_name):
 	device = Device.objects.create(name=device_name)
@@ -28,5 +26,5 @@ def remove_device(request, device_id):
 	context = {'device_list' : new_device_list}
 	return render(request, 'pd_monitor/device_list.html', context)
 	
-def refresh(request):
-	return render(request, 'pd_monitor/jstest.html')
+def refresh(request, html_id):
+	return render(request, 'pd_monitor/'+html_id)

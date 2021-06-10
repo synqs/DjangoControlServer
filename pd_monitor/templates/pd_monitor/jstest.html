@@ -1,0 +1,21 @@
+{% extends "pd_monitor/masterpage.html" %}
+{% block content %}
+
+<h1>A Web Page</h1>
+<p id="demo">A Paragraph</p>
+<button type="button" onclick="myFunction()">Try it</button>
+
+<script type="text/javascript" scr="jstest.js" %}"></script>
+
+{% endblock content %}
+
+{% block redirect %}
+<br>
+<form action="{% url 'pd_monitor:index' %}">
+	<input type="submit" value="Back to Index"></input>
+</form>
+<br>
+<form action="{% url 'pd_monitor:jstest' %}">
+	<button type="submit" class="btn btn-primary">Refresh!</button>
+</form> 
+{% endblock %}

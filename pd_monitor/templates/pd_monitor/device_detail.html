@@ -1,12 +1,6 @@
 {% extends "pd_monitor/masterpage.html" %}
 
 {% block content %}
-{% load static %}
-
-<p id="jstest"></p>
-
-<script type="text/javascript" src="{% static 'detail.js' %}"></script>
-
 {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
 <table class="table table-striped">
 	<thead class="thead-dark">
