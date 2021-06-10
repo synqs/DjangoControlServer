@@ -1,12 +1,12 @@
 {% extends "pd_monitor/masterpage.html" %}
+{% load static %}
+
 {% block content %}
+<div class=container id="info-table">
+	<device-list v-bind:device="devices" v-bind:key="devices.id"></device-list>
+</div>
 
-<h1>A Web Page</h1>
-<p id="demo">A Paragraph</p>
-<button type="button" onclick="myFunction()">Try it</button>
-
-<script type="text/javascript" scr="jstest.js" %}"></script>
-
+<script src="{% static 'jstest.js' %}"></script>
 {% endblock content %}
 
 {% block redirect %}
