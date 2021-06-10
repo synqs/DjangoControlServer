@@ -1,6 +1,6 @@
 from django.shortcuts import render, get_object_or_404
 from django.views import generic
-from django.core.serializers import json
+from django.core import serializers
 from .models import Device
 
 # Create your views here.
@@ -11,7 +11,11 @@ class DetailView(generic.DetailView):
 	model = Device
 
 def jstest(request):
-	return render(request, 'pd_monitor/jstest.html')
+	return render(request, 'pd_monitor/jstest.html', {'device_list_json' : serializers.serialize('json', Device.objects.all())})
+
+def json(request):
+	device_list_json = serializers.serialize('json', Device.objects.all(),fields=('name','description','ip','value'))
+	return render(request, 'pd_monitor/json.html', {'device_list_json' : device_list_json})
 
 def add_device(request, device_name):
 	device = Device.objects.create(name=device_name)

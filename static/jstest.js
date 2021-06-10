@@ -21,14 +21,16 @@ Table.component('device-list', {
 			<th>Status</th>
 			<th>IP</th>
 			<th>Current Value</th>
+			<th></th>
 			</tr>
 		</thead>
 		<tbody> 
 			<tr v-for="d in device">
-			<td>{{ d.name }}</td>
+			<td><a href="{% url 'pd_monitor:detail' device.id %}">{{ d.name }}</a></td>
 			<td>0</td>
 			<td>{{ d.ip }}</td>
 			<td>{{ d.value }}</td>
+			<td><button type="button" class="btn btn-light">Settings</button></td>
 			</tr>
 		</tbody>
 	</table>`,

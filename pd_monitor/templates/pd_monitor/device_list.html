@@ -17,7 +17,7 @@
 		{% for device in device_list %}
 			<tr>
 			<td>
-				<a href="{% url 'pd_monitor:detail' device.id %}">{{ device.name }}
+				<a href="{% url 'pd_monitor:detail' device.id %}">{{ device.name }}<a/>
 				<small class="text-muted d-block">{{ device.description }}</small>
 			</td>
 			<td>0</td>
@@ -31,19 +31,21 @@
 	<p>No devices available.</p>
 {% endif %}
 
-<!--script type="text/javascript" src="{% static 'index.js' %}"></script-->
+<script src="{% static 'index.js' %}"></script>
 {% endblock %}
 
 
 
 {% block redirect %}
 <form action="{% url 'pd_monitor:index' %}">
-	{% csrf_token %}
-	<input type="submit" value="Refresh"></input>
+	<button type="submit" class="btn btn-light">Refresh</button>
 </form>
 
 <form action="{% url 'pd_monitor:jstest' %}">
-	{% csrf_token %}
-	<input type="submit" value="JS Tests"></input>
+	<button type="submit" class="btn btn-primary">JS TEST</button>
+</form>
+
+<form action="{% url 'pd_monitor:json' %}">
+	<button type="submit" class="btn btn-warning">JSON TEST!</button>
 </form> 
 {% endblock %}
