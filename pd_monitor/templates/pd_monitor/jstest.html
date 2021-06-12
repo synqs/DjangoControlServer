@@ -2,8 +2,12 @@
 {% load static %}
 
 {% block content %}
+{{ device_list_json }}
+
+<hr class="rounded">
+
 <div class=container id="info-table">
-	<device-list v-bind:device="devices" v-bind:key="devices.id"></device-list>
+	<device-list v-bind:device="{{ device_list_json }}"></device-list>
 </div>
 
 <script src="{% static 'jstest.js' %}"></script>

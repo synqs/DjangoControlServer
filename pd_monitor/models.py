@@ -24,4 +24,11 @@ class Device(models.Model):
 		return self.http_str() + "arduino/read/all"
 	
 	def pin_val(self, inputpin):
-		    return self.http_str() + "arduino/read/" + inputpin 
+		    return self.http_str() + "arduino/read/" + inputpin
+		    
+	def json(self):
+		return {
+			"name" : self.name,
+			"descripion" : self.description,
+			"ip" : self.ip
+			} 

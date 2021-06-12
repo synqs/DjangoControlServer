@@ -1,39 +1,51 @@
 const Table = Vue.createApp({
 	data() { return {
-		devices: [
-			{ id: '0', name: 'device0', ip: '0', value: '0'},
-			{ id: '1', name: 'device1', ip: '0', value: '0'},
-			{ id: '2', name: 'device2', ip: '0', value: '0'},
-		]
+		data : null,
+		devices : null,
 	}},
-	/*compilerOptions: {
-		delimiters: ['[[', ']]'],
-	}*/
+	compilerOptions: {
+		delimiters: ['[[', ']]']
+	},
+	mounted () {
+	},
+	methods: {
+		get_moneydata() {
+			axios.get('https://api.coindesk.com/v1/bpi/currentprice.json')
+		             .then(response => (this.data = response))
+		             .catch(error => console.log(error))
+		},
+		get_devices() {
+			axios.get('http://localhost:8000/pd_monitor/jstest.html')
+		             .then(response => (this.data = response))
+		             .catch(error => console.log(error))
+		},
+	}  
 });
 
 Table.component('device-list', {
 	props: ['device'],
 	template: 
-	`<table class="table table-striped">
+	`<p v-for="x in device">{{ x.pk }}<p>
+	`
+	/*
+	<table class="table table-striped">
 		<thead class="thead-dark">
 			<tr>
 			<th>Name</th>
 			<th>Status</th>
 			<th>IP</th>
-			<th>Current Value</th>
 			<th></th>
 			</tr>
 		</thead>
 		<tbody> 
 			<tr v-for="d in device">
-			<td><a href="{% url 'pd_monitor:detail' device.id %}">{{ d.name }}</a></td>
+			<td><a href="{% url 'pd_monitor:detail' d.id %}">{{ d.name }}</a></td>
 			<td>0</td>
 			<td>{{ d.ip }}</td>
-			<td>{{ d.value }}</td>
 			<td><button type="button" class="btn btn-light">Settings</button></td>
 			</tr>
 		</tbody>
-	</table>`,
+	</table>*/
 })
 
 Table.mount('#info-table')
