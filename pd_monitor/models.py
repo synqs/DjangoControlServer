@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.core.serializers.json import Serializer
 
 # Create your models here.
 class Device(models.Model):
@@ -26,9 +27,13 @@ class Device(models.Model):
 	def pin_val(self, inputpin):
 		    return self.http_str() + "arduino/read/" + inputpin
 		    
-	def json(self):
+	def get_json(self):
 		return {
 			"name" : self.name,
 			"descripion" : self.description,
 			"ip" : self.ip
 			} 
+
+class JSONSerializer(Serializer):
+	def get_dump_object(self, obj):
+        	return self._current or {}

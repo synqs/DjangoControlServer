@@ -25,7 +25,7 @@ const Table = Vue.createApp({
 Table.component('device-list', {
 	props: ['device'],
 	template: 
-	`<p v-for="x in device">{{ x.pk }}<p>
+	`<p v-for="x in device">{{ x.pk }}</p>
 	`
 	/*
 	<table class="table table-striped">

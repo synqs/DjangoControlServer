@@ -1,7 +1,7 @@
 from django.shortcuts import render, get_object_or_404
 from django.http import JsonResponse
 from django.core import serializers
-from .models import Device
+from .models import Device, JSONSerializer
 
 # Create your views here.
 def index(request):
@@ -22,7 +22,9 @@ def jstest(request):
 
 def json(request):
 	# device_list_json = [i.json() for i in Device.objects.all()]
-	device_list_json = serializers.serialize('json',Device.objects.all())
+	liste = (Device.objects.all().values('pk', 'name', 'description','ip'))
+	# device_list_json = serializers.serialize('json', liste)
+	# device_list_json = json.dumps(list(liste))
 	context = {'device_list_json' : device_list_json}
 	return render(request, 'pd_monitor/json.html', context)
 
