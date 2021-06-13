@@ -1,22 +1,21 @@
 const Table = Vue.createApp({
 	data() { return {
-		data : null,
+		data : 'blub',
 		devices : null,
 	}},
 	compilerOptions: {
 		delimiters: ['[[', ']]']
 	},
 	mounted () {
+		this.get_devices()
 	},
 	methods: {
-		get_moneydata() {
-			axios.get('https://api.coindesk.com/v1/bpi/currentprice.json')
-		             .then(response => (this.data = response))
-		             .catch(error => console.log(error))
+		change_data() {
+			this.data = 'blab'
 		},
 		get_devices() {
-			axios.get('http://localhost:8000/pd_monitor/jstest.html')
-		             .then(response => (this.data = response))
+			axios.get('http://localhost:8000/pd_monitor/json/')
+		             .then(response => (this.data = response.data))
 		             .catch(error => console.log(error))
 		},
 	}  
@@ -34,15 +33,13 @@ Table.component('device-list', {
 			<th></th>
 			</tr>
 		</thead>
-		<tbody>
-		{% for d in device %} 
+		<tbody> 
 			<tr>
-			<td><a href="{% url 'pd_monitor:detail' d.pk %}">{{ d.name }}</a></td>
+			<td><a href="{% url 'pd_monitor:detail' 1 %}">{{ device.name }}</a></td>
 			<td>0</td>
-			<td>{{ d.ip }}</td>
+			<td>id</td>
 			<td><button type="button" class="btn btn-light">Settings</button></td>
 			</tr>
-		{% endfor %}
 		</tbody>
 	</table>`,
 })

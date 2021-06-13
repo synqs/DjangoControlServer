@@ -3,11 +3,14 @@
 
 {% block content %}
 {{ device_list_json }}
+{{ device_list_json|json_script:"datas" }}
+
+<script>JSON.parse(document.getElementById('datas').innerHTML);</script>
 
 <hr class="rounded">
 
-<div class=container id="info-table">
-	<device-list v-bind:device="{{ device_list_json }}"></device-list>
+<div class=container id="info-table" v-bind:data="datas"> 
+	[[ data ]]
 </div>
 
 <script src="{% static 'jstest.js' %}"></script>
