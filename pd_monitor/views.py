@@ -1,5 +1,5 @@
 from django.shortcuts import render, get_object_or_404
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from django.core import serializers
 from .models import Device
 import json
@@ -16,17 +16,14 @@ def detail(request, question_id):
 	return render(request, 'pd_monitor/device_detail.html', context)
 
 def jstest(request):
-	# device_list_json = [i.get_json() for i in Device.objects.all()]
-	fields = ('pk', 'name', 'description', 'ip')
-	# device_list_json = serializers.serialize('json',Device.objects.all(),fields)
-	device_list_json = json.dumps(list(Device.objects.all().values('pk', 'name', 'description', 'ip')))
+	device_list_json = json.dumps(list(Device.objects.all().values()))
 	context = {'device_list_json' : device_list_json}
 	return render(request, 'pd_monitor/jstest.html', context)
 
 def json_data(request):
+	# device_list_json = Device.objects.all()
 	# device_list_json = [i.get_json() for i in Device.objects.all()]
-	fields = ['pk', 'name', 'description', 'ip']
-	# device_list_json = serializers.serialize('json',Device.objects.all(),fields)
-	device_list_json = json.dumps(list(Device.objects.all().values('pk', 'name', 'description', 'ip')))
+	# device_list_json = serializers.serialize('json',Device.objects.all(),fields=('pk', 'name', 'description', 'ip'))
+	device_list_json = json.dumps(list(Device.objects.all().values()))
 	context = {'device_list_json' : device_list_json}
-	return JsonResponse(context, safe=False)
+	return HttpResponse(device_list_json, content_type="application/json")

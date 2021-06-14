@@ -1,7 +1,7 @@
 const Table = Vue.createApp({
 	data() { return {
 		data : 'blub',
-		devices : null,
+		device_list : [{"id": 4}, {"name": "nakafake"}, {"description": "just a faker"}, {"sleeptime": 5.0}, {"ip": "0.0.0.0.34.42"}, {"port": "2"}, {"value": 1.0}, {"added_by_id": 'me'}],
 	}},
 	compilerOptions: {
 		delimiters: ['[[', ']]']
@@ -14,8 +14,8 @@ const Table = Vue.createApp({
 			this.data = 'blab'
 		},
 		get_devices() {
-			axios.get('http://localhost:8000/pd_monitor/json.html')
-		             .then(response => (this.data = response.data))
+			axios.get('http://localhost:8000/pd_monitor/jsondata/')
+		             .then(response => (this.device_list = response.data))
 		             .catch(error => console.log(error))
 		},
 	}  

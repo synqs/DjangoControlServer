@@ -3,14 +3,13 @@
 
 {% block content %}
 {{ device_list_json }}
-{{ device_list_json|json_script:"datas" }}
-
-<script>JSON.parse(document.getElementById('datas').innerHTML);</script>
 
 <hr class="rounded">
 
 <div class=container id="info-table"> 
-	[[ data ]]
+	[[ device_list ]]
+	<button v-on:click="get_devices">GetDev</script>
+	<device-list v-bind:devices="device_list"></device-list>
 </div>
 
 <script src="{% static 'jstest.js' %}"></script>
