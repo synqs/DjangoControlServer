@@ -26,8 +26,8 @@ def jstest(request):
 def json_data(request):
 	# device_list_json = [i.get_json() for i in Device.objects.all()]
 	fields = ['pk', 'name', 'description', 'ip']
-	device_list_json = serializers.serialize('json',Device.objects.all(),fields)
-	# device_list_json = json.dumps(list(Device.objects.all().values('pk', 'name', 'description', 'ip')))
+	# device_list_json = serializers.serialize('json',Device.objects.all(),fields)
+	device_list_json = json.dumps(list(Device.objects.all().values('pk', 'name', 'description', 'ip')))
 	context = {'device_list_json' : device_list_json}
 	return render(request, 'pd_monitor/json.html', context)
 

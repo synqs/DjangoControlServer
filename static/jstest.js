@@ -7,14 +7,14 @@ const Table = Vue.createApp({
 		delimiters: ['[[', ']]']
 	},
 	mounted () {
-		this.get_devices()
+		// this.get_devices()
 	},
 	methods: {
 		change_data() {
 			this.data = 'blab'
 		},
 		get_devices() {
-			axios.get('http://localhost:8000/pd_monitor/json/')
+			axios.get('http://localhost:8000/pd_monitor/json.html')
 		             .then(response => (this.data = response.data))
 		             .catch(error => console.log(error))
 		},
