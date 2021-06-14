@@ -33,7 +33,3 @@ class Device(models.Model):
 			"descripion" : self.description,
 			"ip" : self.ip
 			} 
-
-class JSONSerializer(Serializer):
-	def get_dump_object(self, obj):
-        	return self._current or {}
