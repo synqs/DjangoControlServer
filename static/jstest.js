@@ -1,7 +1,13 @@
 const Table = Vue.createApp({
 	data() { return {
 		data : 'blub',
-		device_list : [{"id": 4}, {"name": "nakafake"}, {"description": "just a faker"}, {"sleeptime": 5.0}, {"ip": "0.0.0.0.34.42"}, {"port": "2"}, {"value": 1.0}, {"added_by_id": 'me'}],
+		device_list : { id: 4,
+				name: 'nakafake',
+				description: 'just a faker',
+				sleeptime: 5.0,
+				ip: '0.0.0.0.34.42',
+				port: '2',value: 1.0,
+				added_by_id: 'me'},
 	}},
 	compilerOptions: {
 		delimiters: ['[[', ']]']
@@ -24,8 +30,8 @@ const Table = Vue.createApp({
 Table.component('device-list', {
 	props: ['device'],
 	template: 
-	`<table class="table table-striped">
-		<thead class="thead-dark">
+	`<table class='table table-striped'>
+		<thead class='thead-dark'>
 			<tr>
 			<th>Name</th>
 			<th>Status</th>
@@ -35,10 +41,10 @@ Table.component('device-list', {
 		</thead>
 		<tbody> 
 			<tr>
-			<td><a href="{% url 'pd_monitor:detail' 1 %}">{{ device.name }}</a></td>
+			<td>{{ device.name }}</td>
 			<td>0</td>
 			<td>id</td>
-			<td><button type="button" class="btn btn-light">Settings</button></td>
+			<td><button type='button' class='btn btn-light'>Settings</button></td>
 			</tr>
 		</tbody>
 	</table>`,

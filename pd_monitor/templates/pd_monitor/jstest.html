@@ -4,12 +4,16 @@
 {% block content %}
 {{ device_list_json }}
 
+<script>axios.get('http://129.206.182.149/arduino/read/all')
+	     .then(response => { console.log(response.data);})
+</script>	
+
 <hr class="rounded">
 
 <div class=container id="info-table"> 
 	[[ device_list ]]
-	<button v-on:click="get_devices">GetDev</script>
-	<device-list v-bind:devices="device_list"></device-list>
+	<button v-on:click="get_devices">GetDev</button>
+	<device-list v-bind:device="device_list"></device-list>
 </div>
 
 <script src="{% static 'jstest.js' %}"></script>
