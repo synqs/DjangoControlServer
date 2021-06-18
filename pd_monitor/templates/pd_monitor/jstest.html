@@ -4,16 +4,15 @@
 {% block content %}
 {{ device_list_json }}
 
-<script>axios.get('http://129.206.182.149/arduino/read/all')
+<!-- script>axios.get('http://129.206.182.149/arduino/read/all')
 	     .then(response => { console.log(response.data);})
-</script>	
+</script -->	
 
 <hr class="rounded">
 
 <div class=container id="info-table"> 
+	[[ data ]]
 	[[ device_list ]]
-	<button v-on:click="get_devices">GetDev</button>
-	<device-list v-bind:device="device_list"></device-list>
 </div>
 
 <script src="{% static 'jstest.js' %}"></script>
@@ -29,3 +28,8 @@
 	<button type="submit" class="btn btn-primary">Refresh!</button>
 </form> 
 {% endblock %}
+
+<device-list v-for="d in device_list" v-bind:device="d" v-bind:key="d.id"></device-list>
+
+{ id: 43, name: 'nakafake', description: 'just a faker', sleeptime: '5.0', ip: '0.0.0.0.34.42', port: '2',value: '1.0', added_by_id: 'me'},
+			{ id: 5, name: 'nakafake2', description: 'just a faker2', sleeptime: '5.2', ip: '0.0.0.0.2', port: '22',value: '1.2', added_by_id: 'me too'}

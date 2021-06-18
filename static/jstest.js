@@ -1,37 +1,32 @@
 const Table = Vue.createApp({
 	data() { return {
 		data : 'blub',
-		device_list : { id: 4,
-				name: 'nakafake',
-				description: 'just a faker',
-				sleeptime: 5.0,
-				ip: '0.0.0.0.34.42',
-				port: '2',value: 1.0,
-				added_by_id: 'me'},
-	}},
+		device_list : 'blab',
+		}
+	},
 	compilerOptions: {
 		delimiters: ['[[', ']]']
 	},
-	mounted () {
+	created () {
 		// this.get_devices()
 	},
 	methods: {
 		change_data() {
-			this.data = 'blab'
+			this.data = blab
 		},
 		get_devices() {
-			axios.get('http://localhost:8000/pd_monitor/jsondata/')
+			axios.get(http://localhost:8000/pd_monitor/jsondata/)
 		             .then(response => (this.device_list = response.data))
 		             .catch(error => console.log(error))
 		},
 	}  
 });
 
-Table.component('device-list', {
-	props: ['device'],
+Table.component(device-list, {
+	props: [device],
 	template: 
-	`<table class='table table-striped'>
-		<thead class='thead-dark'>
+	`<table class=table table-striped>
+		<thead class=thead-dark>
 			<tr>
 			<th>Name</th>
 			<th>Status</th>
@@ -39,15 +34,16 @@ Table.component('device-list', {
 			<th></th>
 			</tr>
 		</thead>
-		<tbody> 
+		<tbody>
 			<tr>
 			<td>{{ device.name }}</td>
 			<td>0</td>
-			<td>id</td>
-			<td><button type='button' class='btn btn-light'>Settings</button></td>
+			<td>{{ device.id }}</td>
+			<td><button type=button class=btn btn-light>Settings</button></td>
 			</tr>
+		{% endfor %}
 		</tbody>
 	</table>`,
 })
 
-Table.mount('#info-table')
+Table.mount(#info-table)
