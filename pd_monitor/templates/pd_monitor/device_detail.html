@@ -2,18 +2,8 @@
 
 {% block content %}
 {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
-<table class="table table-striped">
-	<thead class="thead-dark">
-		<tr>
-		<th colspan="2"><h2>{{ device.name }}</h2></th>
-		</tr>
-	</thead>
-	<tbody>
-		<tr><td>Description</td><td>{{ device.description }}</td></tr>
-		<tr><td>Address</td><td>{{ device.ip }}:{{ device.port }}</td></tr>
-		<tr><td>Sleeptime</td><td>{{ device.sleeptime }} sec</td></tr>
-	</tbody>
-</table>
+
+<script src="{% static 'index.js' %}"></script>
 {% endblock %}
 
 {% block redirect %}

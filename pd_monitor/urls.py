@@ -5,6 +5,5 @@ app_name = 'pd_monitor'
 urlpatterns = [
 	path('', views.index, name='index'),
 	path('<int:pk>/', views.detail, name='detail'),
-	path('jstest/', views.jstest, name='jstest'),
 	path('jsondata/', views.json_data, name='json_data')
 ]
