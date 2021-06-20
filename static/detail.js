@@ -1,11 +1,8 @@
-// document.getElementById("jstest").innerHTML = "JavaScript is imported in detail!";
-
-// document.getElementById("demo").innerHTML = "Hello JavaScript!";
 // document.write("Kill");
 
 const DetailTable = Vue.createApp({
 	data() { return {
-		device : { id: 43, name: 'nakafake', description: 'just a faker', sleeptime: '5.0', ip: '0.0.0.0.34.42', port: '2',value: '1.0', added_by_id: 'me'},
+		device_data : { id: 43, name: 'nakafake', description: 'just a faker', sleeptime: '5.0', ip: '0.0.0.0.34.42', port: '2',value: '1.0', added_by_id: 'me'},
 		}
 	},
 	compilerOptions: {
@@ -62,4 +59,4 @@ DetailTable.component('device-widget', {
 	<td><button type="button" class="btn btn-light">Settings</button></td>
 	</tr>`,
 })
-DetailTable.mount('#info-table')
+DetailTable.mount('#detail-table')

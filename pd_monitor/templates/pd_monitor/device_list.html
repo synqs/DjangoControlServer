@@ -6,20 +6,14 @@
 	     .then(response => { console.log(response.data);})
 </script -->	
 
-<div class=container id="index-table"> 
-	[[ data ]]
+<div class=container id="index-table">
 	[[ device_list ]]
 	<device-table v-bind:devices="device_list"></device-table>
-	<button v-on:click=get_devices type="button" type="btn">Refresh</button>
+	<button v-on:click=get_devices type="button" type="btn btn-primary">Refresh</button>
 </div>
 
 <script src="{% static 'index.js' %}"></script>
 {% endblock content %}
 
-{% block redirect %}
-<br>
-<form action="{% url 'pd_monitor:index' %}">
-	{% csrf_token %}
-	<button type="submit" class="btn btn-primary">Refresh!</button>
-</form> 
+{% block redirect %} 
 {% endblock %}

@@ -9,8 +9,8 @@ def index(request):
 	context = {'device_list_json' : device_list_json}
 	return render(request, 'pd_monitor/device_list.html', context)
 
-def detail(request, question_id):
-	device = get_object_or_404(Device, pk=question_id)
+def detail(request, device_id):
+	device = get_object_or_404(Device, pk=device_id)
 	context = { 'device' : device }
 	return render(request, 'pd_monitor/device_detail.html', context)
 

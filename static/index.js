@@ -1,28 +1,25 @@
-// document.getElementById("demo").innerHTML = "Hello JavaScript!";
 document.write("Kill");
 
 const IndexTable = Vue.createApp({
 	data() { return {
-		data : 'blub',
-		device_list : [{ id: 43, name: 'nakafake', description: 'just a faker', sleeptime: '5.0', ip: '0.0.0.0.34.42', port: '2',value: '1.0', added_by_id: 'me'},
-			{ id: 5, name: 'nakafake2', description: 'just a faker2', sleeptime: '5.2', ip: '0.0.0.0.2', port: '22',value: '1.2', added_by_id: 'me too'},]
+		device_list : null
 		}
 	},
 	compilerOptions: {
 		delimiters: ['[[', ']]']
 	},
 	created () {
-		// this.get_devices()
+		this.get_devices()
 	},
 	methods: {
-		change_data() {
-			this.data = blab
-		},
 		get_devices() {
 			axios.get('http://localhost:8000/pd_monitor/jsondata/')
 		             .then(response => (this.device_list = response.data))
 		             .catch(error => console.log(error))
 		},
+		get_details() {
+			const path = '/pd_monitor', 
+		}
 	}  
 });
 
@@ -51,8 +48,8 @@ IndexTable.component('device-widget', {
 	props: ['device'],
 	template: 
 	`<tr>
-	<td><a href="{% url 'pd_monitor:detail' device.id %}">{{ device.name }}</a></td>
-	<td>{{ device.ip }}</td>
+	<td><a v-bind:href="pd_monitor/">{{ device.name }}</a></td>
+	<td>{{ device.ip }} blub</td>
 	<td>{{ device.port }}</td>
 	<td>0</td>
 	<td><button type="button" class="btn btn-light">Settings</button></td>
