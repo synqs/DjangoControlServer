@@ -1,7 +1,7 @@
-document.getElementById("jstest").innerHTML = "JavaScript is imported in detail!";
+// document.getElementById("jstest").innerHTML = "JavaScript is imported in detail!";
 
-document.getElementById("demo").innerHTML = "Hello JavaScript!";
-document.write("Kill");
+// document.getElementById("demo").innerHTML = "Hello JavaScript!";
+// document.write("Kill");
 
 const DetailTable = Vue.createApp({
 	data() { return {

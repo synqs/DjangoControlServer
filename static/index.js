@@ -1,4 +1,4 @@
-document.getElementById("demo").innerHTML = "Hello JavaScript!";
+// document.getElementById("demo").innerHTML = "Hello JavaScript!";
 document.write("Kill");
 
 const IndexTable = Vue.createApp({
@@ -35,8 +35,9 @@ IndexTable.component('device-table', {
 		<thead class="thead-dark">
 			<tr>
 			<th>Name</th>
-			<th>Status</th>
 			<th>IP</th>
+			<th>Port</th>
+			<th>Status</th>
 			<th></th>
 			</tr>
 		</thead>
@@ -50,9 +51,10 @@ IndexTable.component('device-widget', {
 	props: ['device'],
 	template: 
 	`<tr>
-	<td>{{ device.name }}</td>
+	<td><a href="{% url 'pd_monitor:detail' device.id %}">{{ device.name }}</a></td>
+	<td>{{ device.ip }}</td>
+	<td>{{ device.port }}</td>
 	<td>0</td>
-	<td>{{ device.id }}</td>
 	<td><button type="button" class="btn btn-light">Settings</button></td>
 	</tr>`,
 })
