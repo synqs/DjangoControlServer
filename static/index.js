@@ -1,5 +1,3 @@
-document.write("Kill");
-
 const IndexTable = Vue.createApp({
 	data() { return {
 		device_list : null
@@ -8,7 +6,7 @@ const IndexTable = Vue.createApp({
 	compilerOptions: {
 		delimiters: ['[[', ']]']
 	},
-	created () {
+	mounted () {
 		this.get_devices()
 	},
 	methods: {
@@ -17,10 +15,7 @@ const IndexTable = Vue.createApp({
 		             .then(response => (this.device_list = response.data))
 		             .catch(error => console.log(error))
 		},
-		get_details() {
-			const path = '/pd_monitor', 
-		}
-	}  
+	},  
 });
 
 IndexTable.component('device-table', {
@@ -41,15 +36,21 @@ IndexTable.component('device-table', {
 		<tbody>
 		<device-widget v-for="d in devices" v-bind:device="d" v-bind:key="d.id"></device-widget>
 		</tbody>
-	</table>`,
+	</table>
+	`,
 })
 
 IndexTable.component('device-widget', {
 	props: ['device'],
+	data() {
+        	return {
+            		url: 'https://ecosia.org'
+        	}
+    	},
 	template: 
 	`<tr>
-	<td><a v-bind:href="pd_monitor/">{{ device.name }}</a></td>
-	<td>{{ device.ip }} blub</td>
+	<td><a v-bind:href="'/pd_monitor/' + device.id">{{ device.name }}</a></td>
+	<td>{{ device.ip }}</td>
 	<td>{{ device.port }}</td>
 	<td>0</td>
 	<td><button type="button" class="btn btn-light">Settings</button></td>

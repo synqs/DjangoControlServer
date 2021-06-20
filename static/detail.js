@@ -2,19 +2,21 @@
 
 const DetailTable = Vue.createApp({
 	data() { return {
-		device_data : { id: 43, name: 'nakafake', description: 'just a faker', sleeptime: '5.0', ip: '0.0.0.0.34.42', port: '2',value: '1.0', added_by_id: 'me'},
+		device : null,
+		data : null
 		}
 	},
 	compilerOptions: {
 		delimiters: ['[[', ']]']
 	},
 	created () {
-		// this.get_devices()
+		// this.get_data()
 	},
 	methods: {
-		get data() {
-			axios.get('http://localhost:8000/pd_monitor/jsondata/')
-		             .then(response => (this.device_list = response.data))
+		get_data() {
+			path = device_data.ip + '/read/all/'
+			axios.get(path)
+		             .then(response => (this.data = response.data))
 		             .catch(error => console.log(error))
 		},
 	}  
@@ -23,7 +25,7 @@ const DetailTable = Vue.createApp({
 DetailTable.component('detail-table', {
 	props: ['device'],
 	template: `
-	<h2>{{ device.name }} : {{ device:description }}</h2>
+	<h2>{{ device.name }} : {{ device.description }}</h2>
 	<hr class="rounded">
 	<table class="table table-striped">
 		<thead class="thead-dark">
@@ -40,23 +42,15 @@ DetailTable.component('detail-table', {
 		<tr>
 			<td>{{ device.ip }}</td>
 			<td>{{ device.port }}</td>
-			<td>{{ device.status</td>
+			<td>{{ device.status }}</td>
 			<td>{{ device.sleeptime }}</td>
 			<td>{{ device.added_by }}</td>
 			<td><button type="button" class="btn btn-light">Settings</button></td>
-		</tr
+		</tr>
 		</tbody>
 	</table>`,
 })
 
-DetailTable.component('device-widget', {
-	props: ['device'],
-	template: 
-	`<tr>
-	<td>{{ device.name }}</td>
-	<td>0</td>
-	<td>{{ device.id }}</td>
-	<td><button type="button" class="btn btn-light">Settings</button></td>
-	</tr>`,
-})
+DeviceData.component('device-data
+
 DetailTable.mount('#detail-table')
