@@ -1,20 +1,20 @@
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse
-from .models import Device
+from .models import PDmon
 import json
 
 # Create your views here.
 def index(request):
-	device_list_json = json.dumps(list(Device.objects.all().values()))
-	context = {'device_list_json' : device_list_json}
-	return render(request, 'pd_monitor/device_list.html', context)
+	pdmon_list_json = json.dumps(list(PDmon.objects.all().values()))
+	context = {'pdmon_list_json' : pdmon_list_json}
+	return render(request, 'pd_monitor/pdmon_list.html', context)
 
-def detail(request, device_id):
-	device = get_object_or_404(Device, pk=device_id)
-	context = { 'device' : device }
-	return render(request, 'pd_monitor/device_detail.html', context)
+def detail(request, pdmon_id):
+	pdmon = get_object_or_404(PDmon, pk=pdmon_id)
+	context = { 'pdmon' : pdmon }
+	return render(request, 'pd_monitor/pdmon_detail.html', context)
 
 def json_data(request):
-	device_list_json = json.dumps(list(Device.objects.all().values()))
-	context = {'device_list_json' : device_list_json}
-	return HttpResponse(device_list_json, content_type="application/json")
+	pdmon_list_json = json.dumps(list(PDmon.objects.all().values()))
+	context = {'pdmon_list_json' : pdmon_list_json}
+	return HttpResponse(pdmon_list_json, content_type="application/json")

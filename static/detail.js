@@ -49,14 +49,4 @@ DetailTable.component('detail-table', {
 	</table>`,
 })
 
-DetailTable.component('device-widget', {
-	props: ['device'],
-	template: 
-	`<tr>
-	<td>{{ device.name }}</td>
-	<td>0</td>
-	<td>{{ device.id }}</td>
-	<td><button type="button" class="btn btn-light">Settings</button></td>
-	</tr>`,
-})
 DetailTable.mount('#detail-table')
