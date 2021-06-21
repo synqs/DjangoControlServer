@@ -11,14 +11,14 @@ const IndexTable = Vue.createApp({
 	},
 	methods: {
 		get_devices() {
-			axios.get('http://localhost:8000/pd_monitor/index/')
+			axios.get('http://localhost:8000/pd_monitor/jsondata/')
 		             .then(response => (this.device_list = response.data))
 		             .catch(error => console.log(error))
 		},
 	},  
 });
 
-IndexTable.component('device-header', {
+IndexTable.component('device-table', {
 	props: ['devices'],
 	template:`
 	<h2>Device Index</h2>

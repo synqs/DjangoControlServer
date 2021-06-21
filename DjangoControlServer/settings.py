@@ -124,7 +124,6 @@ STATIC_URL = '/static/'
 
 STATICFILES_DIRS = [
 	BASE_DIR / 'static',
-	# '/static/',
 ]
 
 # Default primary key field type
@@ -133,4 +132,5 @@ STATICFILES_DIRS = [
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Allow cross-site references
+
 SESSION_COOKIE_SAMESITE = 'None'

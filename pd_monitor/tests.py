@@ -1,7 +1,7 @@
 from django.test import TestCase
 from django.urls import reverse
 
-from .models import Device
+from .models import PDmon
 
 # Create your tests here.
 class DeviceIndexViewTests(TestCase):

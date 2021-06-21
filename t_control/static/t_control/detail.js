@@ -2,7 +2,8 @@
 
 const DetailTable = Vue.createApp({
 	data() { return {
-		device : null
+		device : null,
+		data : null
 		}
 	},
 	compilerOptions: {
@@ -12,7 +13,11 @@ const DetailTable = Vue.createApp({
 		// this.get_data()
 	},
 	methods: {
-		get_device() {
+		get_data() {
+			path = device_data.ip + '/read/all/'
+			axios.get(path)
+		             .then(response => (this.data = response.data))
+		             .catch(error => console.log(error))
 		},
 	}  
 });
@@ -46,4 +51,9 @@ DetailTable.component('detail-table', {
 	</table>`,
 })
 
+<<<<<<< HEAD
+=======
+DeviceData.component('device-data
+
+>>>>>>> refs/remotes/origin/main
 DetailTable.mount('#detail-table')

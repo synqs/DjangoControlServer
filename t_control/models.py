@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.models import User
 
 # Create your models here.
 class Tcrtl(models.Model):
@@ -9,9 +10,9 @@ class Tcrtl(models.Model):
 	ip = models.CharField(max_length=20, blank=True)		# device ip
 	port = models.CharField(max_length=4, default=80)		# device port (incl. default=80 for YUN ?)
 
-	added_by = models.ForeignKey(User, related_name='devices', on_delete=models.CASCADE, blank=True, null=True)
+	tcrtl_added_by = models.ForeignKey(User, related_name='tctrls', on_delete=models.CASCADE, blank=True, null=True)
 
-	setpoint = models.IntField(default=25)
+	setpoint = models.IntegerField(default=25)
 	value = models.FloatField()
 	output = models.FloatField()
 	error = models.FloatField()

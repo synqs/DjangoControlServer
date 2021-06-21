@@ -4,8 +4,9 @@
 {% block content %}
 {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
 
+{{ pdmon }}
+
 <div class=container id="detail-table">
-	[[ device_data ]]
 	<detail-table v-bind:device="device_data" v-bind:key="device_data.id"></detail-table>
 </div>
 

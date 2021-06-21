@@ -7,9 +7,8 @@
 </script -->	
 
 <div class=container id="index-table">
-	[[ device_list ]]
 	<device-table v-bind:devices="device_list"></device-table>
-	<button v-on:click=get_devices type="button" type="btn btn-primary">Refresh</button>
+	<button v-on:click=get_devices type="button" class="btn btn-primary">Refresh</button>
 </div>
 
 <script src="{% static 'index.js' %}"></script>
