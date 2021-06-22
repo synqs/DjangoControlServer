@@ -1,20 +1,31 @@
 const IndexTable = Vue.createApp({
 	data() { return {
-		device_list : null
+		pdmon_list : null,
+		tctrl_list : null,
 		}
 	},
 	compilerOptions: {
 		delimiters: ['[[', ']]']
 	},
 	mounted () {
-		this.get_devices()
+		// this.get_pdmons()
 	},
 	methods: {
-		get_devices() {
+		get_pdmons() {
 			axios.get('http://localhost:8000/pd_monitor/index/')
-		             .then(response => (this.device_list = response.data))
-		             .catch(error => console.log(error))
+			     .then(response => (this.pdmon_list = response.data))
+			     .catch(error => console.log(error))
 		},
+		get_pdmons_json() {
+			axios.get('http://localhost:8000/pd_monitor/json/')
+			     .then(response => (this.pdmon_list = response.data))
+			     .catch(error => console.log(error))
+		},		
+		get_tcrls() {
+			axios.get('http://localhost:8000/t_control/index/')
+		             .then(response => (this.tcrtl_list = response.data))
+		             .catch(error => console.log(error))
+		}
 	},  
 });
 
@@ -42,11 +53,6 @@ IndexTable.component('device-header', {
 
 IndexTable.component('device-widget', {
 	props: ['device'],
-	data() {
-        	return {
-            		url: 'https://ecosia.org'
-        	}
-    	},
 	template: 
 	`<tr>
 	<td><a v-bind:href="'/pd_monitor/' + device.id">{{ device.name }}</a></td>

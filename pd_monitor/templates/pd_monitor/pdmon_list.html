@@ -7,8 +7,9 @@
 </script -->	
 
 <div class=container id="index-table">
-	<device-table v-bind:devices="device_list"></device-table>
-	<button v-on:click=get_devices type="button" class="btn btn-primary">Refresh</button>
+	<device-header v-bind:devices="pdmon_list"></device-header>
+	<button v-on:click="get_pdmons" type="button" class="btn btn-primary">GET PDMONS</button>
+	<button v-on:click="get_pdmons_json" type="button" class="btn btn-primary">GET PDMONS JSON</button>
 </div>
 
 <script src="{% static 'index.js' %}"></script>
