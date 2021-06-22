@@ -3,6 +3,6 @@ from . import views
 
 app_name = 't_control'
 urlpatterns = [
-	path('', views.index, name='index'),
-	path('<int:device_id>/', views.detail, name='detail')
+	path('', views.index, name='tctrl_index'),
+	path('<int:tctrl_id>/', views.detail, name='tctrl_detail')
 ]

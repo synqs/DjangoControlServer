@@ -3,7 +3,6 @@ from . import views
 
 app_name = 'pd_monitor'
 urlpatterns = [
-	path('', views.index, name='index'),
-	path('<int:device_id>/', views.detail, name='detail'),
-	path('json/', views.json_data, name='json_data')
+	path('', views.index, name='pdmon_index'),
+	path('<int:pdmon_id>/', views.detail, name='pdmon_detail'),
 ]

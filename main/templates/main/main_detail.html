@@ -4,17 +4,13 @@
 {% block content %}
 {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
 
-{{ pdmon }}
-
-<div class=container id="detail-table">
-	<detail-table v-bind:device="device_data" v-bind:key="device_data.id"></detail-table>
-</div>
+<div class=container id="detail-table"></div>
 
 <script src="{% static 'detail.js' %}"></script>
 {% endblock %}
 
 {% block redirect %}
-<form action="{% url 'pd_monitor:index' %}">
+<form action="{% url 'main:index' %}">
 	{% csrf_token %}
 	<input type="submit" value="Back to Index" class="btn btn-primary">
 </form>

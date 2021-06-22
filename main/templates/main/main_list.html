@@ -1,4 +1,4 @@
-{% extends "pd_monitor/masterpage.html" %}
+{% extends "main/masterpage.html" %}
 {% load static %}
 
 {% block content %}
@@ -7,8 +7,6 @@
 </script -->	
 
 <div class=container id="index-table">
-	<device-header v-bind:devices="pdmon_list"></device-header>
-	<button v-on:click="get_pdmons" type="button" class="btn btn-primary">GET PDMONS</button>
 </div>
 
 <script src="{% static 'index.js' %}"></script>

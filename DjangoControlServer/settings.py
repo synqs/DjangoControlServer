@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
+    'main.apps.MainConfig',
     'pd_monitor.apps.PdMonitorConfig',
     't_control.apps.TControlConfig',
 ]
@@ -123,7 +124,7 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 STATICFILES_DIRS = [
-	BASE_DIR / 'static',
+	BASE_DIR / 'main/static/main/',
 ]
 
 # Default primary key field type
@@ -134,4 +135,4 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # Allow cross-site references
 
 SESSION_COOKIE_SAMESITE = 'None'
-CRSF_COOKIE_SAMESITE = 'None'
+CSRF_COOKIE_SAMESITE = 'None'
