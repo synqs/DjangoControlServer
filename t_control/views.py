@@ -10,6 +10,6 @@ def index(request):
 	return HttpResponse(tctrl_list_json, content_type="application/json")
 
 def detail(request, tctrl_id):
-	tctrl = get_object_or_404(Tctrl, pk=tctrl_id)
-	context = { 'tctrl_detail_json' : tctrl }
-	return HttpResponse(tctrl_list_json, content_type="application/json")
+	tctrl_detail_json = get_object_or_404(Tctrl, pk=tctrl_id)
+	context = { 'tctrl_detail_json' : tctrl_detail_json }
+	return HttpResponse(tctrl_detail_json, content_type="application/json")

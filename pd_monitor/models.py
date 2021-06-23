@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 
 # Create your models here.
 class PDmon(models.Model):
+	# dtype = models.CharField(max_length=20, default='pdmon') 
 	name = models.CharField(max_length=20, unique=True)		# should match DNS name eg. nakayun1
 	description = models.CharField(max_length=100, blank=True)	# add. description eg. 2D-MOT path
 	sleeptime = models.FloatField(default=5)
