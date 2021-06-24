@@ -31,16 +31,13 @@ class Tctrl(models.Model):
 	ip = models.CharField(max_length=20, blank=True)		# device ip
 	port = models.CharField(max_length=4, default=80)		# device port (incl. default=80 for YUN ?)
 
-	tcrtl_added_by = models.ForeignKey(User, related_name='tctrls', on_delete=models.CASCADE)
-
-	setpoint = models.IntegerField(default=25)
-	value = models.FloatField()
-	output = models.FloatField()
-	error = models.FloatField()
-	gain = models.FloatField(default=1)
+	setpoint = models.IntegerField(blank=True, default=25)
+	value = models.FloatField(blank=True, default=0)
+	output = models.FloatField(blank=True, default=0)
+	error = models.FloatField(blank=True, default=0)
+	gain = models.FloatField(blank=True, default=1)
 	tauI = models.FloatField(blank=True, default=100)
 	tauD =  models.FloatField(blank=True, default=0)
-	
 	
 	def __str__(self):
 		return self.name

@@ -1,7 +1,8 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse
 from .models import PDmon, Tctrl
-import json
+from django.core import serializers
+from itertools import chain
 
 # Create your views here.
 def index(request):
@@ -9,13 +10,13 @@ def index(request):
 
 # Create your views here.
 def device_index(request):
-	liste = list(PDmon.objects.all().values())
-	liste.append(list(Tctrl.objects.all().values()))
-	device_list_json = json.dumps(liste)
-	context = {'device_list_json' : device_list_json}
-	return HttpResponse(device_list_json, content_type="application/json")
+	pdmons = PDmon.objects.all()
+	tctrls = Tctrl.objects.all()
+	res = serializers.serialize('json',list(chain(pdmons, tctrls)))
+	
+	return HttpResponse(res)
 
-def detail(request, pdmon_id):
-	pdmon_detail_json = get_object_or_404(PDmon, pk=pdmon_id)
-	context = { 'pdmon_detail_json' : pdmon_detail_json }
-	return HttpResponse(pdmon_detail_json, content_type="application/json")
+def device_detail(request, device_name):
+	device_detail_json = get_object_or_404(PDmon, name=device_name)
+	context = { 'device_detail_json' : device_detail_json }
+	return HttpResponse(device_detail_json, content_type="application/json")
