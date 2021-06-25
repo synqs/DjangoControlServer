@@ -1,12 +1,16 @@
-{% extends "pd_monitor/masterpage.html" %}
+{% extends "main/masterpage.html" %}
 {% load static %}
 
 {% block content %}
-{% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
 
-<div class=container id="detail-table"></div>
+{{ detail }}
+
+<div class=container id="devicedetail">
+	<detail-table v-bind:device_detail="{{ detail }}"></detail-table>
+</div>
 
 <script src="{% static 'detail.js' %}"></script>
+<script src="{% static 'pddata.js' %}"></script>
 {% endblock %}
 
 {% block redirect %}

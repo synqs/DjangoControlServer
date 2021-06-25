@@ -1,19 +1,8 @@
 const PDdata = Vue.createApp({
 	data() { return {
-		pdarray : {},
+		pdarray : null,
 		}
 	},
-	methods: {
-		get_pddata() {
-			path = device_data.ip + '/arduino/pdmon/read/all/'
-			axios.get(path)
-		             .then(response => (this.pdarray = response.data))
-		             .catch(error => console.log(error))
-		},
-	}
-});
-
-PDdata.component('pddata-header', {
 	template: `
 		<table class="table table-striped">
 			<thead class="thead-dark">
@@ -23,11 +12,19 @@ PDdata.component('pddata-header', {
 				</tr>
 			</thead>
 			<tbody>
-				<pddata-widget>
+				<pddata-widget></pddata-widget>
 			</tbody>
 		</table>
 	`,
-})
+	methods: {
+		get_pddata() {
+			path = device_data.ip + '/arduino/pdmon/read/all/'
+			axios.get(path)
+		             .then(response => (this.pdarray = response.data))
+		             .catch(error => console.log(error))
+		},
+	}
+});
 
 PDdata.component('pddata-widget', {
 	props: ['values'],

@@ -24,7 +24,7 @@ const DetailTable = Vue.createApp({
 DetailTable.component('detail-table', {
 	props: ['device_detail'],
 	template: `
-	<h2>{{ device_detail.fields.name }} : {{ device_detail.fields.description }}</h2>
+	<h2>{{ device_detail.name }} : {{ device_detail.description }}</h2>
 	<hr class="rounded">
 	<table class="table table-striped">
 		<thead class="thead-dark">
@@ -38,7 +38,7 @@ DetailTable.component('detail-table', {
 			</tr>
 		</thead>
 		<tbody>
-			<detail-widget v-bind:device="device_detail.fields" :key="device_detail.pk"></detail-widget>
+			<detail-widget v-bind:device="device_detail"></detail-widget>
 		</tbody>
 	</table>
 	`,
@@ -48,10 +48,10 @@ DetailTable.component('detail-widget', {
 	props: ['device'],
 	template: `
 	<tr>
-		<td>{{ device.ip }}</td>
-		<td>{{ device.port }}</td>
+		<td>device.ip</td>
+		<td>device.port</td>
 		<td>status</td>
-		<td>{{ device.sleeptime }}</td>
+		<td>sleeptime</td>
 		<td>pdmon_added_by</td>
 		<td><button type="button" class="btn btn-light">Settings</button></td>
 	</tr>
