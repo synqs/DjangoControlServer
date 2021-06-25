@@ -1,10 +1,6 @@
 const PDdata = Vue.createApp({
 	data() { return {
-<<<<<<< HEAD:pd_monitor/static/pd_monitor/pddata.js
-		pdarray : {0,0,0,0,0,0,0,0,0,0,0,0},
-=======
 		pdarray : null,
->>>>>>> unity:main/static/main/pddata.js
 		}
 	},
 	template: `
@@ -16,14 +12,9 @@ const PDdata = Vue.createApp({
 				</tr>
 			</thead>
 			<tbody>
-<<<<<<< HEAD:pd_monitor/static/pd_monitor/pddata.js
-				<pddata-widget v-bind:values="pdarray"></pddata-widget>
-=======
 				<pddata-widget></pddata-widget>
->>>>>>> unity:main/static/main/pddata.js
 			</tbody>
 		</table>
-		<button v-on:click="get_pddata">REFRESH</button>
 	`,
 	methods: {
 		get_pddata() {
