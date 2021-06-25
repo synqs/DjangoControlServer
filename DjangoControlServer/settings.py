@@ -39,8 +39,6 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'main.apps.MainConfig',
-    'pd_monitor.apps.PdMonitorConfig',
-    't_control.apps.TControlConfig',
 ]
 
 MIDDLEWARE = [

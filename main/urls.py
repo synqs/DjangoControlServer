@@ -4,5 +4,10 @@ from . import views
 app_name = 'main'
 urlpatterns = [
 	path('index/', views.index, name='index'),
+<<<<<<< HEAD
 	path('', views.index),
+=======
+	path('devices/', views.device_index, name='device_index'),
+	path('<str:device_type>/<str:device_name>/', views.detail, name='detail'),
+>>>>>>> unity
 ]
