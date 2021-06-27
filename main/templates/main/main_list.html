@@ -17,8 +17,7 @@
 {% endblock content %}
 
 {% block redirect %} 
-<form action="{% url 'main:index' %}">
-	{% csrf_token %}
+<form action="{% url 'main:index' %}" method="get">
 	<input type="submit" class="btn btn-primary" value="REFRESH">
 </form>
 {% endblock %}
