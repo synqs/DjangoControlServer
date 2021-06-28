@@ -59,3 +59,57 @@ DetailTable.component('detail-widget', {
 })
 
 DetailTable.mount('#devicedetail')
+
+const PDData = Vue.createApp({
+	data () { return {
+			appdevice : { 'name' : 'fake', ip : '129.206.182.149'},
+			appdata : "appdata",
+		}
+	},
+	template: `
+		{{ appdevice }}
+		{{ appdata }}
+		<button v-on:click="get_data()">DATA</button>
+	`,
+	created () {
+		// this.get_data()
+	},
+	methods: {
+		get_data() {
+			axios.get('http://' + this.appdevice.ip + '/data/get')
+		             .then(response => (this.data = response.data))
+		             .catch(error => console.log(error))
+		},
+	},
+})
+
+PDData.component( 'pddata-table', {
+	props: ['device', 'data'],
+	template: `
+		{{ device }}
+		{{ data }}
+		<table class="table table-striped">
+			<thead class="thead-dark">
+				<tr>
+				<th>Time</th>
+				<th cols=12>Input</th>
+				</tr>
+			</thead>
+			<tbody>
+				<!-- pddata-widget v-bind:values="data"></pddata-widget -->
+			</tbody>
+		</table>
+	`,
+})
+
+PDData.component( 'pddata-widget', {
+	props : ['values'],
+	template: `
+		{{ values }}
+		<tr>
+		<td v-for="v in values">{{ v }}</td>
+		</tr>
+	`,
+})
+
+PDData.mount('#pddata')
