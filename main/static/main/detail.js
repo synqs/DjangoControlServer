@@ -61,6 +61,7 @@ DetailTable.component('detail-widget', {
 DetailTable.mount('#devicedetail')
 
 const PDData = Vue.createApp({
+	/*
 	data () { return {
 			appdevice : { 'name' : 'fake', ip : '129.206.182.149'},
 			appdata : "appdata",
@@ -81,10 +82,15 @@ const PDData = Vue.createApp({
 		             .catch(error => console.log(error))
 		},
 	},
+	*/
 })
 
 PDData.component( 'pddata-table', {
-	props: ['device', 'data'],
+	data () { return {
+		data : null,
+		}
+	},
+	props: ['device'],
 	template: `
 		{{ device }}
 		{{ data }}
@@ -99,7 +105,22 @@ PDData.component( 'pddata-table', {
 				<!-- pddata-widget v-bind:values="data"></pddata-widget -->
 			</tbody>
 		</table>
+		<button v-on:click="get_data()">DATA</button>
 	`,
+	methods: {
+		get_data() {
+			axios.defaults.headers.get['Access-Control-Allow-Origin'] = '*';
+			axios.get('http://' + this.device.fields.ip + '/data/get', {headers: {
+                    "Content-Type": "application/json",
+                    "Cookie": this.sessionid,
+                    "Access-Control-Allow-Origin": "*",
+                    "Access-Control-Allow-Methods": "GET, POST, PATCH, PUT, DELETE, OPTIONS",
+                    "Access-Control-Allow-Headers": "Origin, Content-Type, X-Auth-Token, Authorization, Accept,charset,boundary,Content-Length"
+                }, })
+		             .then(response => (this.data = response.data))
+		             .catch(error => console.log(error))
+		},
+	},
 })
 
 PDData.component( 'pddata-widget', {
