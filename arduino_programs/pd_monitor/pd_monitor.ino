@@ -47,26 +47,15 @@ void loop() {
 
 void process(BridgeClient client) {
   String command = client.readStringUntil('/');	// Read the command
-  String component = client.readStringUntil('\r'); // Read component
   
-  if (component == "all") { // Read all channels and store in values
-    for (int i = 0; i <= 11; i++) {
-      char output[5];
-      values[i] = analogRead(pins[i]) * 0.01257558; // Own calibration
-      // client.print(values[i]); client.print(", ");
-      dtostrf(values[i],sizeof(output),2,output); // Convert values to string of format "xx.yy"
-      client.print(output); client.print(", ");
-    }
-  }
-
-	//if (command == "read") { // Is "read" command?
-  //  readCommand(client);
-	//}
+	if (command == "read") { // Is "read" command?
+    readCommand(client);
+	}
 }
 
-/*
+
 void readCommand(BridgeClient client) {
-  String component = client.readStringUntil('\r'); // Read component
+  String component = client.readStringUntil('/'); // Read component
 
   if (component == "all") { // Read all channels and store in values
     for (int i = 0; i <= 11; i++) {
@@ -77,7 +66,7 @@ void readCommand(BridgeClient client) {
       client.print(output); client.print(", ");
     }
   }
-
+  /*
   // IMPLEMENT SINGLE/SELECTIVE CHANNEL READOUT ?
   else {
     for (int i = 0; i <= component.length(); i++) {
@@ -87,5 +76,5 @@ void readCommand(BridgeClient client) {
       //client.print(voltage);
     }
   }
+  */
 }
-*/

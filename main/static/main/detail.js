@@ -1,25 +1,4 @@
-const DetailTable = Vue.createApp({
-	/*
-	data() { return {
-		meta : null,
-		device : null,
-		}
-	},
-	compilerOptions: {
-		delimiters: ['[[', ']]']
-	},
-	created () {
-		// this.get_data()
-	},
-	methods: {
-		get_device(device_id) {
-			axios.get('http://localhost:8000/pd_monitor/' + device_id)
-		             .then(response => (this.device = response.data))
-		             .catch(error => console.log(error))
-		},
-	}
-	*/  
-});
+const DetailTable = Vue.createApp({})
 
 DetailTable.component('detail-table', {
 	props: ['device_detail'],
@@ -50,9 +29,9 @@ DetailTable.component('detail-widget', {
 	<tr>
 		<td>{{ device.ip }}</td>
 		<td>{{ device.port }}</td>
-		<td>status</td>
+		<td>online</td>
 		<td>{{ device.sleeptime }}</td>
-		<td>pdmon_added_by</td>
+		<td>nakalab</td>
 		<td><button type="button" class="btn btn-light">Settings</button></td>
 	</tr>
 	`,
@@ -60,30 +39,9 @@ DetailTable.component('detail-widget', {
 
 DetailTable.mount('#devicedetail')
 
-const PDData = Vue.createApp({
-	/*
-	data () { return {
-			appdevice : { 'name' : 'fake', ip : '129.206.182.149'},
-			appdata : "appdata",
-		}
-	},
-	template: `
-		{{ appdevice }}
-		{{ appdata }}
-		<button v-on:click="get_data()">DATA</button>
-	`,
-	created () {
-		// this.get_data()
-	},
-	methods: {
-		get_data() {
-			axios.get('http://' + this.appdevice.ip + '/data/get')
-		             .then(response => (this.data = response.data))
-		             .catch(error => console.log(error))
-		},
-	},
-	*/
-})
+/* PDDATA APPLICATION */
+
+const PDData = Vue.createApp({})
 
 PDData.component( 'pddata-table', {
 	data () { return {
@@ -109,10 +67,8 @@ PDData.component( 'pddata-table', {
 	`,
 	methods: {
 		get_data() {
-			axios.defaults.headers.get['Access-Control-Allow-Origin'] = '*';
 			axios.get('http://' + this.device.fields.ip + '/data/get', {headers: {
                     "Content-Type": "application/json",
-                    "Cookie": this.sessionid,
                     "Access-Control-Allow-Origin": "*",
                     "Access-Control-Allow-Methods": "GET, POST, PATCH, PUT, DELETE, OPTIONS",
                     "Access-Control-Allow-Headers": "Origin, Content-Type, X-Auth-Token, Authorization, Accept,charset,boundary,Content-Length"

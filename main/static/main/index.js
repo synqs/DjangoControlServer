@@ -36,25 +36,25 @@ IndexTable.component('index-table', {
 			<th>IP</th>
 			<th>Port</th>
 			<th>Status</th>
-			<th></th>
+			<th>Type</th>
 			</tr>
 		</thead>
 		<tbody>
-		<device-widget v-for="d in device_list" v-bind:device="d.fields" :meta="d.model" :key="d.pk"></device-widget>
+		<device-widget v-for="d in device_list" v-bind:device="d" :key="d.pk"></device-widget>
 		</tbody>
 	</table>
 	`,
 })
 
 IndexTable.component('device-widget', {
-	props: ['meta','device'],
+	props: ['device'],
 	template: `
 	<tr>
 	<td><a v-bind:href="'/' + meta +'/' + device.name">{{ device.name }}</a></td>
-	<td>{{ device.ip }}</td>
-	<td>{{ device.port }}</td>
-	<td>{{ meta }}</td>
-	<td v-if="meta == 'main.pdmon'">blub</td>
+	<td>{{ device.fields.ip }}</td>
+	<td>{{ device.fields.port }}</td>
+	<td>online</td>
+	<td>{{ device.meta }}</td>
 	</tr>
 	`,
 })
