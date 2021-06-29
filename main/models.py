@@ -15,8 +15,8 @@ class PDmon(models.Model):
 
 	pdmon_added_by = models.ForeignKey(User, related_name='pdmons', on_delete=models.CASCADE, blank=True, null=True)
 
-	def __str__(self):
-		return self.name
+	# def __str__(self):
+	#	return self.name
 	
 	def http_str(self):
 		return "http://" + self.ip + ":" + self.port

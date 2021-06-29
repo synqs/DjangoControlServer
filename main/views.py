@@ -2,8 +2,6 @@ from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse
 from .models import PDmon, Tctrl
 from django.core import serializers
-from itertools import chain
-import json
 
 # Create your views here.
 def index(request):
@@ -22,6 +20,9 @@ def detail(request, device_type, device_name):
 	detail = serializers.serialize('json', device)
 	context = { 'detail' : detail[1:-1] }
 	return render(request, 'main/main_detail.html', context)
+    
+def register_device(request):
+    d = 3
 
 """
 def device_index(request):
