@@ -2,16 +2,13 @@
 {% load static %}
 
 {% block content %}
-{% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
-{{ detail }}
-
-<div class=container id="devicedetail">
+<!-- div class=container id="devicedetail">
 	<detail-table v-bind:device_detail="{{ detail }}"></detail-table>
-</div>
+</div -->
 
-<div class=container id="pddata">
+<!-- div class=container id="pddata">
 	<pddata-table v-bind:device="{{ detail }}"></pddata-table>
-</div>
+</div -->
 
 <script src="{% static 'detail.js' %}"></script>
 <!-- script src="{% static 'pddata.js' %}"></script -->

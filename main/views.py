@@ -20,23 +20,3 @@ def detail(request, device_type, device_name):
 	detail = serializers.serialize('json', device)
 	context = { 'detail' : detail[1:-1] }
 	return render(request, 'main/main_detail.html', context)
-    
-def register_device(request):
-    d = 3
-
-"""
-def device_index(request):
-	pdmons = PDmon.objects.all()
-	tctrls = Tctrl.objects.all()
-	index = serializers.serialize('json', [*pdmons, *tctrls])
-	
-	return HttpResponse(index)
-
-def device_detail(request, device_type, device_name):
-	typ = device_type[5:]
-	device = typ.objects.filter(name=device_name)
-	data = serializers.serialize('json', device)
-	device_detail = json.loads(data[1:-1])
-	
-	return render(request, 'main/main_detail.html', device_detail)
-"""
