@@ -17,13 +17,13 @@ float R1 = 47000.0;
 float R2 = 33000.0;
 
 #include <Bridge.h>
-#include <BridgeServer.h>
-#include <BridgeClient.h>
+#include <YunServer.h>
+#include <YunClient.h>
 
 // Listen to the default port 5555, the Yún webserver
 // will forward there all the HTTP requests you send
 
-BridgeServer server;
+YunServer server;
 
 void setup() {
 	Bridge.begin(); // Bridge startup
@@ -35,7 +35,7 @@ void setup() {
 }
 
 void loop() {
-	BridgeClient client = server.accept(); // Get clients coming from server
+	YunClient client = server.accept(); // Get clients coming from server
 
 	if (client) { // There is a new client?
 		process(client); // Process request
@@ -45,7 +45,7 @@ void loop() {
 	delay(50); // Poll every 50ms
 }
 
-void process(BridgeClient client) {
+void process(YunClient client) {
   String command = client.readStringUntil('/');	// Read the command
   
 	if (command == "read") { // Is "read" command?
@@ -54,7 +54,7 @@ void process(BridgeClient client) {
 }
 
 
-void readCommand(BridgeClient client) {
+void readCommand(YunClient client) {
   String component = client.readStringUntil('/'); // Read component
 
   if (component == "all") { // Read all channels and store in values

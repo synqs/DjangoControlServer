@@ -45,25 +45,26 @@ const PDData = Vue.createApp({})
 
 PDData.component( 'pddata-table', {
 	data () { return {
-		data : null,
+		data : {ch0 : "0", ch1 : "1", ch2 : "2", ch3 : "3", 
+				ch4 : "4", ch5 : "5", ch6 : "6", ch7 : "7",
+				ch8 : "8", ch9 : "9", ch10 : "10", ch11 : "11",},
+		time : new Date().toLocaleString(),
 		}
 	},
 	props: ['device'],
 	template: `
-		{{ device }}
-		{{ data }}
-		<table class="table table-striped">
+		<table class="table table-striped" responsive="True">
 			<thead class="thead-dark">
 				<tr>
 				<th>Time</th>
-				<th cols=12>Input</th>
+				<th colspan="12">Input</th>
 				</tr>
 			</thead>
 			<tbody>
-				<!-- pddata-widget v-bind:values="data"></pddata-widget -->
+				<pddata-widget v-bind:values="data"></pddata-widget>
 			</tbody>
 		</table>
-		<button v-on:click="get_data()">DATA</button>
+		<button v-on:click="get_data()" class="btn btn-secondary">DATA</button>
 	`,
 	methods: {
 		get_data() {
@@ -80,10 +81,14 @@ PDData.component( 'pddata-table', {
 })
 
 PDData.component( 'pddata-widget', {
+	data() { return {
+		time : new Date().toLocaleString()
+		}
+	},
 	props : ['values'],
 	template: `
-		{{ values }}
 		<tr>
+		<td>{{ time }}</td>
 		<td v-for="v in values">{{ v }}</td>
 		</tr>
 	`,

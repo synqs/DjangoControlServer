@@ -17,6 +17,11 @@ void setup() {
 
   // setup pins for analog read
   for(int i=0; i<12; i++) pinMode(pins[i],INPUT);
+
+  // add default settings to the key-value list at the linux kernel
+  for(int i=0; i<12; i++) {
+    Bridge.put("CH" + String(i+1) + "_name", "_CH" + String(i+1));
+  }
 }
 
 /* process */
