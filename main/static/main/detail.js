@@ -48,11 +48,11 @@ PDData.component( 'pddata-table', {
 		data : {ch0 : "0", ch1 : "1", ch2 : "2", ch3 : "3", 
 				ch4 : "4", ch5 : "5", ch6 : "6", ch7 : "7",
 				ch8 : "8", ch9 : "9", ch10 : "10", ch11 : "11",},
-		time : new Date().toLocaleString(),
 		}
 	},
 	props: ['device'],
 	template: `
+		{{ data }}
 		<table class="table table-striped" responsive="True">
 			<thead class="thead-dark">
 				<tr>
@@ -61,19 +61,15 @@ PDData.component( 'pddata-table', {
 				</tr>
 			</thead>
 			<tbody>
-				<pddata-widget v-bind:values="data"></pddata-widget>
+				<!-- pddata-widget v-bind:values="data"></pddata-widget -->
 			</tbody>
 		</table>
 		<button v-on:click="get_data()" class="btn btn-secondary">DATA</button>
 	`,
 	methods: {
 		get_data() {
-			axios.get('http://' + this.device.fields.ip + '/data/get', {headers: {
-                    "Content-Type": "application/json",
-                    "Access-Control-Allow-Origin": "*",
-                    "Access-Control-Allow-Methods": "GET, POST, PATCH, PUT, DELETE, OPTIONS",
-                    "Access-Control-Allow-Headers": "Origin, Content-Type, X-Auth-Token, Authorization, Accept,charset,boundary,Content-Length"
-                }, })
+			axios.defaults.headers.common["Access-Control-Allow-Origin"] = "*";
+			axios.get('http://' + this.device.fields.ip + '/read/')
 		             .then(response => (this.data = response.data))
 		             .catch(error => console.log(error))
 		},
