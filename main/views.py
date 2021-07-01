@@ -2,6 +2,7 @@ from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse
 from .models import PDmon, Tctrl
 from django.core import serializers
+import requests, json
 
 # Create your views here.
 def index(request):
@@ -20,3 +21,13 @@ def detail(request, device_type, device_name):
 	detail = serializers.serialize('json', device)
 	context = { 'detail' : detail[1:-1] }
 	return render(request, 'main/main_detail.html', context)
+    
+def data(request, device_type, device_name):
+	if device_type == 'main.pdmon': typ = PDmon
+	else: typ = Tctrl
+	device = typ.objects.get(name=device_name)
+	url = "http://" + device.ip + "/data/get"
+	r = requests.get(url)
+	data_string = r.text
+	data_dict = json.loads(data_string)
+	return HttpResponse(data_string)

@@ -32,7 +32,7 @@ DetailTable.component('detail-widget', {
 		<td>online</td>
 		<td>{{ device.sleeptime }}</td>
 		<td>nakalab</td>
-		<td><button type="button" class="btn btn-light">Settings</button></td>
+		<td></td>
 	</tr>
 	`,
 })
@@ -45,33 +45,54 @@ const PDData = Vue.createApp({})
 
 PDData.component( 'pddata-table', {
 	data () { return {
-		data : {ch0 : "read", ch1 : "1", ch2 : "2", ch3 : "3", 
-			ch4 : "4", ch5 : "5", ch6 : "6", ch7 : "7",
-			ch8 : "8", ch9 : "9", ch10 : "10", ch11 : "11",},
+		datetime : new Date().toLocaleTimeString(),
+		data : {"CH" : "0"},
+		datas : {},
 		}
 	},
 	props: ['device'],
 	template: `
-		{{ data }}
 		<table class="table table-striped" responsive="True">
 			<thead class="thead-dark">
 				<tr>
 				<th>Time</th>
-				<th colspan="12">Input</th>
+				<th v-for="key in Object.keys(data)">{{ key }}</th>
 				</tr>
 			</thead>
 			<tbody>
-				<pddata-widget v-bind:values="data"></pddata-widget>
+				<pddata-widget v-bind:data="data" :datetime="datetime"></pddata-widget>
 			</tbody>
 		</table>
-		<button v-on:click="get_data()" class="btn btn-secondary">DATA</button>
-	`,
+		<button v-on:click="get_data()" class="btn btn-secondary">fetch</button>
+		`,
+	mounted() {
+		setInterval(() => {
+			this.get_data()
+		}, 5000)
+	},
 	methods: {
 		get_data() {
-			axios.defaults.headers.common["Access-Control-Allow-Origin"] = "*";
-			axios.defaults.headers.common["Access-Control-Allow-Methods"] = "POST, GET, OPTIONS, DELETE, PUT";
-			axios.defaults.headers.common["Access-Control-Allow-Headers"] = "append,delete,entries,foreach,get,has,keys,set,values,Authorization";
-			axios.post('http://' + this.device.fields.ip + '/read')
+			const sortObject = obj => Object.keys(obj).sort().reduce((res, key) => (res[key] = obj[key], res), {});
+			axios.get('/' + this.device.model + '/' + this.device.fields.name + '/data/')
+		             .then(response => (this.data = sortObject(response.data.value)))
+		             .catch(error => console.log(error));
+			this.datetime = new Date().toLocaleTimeString();
+		},
+		get_xml(curl) {
+			const xhr = new XMLHttpRequest();
+			const url = 'http://' + this.device.fields.ip + curl;
+
+			xhr.open('GET', url);
+			// xhr.setRequestHeader('Access-Control-Request-Method', 'GET');
+			// xhr.setRequestHeader('Content-Type', 'text/html');
+			// xhr.onreadystatechange = someHandler;
+			xhr.send();
+		},
+		get_axios() {
+			// axios.defaults.xsrfHeaderName = "X-CSRFTOKEN"
+			// axios.defaults.xsrfCookieName = "csrftoken"
+			const headers = {"X-CSRFTOKEN" : "VPP8z9DLX4E6F1YO96qBWb26SjZ7c2ayaLY88jLjLAUqy14EY2LKdSCFHgI47bD7"}
+			axios.get('http://' + this.device.fields.ip + '/data/get', {headers:headers})
 		             .then(response => (this.data = response.data))
 		             .catch(error => console.log(error))
 		},
@@ -79,15 +100,11 @@ PDData.component( 'pddata-table', {
 })
 
 PDData.component( 'pddata-widget', {
-	data() { return {
-		time : new Date().toLocaleString()
-		}
-	},
-	props : ['values'],
+	props : ['datetime','data'],
 	template: `
 		<tr>
-		<td>{{ time }}</td>
-		<td v-for="v in values">{{ v }}</td>
+		<td>{{ datetime }}</td>
+		<td v-for="ch in data">{{ ch }}</td>
 		</tr>
 	`,
 })

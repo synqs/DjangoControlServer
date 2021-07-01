@@ -162,6 +162,8 @@ void readCommand(BridgeClient client) {
   //client.println(F("setpoint, input, error, output, G, tauI, tauD"));
   client.println("HTTP/1.1 200 OK");
           client.println("Content-Type: text/html");
+          client.println("Access-Control-Allow-Origin: http://localhost:8000");   
+          client.println("Access-Control-Allow-Methods: GET");
           client.println("Connection: close");  // the connection will be closed after completion of the response
           client.println();
           client.println("<!DOCTYPE HTML>");
