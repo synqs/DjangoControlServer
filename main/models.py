@@ -5,27 +5,25 @@ import requests
 class PDmon(models.Model):
 	name = models.CharField(max_length=20, unique=True)		# should match DNS name eg. nakayun1
 	description = models.CharField(max_length=100, blank=True)	# add. description eg. 2D-MOT path
-	sleeptime = models.FloatField(default=5)
-
+	sleeptime = models.FloatField(default=5)			# sleeptime/interval after which to pull the device again
 	ip = models.CharField(max_length=20, blank=True)		# device ip
-	port = models.CharField(max_length=4, blank=True)		# device port (incl. default=80 for YUN ?)
-
-	data_string = models.CharField(max_length=100, blank=True)				# here, this is a voltage
-
-	# def __str__(self):
-	#	return self.name
+	port = models.CharField(max_length=4, blank=True)		# device port
 	
-	def pdmon_http(self):
-		return "http://" + self.ip + "/data/get"
+	# parameters/values for pdmon
+	data_string = models.CharField(max_length=100, blank=True)	# store data in string
+
+	def __str__(self):
+		return self.name
 
 class Tctrl(models.Model):
 	name = models.CharField(max_length=20, unique=True)		# should match DNS name eg. nakayun1
 	description = models.CharField(max_length=100, blank=True)	# add. description eg. 2D-MOT path
-	sleeptime = models.FloatField(default=5)
+	sleeptime = models.FloatField(default=5)			# sleeptime/interval after which to pull the device again
 
 	ip = models.CharField(max_length=20, blank=True)		# device ip
-	port = models.CharField(max_length=4, default=80)		# device port
+	port = models.CharField(max_length=4, blank=True)		# device port
 
+	# parameters/values for tctrl
 	setpoint = models.IntegerField(blank=True, default=25)
 	value = models.FloatField(blank=True, default=0)
 	output = models.FloatField(blank=True, default=0)
@@ -33,4 +31,7 @@ class Tctrl(models.Model):
 	gain = models.FloatField(blank=True, default=1)
 	tauI = models.FloatField(blank=True, default=100)
 	tauD =  models.FloatField(blank=True, default=0)
-	value_string = models.CharField(max_length=100, blank=True)
+	data_string = models.CharField(max_length=100, blank=True)
+	
+	def __str__(self):
+		return self.name

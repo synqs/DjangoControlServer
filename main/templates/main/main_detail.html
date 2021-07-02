@@ -2,11 +2,12 @@
 {% load static %}
 
 {% block content %}
-<div class=container id="devicedetail">
-	<detail-table v-bind:device_detail="{{ detail }}"></detail-table>
+
+<div class="container" id="devicedetail">
+	<detail-table v-bind:device="{{ detail }}"></detail-table>
 </div>
 
-<div class=container id="pddata">
+<div class="container" id="pddata">
 	<pddata-table v-bind:device="{{ detail }}"></pddata-table>
 </div>
 

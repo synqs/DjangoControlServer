@@ -1,40 +1,50 @@
 const DetailTable = Vue.createApp({})
 
 DetailTable.component('detail-table', {
-	props: ['device_detail'],
+	props: ['device'],
 	template: `
-	<h2>{{ device_detail.fields.name }} : {{ device_detail.fields.description }}</h2>
-	<hr class="rounded">
 	<table class="table table-striped">
 		<thead class="thead-dark">
 			<tr>
-			<th>IP</th>
-			<th>Port</th>
-			<th>Status</th>
-			<th>Sleeptime</th>
-			<th>Owner</th>
-			<th></th>
+			<th colspan=5><h4>{{ device.fields.name }} : {{ device.fields.description }}</h4></th>
+			</tr>
+			<tr>
+			<th>IP : {{ device.fields.ip }}</th>
+			<th>Port : {{device.fields.port }}</th>
+			<th>Status : online</th>
+			<th>Owner : nakalab</th>
+			<th>
+				<button class="btn btn-primary">Settings</button>
+				<form action="{% url 'main:remove' %}">
+				<button type="submit" class="btn btn-warning">Remove</button>
+				</form>
+				<button class="btn" v-on:click="remove_fetch()">fetch</button>
+			</th>
 			</tr>
 		</thead>
-		<tbody>
-			<detail-widget v-bind:device="device_detail.fields" :key="device_detail.pk"></detail-widget>
-		</tbody>
 	</table>
 	`,
-})
-
-DetailTable.component('detail-widget', {
-	props: ['device'],
-	template: `
-	<tr>
-		<td>{{ device.ip }}</td>
-		<td>{{ device.port }}</td>
-		<td>online</td>
-		<td>{{ device.sleeptime }}</td>
-		<td>nakalab</td>
-		<td></td>
-	</tr>
-	`,
+	methods: {
+		settings() {
+		},
+		remove() {
+			url = '/remove/';
+			config = {};
+			data = {	'device_type':this.device.model, 						'device_name':this.device.fields.name};
+			//window.location.href(url)
+			axios.post(url, data)
+			     .catch(error => console.log(error));
+		},
+		remove_fetch() {
+			url = '/remove/';
+			config = {	method : 'POST', 
+					mode : 'cors', };
+			data = {	'device_type':this.device.model, 						'device_name':this.device.fields.name}; 
+			fetch(url, config, data)
+				//.then(response => this.data)
+				.then(response => console.log(response))
+		},
+	},
 })
 
 DetailTable.mount('#devicedetail')
@@ -44,6 +54,127 @@ DetailTable.mount('#devicedetail')
 const PDData = Vue.createApp({})
 
 PDData.component( 'pddata-table', {
+	data () { return {
+		datetime : new Date().toLocaleTimeString(),
+		data : {"CHoo" : "0"},
+		datas : {},
+		}
+	},
+	props: ['device'],
+	template: `
+		{{ data }}
+		<!-- table class="table table-striped" responsive="True">
+			<thead class="thead-dark">
+				<tr>
+				<th>Time</th>
+				<th v-for="key in Object.keys(data)">{{ key }}</th>
+				</tr>
+			</thead>
+			<tbody>
+				<pddata-widget v-bind:data="data" :datetime="datetime"></pddata-widget>
+			</tbody>
+		</table -->
+		<button class="btn btn-success" v-on:click="start_data()">start</button>
+		<button class="btn btn-danger" v-on:click="stop_data()">stop</button>
+		<button class="btn" v-on:click="get_data()">get</button>
+		<button class="btn" v-on:click="fetch_data()">fetch</button>
+		<button class="btn" v-on:click="fetch_direct()">fetch direct</button>
+	`,
+	/*mounted() {
+		setInterval(() => {
+			this.get_data()
+		}, 1000*this.device.fields.sleeptime)
+	},*/
+	methods: {
+		get_data() {
+			const sortObject = obj => Object.keys(obj).sort().reduce((res, key) => (res[key] = obj[key], res), {});
+			axios.get('/' + this.device.model + '/' + this.device.fields.name + '/data/')
+		             .then(response => (this.data = sortObject(response.data.value)))
+		             .catch(error => console.log(error));
+			this.datetime = new Date().toLocaleTimeString();
+		},
+		start_data() {
+			this.timer = setInterval(()=>{this.get_data()}, 
+					1000*this.device.fields.sleeptime);
+		},
+		stop_data() {
+			clearInterval(this.timer);
+		},
+		fetch_data() {
+			url = '/' + this.device.model + '/' + this.device.fields.name + '/data/';
+			config = {	method : 'GET', 
+					mode : 'cors', };
+			data = {	'device_type':this.device.model, 						'device_name':this.device.fields.name}; 
+			fetch(url, config)
+				.then(response => response.json())
+				.then(data => (this.data = data.value))
+				.then(data => console.log(data))
+				.catch(error => console.log(error));
+		},
+		fetch_data() {
+			url = '/' + this.device.model + '/' + this.device.fields.name + '/data/';
+			config = {	method : 'GET', 
+					mode : 'cors', };
+			data = {	'device_type':this.device.model, 						'device_name':this.device.fields.name}; 
+			fetch(url, config)
+				.then(response => response.json())
+				.then(data => (this.data = data.value))
+				.then(data => console.log(data))
+				.catch(error => console.log(error));
+		},
+		fetch_direct() {
+			url = 'http://' + this.device.fields.ip + '/data/get/';
+			config = {	method : 'GET', 
+					mode : 'no-cors',
+					headers : {'Content-Type': 'application/json'}
+					};
+			data = {	'device_type':this.device.model, 						'device_name':this.device.fields.name}; 
+			fetch(url, config)
+				.then(response => console.log(response))
+				//.then(data => (this.data = data.value))
+				.then(data => console.log(data))
+				.catch(error => console.log(error));
+		},
+		/*
+		get_xml(curl) {
+			const xhr = new XMLHttpRequest();
+			const url = 'http://' + this.device.fields.ip + curl;
+
+			xhr.open('GET', url);
+			xhr.setRequestHeader('Access-Control-Request-Method', 'GET');
+			xhr.setRequestHeader('Content-Type', 'text/html');
+			xhr.onreadystatechange = someHandler;
+			xhr.send();
+		},
+		get_axios() {
+			axios.defaults.xsrfHeaderName = "X-CSRFTOKEN"
+			axios.defaults.xsrfCookieName = "csrftoken"
+			const headers = {"X-CSRFTOKEN" : "VPP8z9DLX4E6F1YO96qBWb26SjZ7c2ayaLY88jLjLAUqy14EY2LKdSCFHgI47bD7"}
+			axios.get('http://' + this.device.fields.ip + '/data/get', {headers:headers})
+		             .then(response => (this.data = response.data))
+		             .catch(error => console.log(error))
+		},
+		*/
+	},
+})
+
+PDData.component( 'pddata-widget', {
+	props : ['datetime','data'],
+	template: `
+		<tr>
+		<td>{{ datetime }}</td>
+		<td v-for="ch in data">{{ ch }}</td>
+		</tr>
+	`,
+})
+
+PDData.mount('#pddata')
+
+/* TCTRL APPLICATION */
+
+const TCData = Vue.createApp({})
+
+TCData.component( 'tcdata-table', {
 	data () { return {
 		datetime : new Date().toLocaleTimeString(),
 		data : {"CH" : "0"},
@@ -78,28 +209,30 @@ PDData.component( 'pddata-table', {
 		             .catch(error => console.log(error));
 			this.datetime = new Date().toLocaleTimeString();
 		},
+		/*
 		get_xml(curl) {
 			const xhr = new XMLHttpRequest();
 			const url = 'http://' + this.device.fields.ip + curl;
 
 			xhr.open('GET', url);
-			// xhr.setRequestHeader('Access-Control-Request-Method', 'GET');
-			// xhr.setRequestHeader('Content-Type', 'text/html');
-			// xhr.onreadystatechange = someHandler;
+			xhr.setRequestHeader('Access-Control-Request-Method', 'GET');
+			xhr.setRequestHeader('Content-Type', 'text/html');
+			xhr.onreadystatechange = someHandler;
 			xhr.send();
 		},
 		get_axios() {
-			// axios.defaults.xsrfHeaderName = "X-CSRFTOKEN"
-			// axios.defaults.xsrfCookieName = "csrftoken"
+			axios.defaults.xsrfHeaderName = "X-CSRFTOKEN"
+			axios.defaults.xsrfCookieName = "csrftoken"
 			const headers = {"X-CSRFTOKEN" : "VPP8z9DLX4E6F1YO96qBWb26SjZ7c2ayaLY88jLjLAUqy14EY2LKdSCFHgI47bD7"}
 			axios.get('http://' + this.device.fields.ip + '/data/get', {headers:headers})
 		             .then(response => (this.data = response.data))
 		             .catch(error => console.log(error))
 		},
+		*/
 	},
 })
 
-PDData.component( 'pddata-widget', {
+TCData.component( 'tcdata-widget', {
 	props : ['datetime','data'],
 	template: `
 		<tr>
@@ -109,4 +242,4 @@ PDData.component( 'pddata-widget', {
 	`,
 })
 
-PDData.mount('#pddata')
+TCData.mount('#tcdata')

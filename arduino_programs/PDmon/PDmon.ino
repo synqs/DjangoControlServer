@@ -20,7 +20,7 @@ void loop() {
   for(int i=0; i<12; i++) { // read all pins and store result
     char output[5]; // output char
     values[i] = 0.5*(values[i] + analogRead(pins[i])); // smooth the measured value
-    dtostrf(values[i]*5.0/1023,sizeof(output),3,output); // read and convert value
+    dtostrf(values[i]*5.0/1023,sizeof(output),1,output); // read and convert value
     const char buff[2];
     sprintf(buff,"%02d",i); // label padding for sorting by channels afterwards
     Bridge.put("CH" + String(buff),output); // store the result
