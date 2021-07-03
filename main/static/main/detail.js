@@ -56,7 +56,7 @@ const PDData = Vue.createApp({})
 PDData.component( 'pddata-table', {
 	data () { return {
 		datetime : new Date().toLocaleTimeString(),
-		data : {"CHoo" : "0"},
+		data : {"CH" : "0"},
 		datas : {},
 		}
 	},
@@ -79,6 +79,7 @@ PDData.component( 'pddata-table', {
 		<button class="btn" v-on:click="get_data()">get</button>
 		<button class="btn" v-on:click="fetch_data()">fetch</button>
 		<button class="btn" v-on:click="fetch_direct()">fetch direct</button>
+		<button class="btn" v-on:click="get_xml()">xml direct</button>
 	`,
 	/*mounted() {
 		setInterval(() => {
@@ -125,27 +126,27 @@ PDData.component( 'pddata-table', {
 		fetch_direct() {
 			url = 'http://' + this.device.fields.ip + '/data/get/';
 			config = {	method : 'GET', 
-					mode : 'no-cors',
+					mode : 'cors',
+					credentials : 'omit',
 					headers : {'Content-Type': 'application/json'}
 					};
 			data = {	'device_type':this.device.model, 						'device_name':this.device.fields.name}; 
 			fetch(url, config)
-				.then(response => console.log(response))
+				.then(response => console.log(response.json()))
 				//.then(data => (this.data = data.value))
 				.then(data => console.log(data))
-				.catch(error => console.log(error));
+				//.catch(error => console.log(error));
 		},
-		/*
-		get_xml(curl) {
+		get_xml() {
 			const xhr = new XMLHttpRequest();
-			const url = 'http://' + this.device.fields.ip + curl;
-
+			const url = 'http://' + this.device.fields.ip + '/data/get';
+			headers = {'Content-Type': 'application/json'};
+				
 			xhr.open('GET', url);
-			xhr.setRequestHeader('Access-Control-Request-Method', 'GET');
-			xhr.setRequestHeader('Content-Type', 'text/html');
-			xhr.onreadystatechange = someHandler;
+			// xhr.onreadystatechange = someHandler;
 			xhr.send();
 		},
+		/*
 		get_axios() {
 			axios.defaults.xsrfHeaderName = "X-CSRFTOKEN"
 			axios.defaults.xsrfCookieName = "csrftoken"
@@ -171,7 +172,7 @@ PDData.component( 'pddata-widget', {
 PDData.mount('#pddata')
 
 /* TCTRL APPLICATION */
-
+/*
 const TCData = Vue.createApp({})
 
 TCData.component( 'tcdata-table', {
@@ -228,7 +229,6 @@ TCData.component( 'tcdata-table', {
 		             .then(response => (this.data = response.data))
 		             .catch(error => console.log(error))
 		},
-		*/
 	},
 })
 
@@ -243,3 +243,4 @@ TCData.component( 'tcdata-widget', {
 })
 
 TCData.mount('#tcdata')
+*/
