@@ -87,12 +87,9 @@ PDData.component( 'pddata-table', {
 		}, 1000*this.device.fields.sleeptime)
 	},*/
 	methods: {
-		get_data() {
+		sort_data(obj) {
 			const sortObject = obj => Object.keys(obj).sort().reduce((res, key) => (res[key] = obj[key], res), {});
-			axios.get('/' + this.device.model + '/' + this.device.fields.name + '/data/')
-		             .then(response => (this.data = sortObject(response.data.value)))
-		             .catch(error => console.log(error));
-			this.datetime = new Date().toLocaleTimeString();
+			return sortObject(obj)
 		},
 		start_data() {
 			this.timer = setInterval(()=>{this.get_data()}, 
@@ -105,23 +102,12 @@ PDData.component( 'pddata-table', {
 			url = '/' + this.device.model + '/' + this.device.fields.name + '/data/';
 			config = {	method : 'GET', 
 					mode : 'cors', };
-			data = {	'device_type':this.device.model, 						'device_name':this.device.fields.name}; 
+			data = {	'device_type':this.device.model, 'device_name':this.device.fields.name}; 
 			fetch(url, config)
 				.then(response => response.json())
-				.then(data => (this.data = data.value))
+				.then(data => (this.data = this.sort_data(data.value)))
 				.then(data => console.log(data))
-				.catch(error => console.log(error));
-		},
-		fetch_data() {
-			url = '/' + this.device.model + '/' + this.device.fields.name + '/data/';
-			config = {	method : 'GET', 
-					mode : 'cors', };
-			data = {	'device_type':this.device.model, 						'device_name':this.device.fields.name}; 
-			fetch(url, config)
-				.then(response => response.json())
-				.then(data => (this.data = data.value))
-				.then(data => console.log(data))
-				.catch(error => console.log(error));
+				.catch(error => console.log(error))
 		},
 		fetch_direct() {
 			url = 'http://' + this.device.fields.ip + '/data/get/';
