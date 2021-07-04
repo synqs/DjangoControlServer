@@ -19,8 +19,8 @@ This is a minimalistic control server for small lab devices.
 ## how to 
 1. Download the github repo on your local computer.
 	- It is recommended to use an independent virtual environment. One option is to download and install Anaconda/Miniconda (lightweight alternative). Refer to the [conda docs](https://docs.anaconda.com/anaconda/install/index.html) on how to do this exactly.
-		a. create a virtual environment with `conda create -n "env_name"`
-		b. use `conda activate "env_name"` to activate the environment 
+		* create a virtual environment with `conda create -n "env_name"`
+		* use `conda activate "env_name"` to activate the environment 
 2. Navigate to the root directory of the repo and install all required packages with `pip install -r requirements.txt`.
 	- Note: If you're in the KIP, you might want to add the option `--proxy http://proxy.kip.uni-heidelberg.de:8080` right after `pip`
 3. Create a superuser account by passing `python manage.py createsuperuser` to the console. In case, you already have an account, skip this step.
