@@ -50,7 +50,7 @@ IndexTable.component('device-widget', {
 	template: `
 	<tr>
 	<td>{{ device.model }} # {{ device.pk }}</td>
-	<td><a v-bind:href="'/' + device.model +'/' + device.fields.name">{{ device.fields.name }}</a></td>
+	<td><a v-bind:href="'/' + device.model + '/' + device.fields.name">{{ device.fields.name }}</a></td>
 	<td>{{ device.fields.ip }}</td>
 	<td>online</td>
 	<td><button class="btn">Settings</button></td>

@@ -2,47 +2,50 @@ const DetailTable = Vue.createApp({})
 
 DetailTable.component('detail-table', {
 	props: ['device'],
+	delimiters: ['[[', ']]'],
 	template: `
+	<p>BLUB</p>
 	<table class="table table-striped">
 		<thead class="thead-dark">
 			<tr>
-			<th colspan=5><h4>{{ device.fields.name }} : {{ device.fields.description }}</h4></th>
+			<th colspan=5><h4>[[ device.fields.name ]] : [[ device.fields.description ]]</h4></th>
 			</tr>
 			<tr>
-			<th>IP : {{ device.fields.ip }}</th>
-			<th>Port : {{device.fields.port }}</th>
+			<th>IP : [[ device.fields.ip ]]</th>
+			<th>Port : [[ device.fields.port ]]</th>
 			<th>Status : online</th>
 			<th>Owner : nakalab</th>
 			<th>
-				<button class="btn btn-primary">Settings</button>
-				<form action="{% url 'main:remove' %}">
+				<!-- button class="btn btn-primary">Settings</button>
+				<form action="/remove/?device_type=device.model&device_name=device.fields.name" method="post">
 				<button type="submit" class="btn btn-warning">Remove</button>
-				</form>
-				<button class="btn" v-on:click="remove_fetch()">fetch</button>
+				</form -->
+				<button class="btn btn-primary" v-on:click="remove_fetch()">remove fetch</button>
+				<button class="btn btn-primary" v-on:click="remove_axios()">remove axios</button>
 			</th>
 			</tr>
 		</thead>
 	</table>
 	`,
 	methods: {
-		settings() {
-		},
-		remove() {
-			url = '/remove/';
-			config = {};
-			data = {	'device_type':this.device.model, 						'device_name':this.device.fields.name};
-			//window.location.href(url)
-			axios.post(url, data)
+		remove_axios() {
+			const url = '/remove/';
+			const payload = { this.device };
+			axios.defaults.xsrfHeaderName = "X-CSRFTOKEN";
+			axios.defaults.xsrfCookieName = "csrftoken";
+			axios.post(url, payload)
 			     .catch(error => console.log(error));
 		},
 		remove_fetch() {
 			url = '/remove/';
 			config = {	method : 'POST', 
-					mode : 'cors', };
-			data = {	'device_type':this.device.model, 						'device_name':this.device.fields.name}; 
+					mode : 'cors', 
+					credentials : 'include' };
+			data = {	device_type : this.device.model, 						device_name : this.device.fields.name}; 
 			fetch(url, config, data)
 				//.then(response => this.data)
 				.then(response => console.log(response))
+				.catch(error => console.log(error))
 		},
 	},
 })
@@ -76,68 +79,64 @@ PDData.component( 'pddata-table', {
 		</table -->
 		<button class="btn btn-success" v-on:click="start_data()">start</button>
 		<button class="btn btn-danger" v-on:click="stop_data()">stop</button>
-		<button class="btn" v-on:click="get_data()">get</button>
 		<button class="btn" v-on:click="fetch_data()">fetch</button>
-		<button class="btn" v-on:click="fetch_direct()">fetch direct</button>
+		<!-- button class="btn" v-on:click="fetch_direct()">fetch direct</button>
 		<button class="btn" v-on:click="get_xml()">xml direct</button>
+		<button class="btn" v-on:click="get_axios()">axios direct</button -->
 	`,
-	/*mounted() {
-		setInterval(() => {
-			this.get_data()
-		}, 1000*this.device.fields.sleeptime)
-	},*/
+	mounted() {
+		this.fetch_data()
+	},
 	methods: {
-		sort_data(obj) {
+		sort_data(obj) { // used for sorting the CHxx values
 			const sortObject = obj => Object.keys(obj).sort().reduce((res, key) => (res[key] = obj[key], res), {});
 			return sortObject(obj)
 		},
-		start_data() {
-			this.timer = setInterval(()=>{this.get_data()}, 
+		start_data() { // start fetching data every dt = sleeptime
+			this.timer = setInterval(()=>{this.fetch_data()}, 
 					1000*this.device.fields.sleeptime);
 		},
-		stop_data() {
+		stop_data() { // stop fetching data
 			clearInterval(this.timer);
 		},
-		fetch_data() {
+		fetch_data() { // fetch a single set of data with python request
 			url = '/' + this.device.model + '/' + this.device.fields.name + '/data/';
 			config = {	method : 'GET', 
 					mode : 'cors', };
-			data = {	'device_type':this.device.model, 'device_name':this.device.fields.name}; 
+			data = {	'device_type':this.device.model, 						'device_name':this.device.fields.name}; 
 			fetch(url, config)
 				.then(response => response.json())
 				.then(data => (this.data = this.sort_data(data.value)))
 				.then(data => console.log(data))
 				.catch(error => console.log(error))
 		},
-		fetch_direct() {
-			url = 'http://' + this.device.fields.ip + '/data/get/';
+		/* all those methods do not work due to missing ACAO-header
+		fetch_direct() { // fetch a single set of data directly from arduino (fetch)
+			url = 'http://' + this.device.fields.ip + '/read/all/';
 			config = {	method : 'GET', 
 					mode : 'cors',
-					credentials : 'omit',
+					credentials : 'include',
 					headers : {'Content-Type': 'application/json'}
-					};
-			data = {	'device_type':this.device.model, 						'device_name':this.device.fields.name}; 
+					}; 
 			fetch(url, config)
 				.then(response => console.log(response.json()))
 				//.then(data => (this.data = data.value))
 				.then(data => console.log(data))
 				//.catch(error => console.log(error));
 		},
-		get_xml() {
+		get_xml() { // fetch a single set of data directly from arduino (xml)
 			const xhr = new XMLHttpRequest();
 			const url = 'http://' + this.device.fields.ip + '/data/get';
 			headers = {'Content-Type': 'application/json'};
 				
 			xhr.open('GET', url);
-			// xhr.onreadystatechange = someHandler;
 			xhr.send();
 		},
-		/*
-		get_axios() {
+		get_axios() { // fetch a single set of data directly from arduino (axios)
 			axios.defaults.xsrfHeaderName = "X-CSRFTOKEN"
 			axios.defaults.xsrfCookieName = "csrftoken"
 			const headers = {"X-CSRFTOKEN" : "VPP8z9DLX4E6F1YO96qBWb26SjZ7c2ayaLY88jLjLAUqy14EY2LKdSCFHgI47bD7"}
-			axios.get('http://' + this.device.fields.ip + '/data/get', {headers:headers})
+			axios.get('http://' + this.device.fields.ip + '/data/get') //, {headers:headers})
 		             .then(response => (this.data = response.data))
 		             .catch(error => console.log(error))
 		},

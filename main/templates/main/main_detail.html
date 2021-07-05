@@ -3,6 +3,30 @@
 
 {% block content %}
 
+<!-- div class="container" id="test">
+	<testtable></testtable>
+</div>
+
+<script>
+const test = Vue.createApp({
+	delimiters: ['[[', ']]'],
+});
+
+test.component('testtable', {
+	data () { return {
+			info : 'information',
+		}
+	},
+	delimiters: ['[[', ']]'],
+	template: `
+		[[ info ]]
+		<h1><a v-bind:href="{% url 'main:index' %}">Index</a></h1>
+	`,
+});
+
+test.mount('#test');
+</script -->
+
 <div class="container" id="devicedetail">
 	<detail-table v-bind:device="{{ detail }}"></detail-table>
 </div>
@@ -11,7 +35,7 @@
 	<pddata-table v-bind:device="{{ detail }}"></pddata-table>
 </div>
 
-<script src="{% static 'main/detail.js' %}"></script>
+<script type="text/javascript" src="{% static 'main/detail.js' %}"></script>
 <!-- script src="{% static 'pddata.js' %}"></script -->
 {% endblock %}
 

@@ -33,8 +33,15 @@ def data(request, device_type, device_name):
 	# data_dict = json.loads(data_string)
 	return HttpResponse(data_string)
 	
-def remove(request, device_type, device_name):
-	typ = device_type
+def remove(request):
+	print(request.POST)
+	print(request.POST.encode())
+	post_dict = json.loads(request.body.decode('utf-8'))
+	device_type = post_dict['device_type']
+	device_name = post_dict['device_name']
+	if device_type == 'main.pdmon': typ = PDmon
+	else: typ = Tctrl
+	'''
 	device = get_object_or_404(typ, name=device_name)
-	device.delete()
+	device.delete() '''
 	return redirect('index')
