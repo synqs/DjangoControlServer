@@ -10,7 +10,7 @@ class PDmon(models.Model):
 	port = models.CharField(max_length=4, blank=True)		# device port
 	
 	# parameters/values for pdmon
-	channels = models.CharField(max_length=27, default='[0,1,2,3,4,5,6,7,8,9,10,11]')
+	channel_string = models.CharField(max_length=27, default='0,1,2,3,4,5,6,7,8,9,10,11')
 	data_string = models.CharField(max_length=100, blank=True)	# store data in string
 
 	def __str__(self):
@@ -19,14 +19,13 @@ class PDmon(models.Model):
 	def http_str(self):
 		return 'http://' + self.ip + '/'
 
-	def set_channels(self, array):
-		self.channels = array
-		return 0
+	def get_channels(self):
+		for ch
 
 class Tctrl(models.Model):
 	name = models.CharField(max_length=20, unique=True)		# should match DNS name eg. nakayun1
 	description = models.CharField(max_length=100, blank=True)	# add. description eg. 2D-MOT path
-	sleeptime = models.FloatField(default=5)			# sleeptime/interval after which to pull the device again
+	sleeptime = models.FloatField(default=5) # sleeptime/interval after which to pull the device again
 
 	ip = models.CharField(max_length=20, blank=True)		# device ip
 	port = models.CharField(max_length=4, blank=True)		# device port

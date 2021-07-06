@@ -29,21 +29,21 @@ DetailTable.component('detail-table', {
 	`,
 	methods: {
 		remove_axios() {
-			const url = '/remove/';
-			const payload = { 	"device_type":this.device.model,
-						"device_name":this.device.fields.name};
+			const url = '/' + this.device.model + '/' + this.device.fields.name + '/remove/';
+			const payload = this.device;
 			axios.defaults.xsrfHeaderName = "X-CSRFTOKEN";
 			axios.defaults.xsrfCookieName = "csrftoken";
 			axios.post(url, payload)
+				 .then(response => console.log(response))
 			     .catch(error => console.log(error));
 		},
 		remove_fetch() {
-			url = '/remove/';
-			config = {	method : 'POST', 
-					mode : 'cors', 
-					credentials : 'include' };
-			data = {	device_type : this.device.model, 								device_name : this.device.fields.name}; 
-			fetch(url, config, data)
+			const url = '/' + this.device.model + '/' + this.device.fields.name + '/remove/';
+			config = {  method : 'POST', 
+                        mode : 'cors', 
+						credentials : 'include', };
+			const payload = this.device; 
+			fetch(url, config, payload)
 				//.then(response => this.data)
 				.then(response => console.log(response))
 				.catch(error => console.log(error))
@@ -66,8 +66,8 @@ PDData.component( 'pddata-table', {
 	},
 	props: ['device'],
 	template: `
-		{{ data }}
-		<!-- table class="table table-striped" responsive="True">
+        {{ device.fields.channels }}
+		<table class="table table-striped" responsive="True">
 			<thead class="thead-dark">
 				<tr>
 				<th>Time</th>
@@ -77,7 +77,7 @@ PDData.component( 'pddata-table', {
 			<tbody>
 				<pddata-widget v-bind:data="data" :datetime="datetime"></pddata-widget>
 			</tbody>
-		</table -->
+		</table>
 		<button class="btn btn-success" v-on:click="start_data()">start</button>
 		<button class="btn btn-danger" v-on:click="stop_data()">stop</button>
 		<button class="btn" v-on:click="fetch_data()">fetch</button>
@@ -91,7 +91,7 @@ PDData.component( 'pddata-table', {
 	methods: {
 		sort_data(obj) { // used for sorting the CHxx values
 			const sortObject = obj => Object.keys(obj).sort().reduce((res, key) => (res[key] = obj[key], res), {});
-			return sortObject(obj)
+			return sortObject(obj);
 		},
 		start_data() { // start fetching data every dt = sleeptime
 			this.timer = setInterval(()=>{this.fetch_data()}, 
@@ -101,13 +101,13 @@ PDData.component( 'pddata-table', {
 			clearInterval(this.timer);
 		},
 		fetch_data() { // fetch a single set of data with python request
-			url = '/' + this.device.model + '/' + this.device.fields.name + '/data/';
-			config = {	method : 'GET', 
-					mode : 'cors', }; 
-			fetch(url, config)
+			const url = '/' + this.device.model + '/' + this.device.fields.name + '/data/';
+			config = {  method : 'GET',
+                        mode : 'cors', }; 
+			fetch(url)
 				.then(response => response.json())
 				.then(data => (this.data = this.sort_data(data.value)))
-				.then(data => console.log(data))
+				.then(response => console.log(response))
 				.catch(error => console.log(error))
 		},
 		/* all those methods do not work due to missing ACAO-header
