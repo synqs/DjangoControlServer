@@ -14,6 +14,11 @@ def index(request):
 	return render(request, 'main/main_list.html', context)
 
 def detail(request, device_type, device_name):
+	#
+	# post_dict = json.loads(request.body.decode('utf-8'))
+	# device_type = post_dict['device_type']
+	# device_name = post_dict['device_name']
+
 	if device_type == 'main.pdmon': typ = PDmon
 	else: typ = Tctrl
 	device = typ.objects.filter(name=device_name)
@@ -22,9 +27,14 @@ def detail(request, device_type, device_name):
 	context = { 'detail' : detail[1:-1], 'type' : type(device_type) }
 	return render(request, 'main/main_detail.html', context)
     
-def data(request, device_type, device_name):
+def data(request):
+	post_dict = json.loads(request.body.decode('utf-8'))
+	device_type = post_dict['device_type']
+	device_name = post_dict['device_name']
+
 	if device_type == 'main.pdmon': typ = PDmon
 	else: typ = Tctrl
+
 	device = get_object_or_404(typ, name=device_name)
 	url = "http://" + device.ip + "/data/get"
 	r = requests.get(url)
@@ -35,13 +45,14 @@ def data(request, device_type, device_name):
 	
 def remove(request):
 	print(request.POST)
-	print(request.POST.encode())
+	# print(request.POST.encode())
 	post_dict = json.loads(request.body.decode('utf-8'))
 	device_type = post_dict['device_type']
 	device_name = post_dict['device_name']
 	if device_type == 'main.pdmon': typ = PDmon
 	else: typ = Tctrl
-	'''
+
+	''' so this view is working, but I commented out this out such that we can have a look at the axios requesting and stuff
 	device = get_object_or_404(typ, name=device_name)
 	device.delete() '''
-	return redirect('index')
+	return redirect('/index/')

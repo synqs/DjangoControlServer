@@ -30,7 +30,8 @@ DetailTable.component('detail-table', {
 	methods: {
 		remove_axios() {
 			const url = '/remove/';
-			const payload = { this.device };
+			const payload = { 	"device_type":this.device.model,
+						"device_name":this.device.fields.name};
 			axios.defaults.xsrfHeaderName = "X-CSRFTOKEN";
 			axios.defaults.xsrfCookieName = "csrftoken";
 			axios.post(url, payload)
@@ -41,7 +42,7 @@ DetailTable.component('detail-table', {
 			config = {	method : 'POST', 
 					mode : 'cors', 
 					credentials : 'include' };
-			data = {	device_type : this.device.model, 						device_name : this.device.fields.name}; 
+			data = {	device_type : this.device.model, 								device_name : this.device.fields.name}; 
 			fetch(url, config, data)
 				//.then(response => this.data)
 				.then(response => console.log(response))
@@ -102,8 +103,7 @@ PDData.component( 'pddata-table', {
 		fetch_data() { // fetch a single set of data with python request
 			url = '/' + this.device.model + '/' + this.device.fields.name + '/data/';
 			config = {	method : 'GET', 
-					mode : 'cors', };
-			data = {	'device_type':this.device.model, 						'device_name':this.device.fields.name}; 
+					mode : 'cors', }; 
 			fetch(url, config)
 				.then(response => response.json())
 				.then(data => (this.data = this.sort_data(data.value)))

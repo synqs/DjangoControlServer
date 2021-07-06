@@ -165,7 +165,7 @@ void readCommand(BridgeClient client) { // Send feedback to client
   /* This html-like approach currently does not work. We use the key value method */
   client.println("HTTP/1.1 200 OK"); // client.println("Status: 200"); 
   client.println("Content-Type: application/xml");
-  client.println("Access-Control-Allow-Origin: http://localhost:8000");   
+  client.println("Access-Control-Allow-Origin: http://localhost:8000/");   
   client.println("Access-Control-Allow-Methods: GET");
   client.println("Connection: close");  // the connection will be closed after completion of the response
   client.println(); // mandatory blank line
