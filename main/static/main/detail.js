@@ -66,7 +66,7 @@ PDData.component( 'pddata-table', {
 	},
 	props: ['device'],
 	template: `
-        {{ device.fields.channels }}
+        {{ device.fields.channel_string }}
 		<table class="table table-striped" responsive="True">
 			<thead class="thead-dark">
 				<tr>
@@ -81,6 +81,7 @@ PDData.component( 'pddata-table', {
 		<button class="btn btn-success" v-on:click="start_data()">start</button>
 		<button class="btn btn-danger" v-on:click="stop_data()">stop</button>
 		<button class="btn" v-on:click="fetch_data()">fetch</button>
+		<button class="btn" v-on:click="get_channels()">get channels</button>
 		<!-- button class="btn" v-on:click="fetch_direct()">fetch direct</button>
 		<button class="btn" v-on:click="get_xml()">xml direct</button>
 		<button class="btn" v-on:click="get_axios()">axios direct</button -->
@@ -89,6 +90,13 @@ PDData.component( 'pddata-table', {
 		this.fetch_data()
 	},
 	methods: {
+		get_channels() {
+			console.log(this.device.fields.channel_string.split(','));
+			buff = this.device.fields.channel_string.split(',');
+			channels = [];
+			for ch in buff:
+				channels.append("CH" + str(ch).zfill(2));
+		},
 		sort_data(obj) { // used for sorting the CHxx values
 			const sortObject = obj => Object.keys(obj).sort().reduce((res, key) => (res[key] = obj[key], res), {});
 			return sortObject(obj);
