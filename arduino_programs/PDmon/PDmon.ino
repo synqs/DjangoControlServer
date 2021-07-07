@@ -23,7 +23,7 @@ void loop() {
     dtostrf(values[i]*5.0/1023,sizeof(output),1,output); // read and convert value
     const char buff[2];
     sprintf(buff,"%02d",i); // label padding for sorting by channels afterwards
-    Bridge.put("CH" + String(buff),output); // store the result
+    Bridge.put("{ CH" + String(buff),output + "}"); // store the result
   }
   /* Since there is some trouble with sorting the data, we will leave it like this at the moment
   // get the current time

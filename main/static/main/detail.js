@@ -71,7 +71,7 @@ PDData.component( 'pddata-table', {
 			<thead class="thead-dark">
 				<tr>
 				<th>Time</th>
-				<th v-for="key in Object.keys(data)">{{ key }}</th>
+				<th v-for="ch in get_channels()">{{ ch }}</th>
 				</tr>
 			</thead>
 			<tbody>
@@ -91,11 +91,24 @@ PDData.component( 'pddata-table', {
 	},
 	methods: {
 		get_channels() {
-			console.log(this.device.fields.channel_string.split(','));
 			buff = this.device.fields.channel_string.split(',');
-			channels = [];
-			for ch in buff:
-				channels.append("CH" + str(ch).zfill(2));
+			channels = []; var i = 0;
+			for (ch in buff) {
+				channels[i] = "CH" + ch.padStart(2, 0);
+				i++;
+			};
+			console.log(channels);
+			return channels;
+		},
+		filter_data(obj) {
+			console.log(obj);
+			console.log(Object.values(obj));
+			for (ch in obj){
+				console.log(Object.keys(ch));
+				console.log(typeof(ch));
+				console.log(ch.key);
+			}
+			const filterObject = obj => obj.filter( ch => this.get_channels.include(ch)); 
 		},
 		sort_data(obj) { // used for sorting the CHxx values
 			const sortObject = obj => Object.keys(obj).sort().reduce((res, key) => (res[key] = obj[key], res), {});
@@ -109,14 +122,18 @@ PDData.component( 'pddata-table', {
 			clearInterval(this.timer);
 		},
 		fetch_data() { // fetch a single set of data with python request
+			var buff;
 			const url = '/' + this.device.model + '/' + this.device.fields.name + '/data/';
 			config = {  method : 'GET',
                         mode : 'cors', }; 
 			fetch(url)
 				.then(response => response.json())
-				.then(data => (this.data = this.sort_data(data.value)))
-				.then(response => console.log(response))
-				.catch(error => console.log(error))
+				.then(data => this.filter_data(data.value))
+				.catch(error => console.log(error));
+				
+			//console.log(this.data.filter( function(item){
+			//	return Objects.keys(item) in this.get_channels()
+			//}));
 		},
 		/* all those methods do not work due to missing ACAO-header
 		fetch_direct() { // fetch a single set of data directly from arduino (fetch)
