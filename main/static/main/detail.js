@@ -4,7 +4,6 @@ DetailTable.component('detail-table', {
 	props: ['device'],
 	delimiters: ['[[', ']]'],
 	template: `
-	<p>BLUB</p>
 	<table class="table table-striped">
 		<thead class="thead-dark">
 			<tr>
@@ -30,18 +29,18 @@ DetailTable.component('detail-table', {
 	methods: {
 		remove_axios() {
 			const url = '/' + this.device.model + '/' + this.device.fields.name + '/remove/';
-			const payload = this.device;
+			const payload = { this.device };
 			axios.defaults.xsrfHeaderName = "X-CSRFTOKEN";
 			axios.defaults.xsrfCookieName = "csrftoken";
-			axios.post(url, payload)
-				 .then(response => console.log(response))
-			     .catch(error => console.log(error));
+			axios.get(url)
+				.then(response => console.log(response))
+				.catch(error => console.log(error));
 		},
 		remove_fetch() {
 			const url = '/' + this.device.model + '/' + this.device.fields.name + '/remove/';
-			config = {  method : 'POST', 
-                        mode : 'cors', 
-						credentials : 'include', };
+			config = {	method : 'POST', 
+                        		mode : 'cors', 
+					credentials : 'include', };
 			const payload = this.device; 
 			fetch(url, config, payload)
 				//.then(response => this.data)
@@ -59,13 +58,15 @@ const PDData = Vue.createApp({})
 
 PDData.component( 'pddata-table', {
 	data () { return {
-		datetime : new Date().toLocaleTimeString(),
-		data : {"CH" : "0"},
-		datas : {},
+		data : [],
+		datas : [],
 		}
 	},
 	props: ['device'],
 	template: `
+	<button class="btn btn-success" v-on:click="start_data()">start</button>
+	<button class="btn btn-danger" v-on:click="stop_data()">stop</button>
+	<button class="btn" v-on:click="get_data()">get</button>
         {{ device.fields.channel_string }}
 		<table class="table table-striped" responsive="True">
 			<thead class="thead-dark">
@@ -75,62 +76,58 @@ PDData.component( 'pddata-table', {
 				</tr>
 			</thead>
 			<tbody>
-				<pddata-widget v-bind:data="data" :datetime="datetime"></pddata-widget>
+				<pddata-widget v-for="data in datas" v-bind:data="data"></pddata-widget>
 			</tbody>
 		</table>
-		<button class="btn btn-success" v-on:click="start_data()">start</button>
-		<button class="btn btn-danger" v-on:click="stop_data()">stop</button>
-		<button class="btn" v-on:click="fetch_data()">fetch</button>
-		<button class="btn" v-on:click="get_channels()">get channels</button>
-		<!-- button class="btn" v-on:click="fetch_direct()">fetch direct</button>
-		<button class="btn" v-on:click="get_xml()">xml direct</button>
-		<button class="btn" v-on:click="get_axios()">axios direct</button -->
 	`,
 	mounted() {
-		this.fetch_data()
+		this.get_data()
 	},
 	methods: {
-		get_channels() {
+		get_channels() { // get an array of desired channels
 			buff = this.device.fields.channel_string.split(',');
 			channels = []; var i = 0;
 			for (ch in buff) {
-				channels[i] = "CH" + ch.padStart(2, 0);
+				channels[i] = "CH" + buff[i].padStart(2, 0);
 				i++;
 			};
-			console.log(channels);
 			return channels;
 		},
-		filter_data(obj) {
-			console.log(obj);
-			console.log(Object.values(obj));
-			for (ch in obj){
-				console.log(Object.keys(ch));
-				console.log(typeof(ch));
-				console.log(ch.key);
-			}
-			const filterObject = obj => obj.filter( ch => this.get_channels.include(ch)); 
-		},
-		sort_data(obj) { // used for sorting the CHxx values
-			const sortObject = obj => Object.keys(obj).sort().reduce((res, key) => (res[key] = obj[key], res), {});
-			return sortObject(obj);
+		set_channels() {
+			
+		sofi_data(obj) { // used for sorting and filtering the CHxx values
+			const sort = obj => Object.keys(obj).sort().reduce((res, key) => (res[key] = obj[key], res), {});
+			data = sort(obj)
+			channels = this.get_channels();
+			filtered = []; var i = 0;
+			for (ch in data){ if (channels.includes(String(ch))) {
+				filtered[i] = data[ch];
+				i++;
+			}};
+			return filtered; 
 		},
 		start_data() { // start fetching data every dt = sleeptime
-			this.timer = setInterval(()=>{this.fetch_data()}, 
+			this.timer = setInterval(()=>{this.get_data()}, 
 					1000*this.device.fields.sleeptime);
 		},
 		stop_data() { // stop fetching data
 			clearInterval(this.timer);
 		},
-		fetch_data() { // fetch a single set of data with python request
+		get_data() { // fetch a single set of data with python request
 			var buff;
 			const url = '/' + this.device.model + '/' + this.device.fields.name + '/data/';
 			config = {  method : 'GET',
                         mode : 'cors', }; 
 			fetch(url)
 				.then(response => response.json())
-				.then(data => this.filter_data(data.value))
+				.then(data => this.sofi_data(data.value))
+				.then(data => {
+					this.data = data;
+					this.datas.unshift(data); 
+				})
 				.catch(error => console.log(error));
-				
+			
+			// can we use this as a quicker way to sort and filter ?
 			//console.log(this.data.filter( function(item){
 			//	return Objects.keys(item) in this.get_channels()
 			//}));
@@ -170,10 +167,14 @@ PDData.component( 'pddata-table', {
 })
 
 PDData.component( 'pddata-widget', {
-	props : ['datetime','data'],
+	data () { return {
+		datetime : new Date().toLocaleTimeString(),
+		}
+	},
+	props : ['data'],
 	template: `
 		<tr>
-		<td>{{ datetime }}</td>
+		<td>{{ this.datetime }}</td>
 		<td v-for="ch in data">{{ ch }}</td>
 		</tr>
 	`,

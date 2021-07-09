@@ -28,23 +28,16 @@ def detail(request, device_type, device_name):
 	return render(request, 'main/main_detail.html', context)
         
 def data(request, device_type, device_name):
-    print(request.body)
-    # print(request.body.encode())
-    '''
-    post_dict = json.loads(request.body.decode('utf-8'))
-    device_type = post_dict['device_type']
-    device_name = post_dict['device_name']
-    '''
-    if device_type == 'main.pdmon': typ = PDmon
-    else: typ = Tctrl
-    device = get_object_or_404(typ, name=device_name)
-    url = "http://" + device.ip + "/data/get"
-    r = requests.get(url)
-    data_string = r.text
-    # data_json = r.json()
-    data_dict = json.loads(data_string)
-    print(data_dict['value'])
-    return HttpResponse(data_string)
+	print(request.body)
+	# print(request.body.encode())
+	if device_type == 'main.pdmon': typ = PDmon
+	else: typ = Tctrl
+	device = get_object_or_404(typ, name=device_name)
+	url = "http://" + device.ip + "/data/get"
+	r = requests.get(url)
+	data_string = r.text
+
+	return HttpResponse(data_string)
     
 def remove(request):
 	print(request.POST)
@@ -59,3 +52,9 @@ def remove(request):
 	device = get_object_or_404(typ, name=device_name)
 	device.delete() '''
 	return redirect('index')
+	
+### PDMON related views ###
+
+def set_channel(request):
+	print(request.POST)
+	print(request.body)
