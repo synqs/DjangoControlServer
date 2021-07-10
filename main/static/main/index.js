@@ -53,10 +53,15 @@ IndexTable.component('device-widget', {
 	<td><a v-bind:href="'/' + device.model + '/' + device.fields.name">{{ device.fields.name }}</a></td>
 	<td>{{ device.fields.ip }}</td>
 	<td>online</td>
-	<td><button class="btn">Settings</button></td>
+	<td><button v-on:click="get_detail()" class="btn btn-primary">Details</button></td>
 	<td><button class="btn btn-warning">Remove</button></td>
 	</tr>
 	`,
+	methods: {
+		get_detail() {
+			
+		},
+	},
 })
 
 IndexTable.mount('#deviceindex')

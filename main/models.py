@@ -11,7 +11,7 @@ class PDmon(models.Model):
 	
 	# parameters/values for pdmon
 	channel_string = models.CharField(max_length=27, default='0,1,2,3,4,5,6,7,8,9,10,11')
-	data_string = models.CharField(max_length=100, blank=True)	# store data in string
+	# data_string = models.CharField(max_length=100, blank=True)	# store data in string
 
 	def __str__(self):
 		return self.name
