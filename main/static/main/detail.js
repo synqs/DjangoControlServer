@@ -119,7 +119,9 @@ PDData.component( 'pddata-table', {
 						url : 'http://' + this.device.fields.ip + '/data/get',
 						xsrfCookieName: 'csrftoken',
 						xsrfHeaderName: 'X-CSRFTOKEN',
-						headers : {'Access-Control-Allow-Origin' : '*'},
+						proxy : { host: 'proxy.kip.uni-heidelberg.de', port : 8080 },
+						headers: { 	'Access-Control-Allow-Origin' : '*',
+								'Sec-Fetch-Mode' : 'no-cors' }, 
 						data : this.device };
 			axios(config)
 				.then(response => {
