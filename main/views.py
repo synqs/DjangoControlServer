@@ -30,11 +30,18 @@ def detail(request, device_type, device_name):
 def data(request):
 	post_dict = json.loads(request.body.decode())
 	
-	device_ip = post_dict['fields']['ip']
+	# device_ip = post_dict['fields']['ip'] # this would be a shortcut...
 	
-	url = "http://" + device_ip + "/data/get"
+	device_type = post_dict['model']
+	device_name = post_dict['fields']['name']
+	if device_type == 'main.pdmon': typ = PDmon
+	else: typ = Tctrl
+	
+	device = get_object_or_404(typ, name=device_name)
+	
+	url = "http://" + device.ip + "/data/get"
 	r = requests.get(url)
-	data_string = r.text
+	data_string = r.text + device.channel_string
 	
 	return HttpResponse(data_string)
     
@@ -55,5 +62,5 @@ def remove(request):
 ### PDMON related views ###
 
 def set_channel(request):
-	print(request.POST)
-	print(request.body)
+	post_dict = json.loads(request.body.decode())
+	# print(post_dict['channels'])

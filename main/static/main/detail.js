@@ -78,8 +78,6 @@ PDData.component( 'pddata-table', {
 			}
 			return channels;
 		},
-		set_channels() {
-		},
 		sofi_data(obj) { // used for sorting and filtering the CHxx values
 			const sort = obj => Object.keys(obj).sort().reduce((res, key) => (res[key] = obj[key], res), {});
 			data = sort(obj)
@@ -113,6 +111,21 @@ PDData.component( 'pddata-table', {
 					})
 				.catch(error => console.log(error))
 		},
+		set_channels(arr) {
+			config = {  method : 'POST',
+						url : '/channels/',
+						xsrfCookieName: 'csrftoken',
+						xsrfHeaderName: 'X-CSRFTOKEN',
+						data : this.device };
+			axios(config)
+				.then(response => {
+					// console.log(response.data['value']);
+					const sofi_data = this.sofi_data(response.data['value']); // is there a quicker way to sort and filter ?
+					this.data = sofi_data;
+					this.datas.unshift(sofi_data); 
+					})
+				.catch(error => console.log(error))
+		},
 		/* this method does not work due to missing ACAO-header */
 		get_data_direct() { // fetch a single set of data directly from arduino (axios)
 			config = {  method : 'GET',
@@ -121,7 +134,8 @@ PDData.component( 'pddata-table', {
 						xsrfHeaderName: 'X-CSRFTOKEN',
 						proxy : { host: 'proxy.kip.uni-heidelberg.de', port : 8080 },
 						headers: { 	'Access-Control-Allow-Origin' : '*',
-								'Sec-Fetch-Mode' : 'no-cors' }, 
+									'Content-Type' : 'application/json',
+									'crossdomain' : 'true'}, 
 						data : this.device };
 			axios(config)
 				.then(response => {
