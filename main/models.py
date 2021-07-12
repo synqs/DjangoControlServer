@@ -20,7 +20,9 @@ class PDmon(models.Model):
 		return 'http://' + self.ip + '/'
 
 	def set_channels(self, array):
-		array = self.channel_string
+		print(array)
+		self.channel_string = array
+		return 0
 
 class Tctrl(models.Model):
 	name = models.CharField(max_length=20, unique=True)		# should match DNS name eg. nakayun1

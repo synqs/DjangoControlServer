@@ -29,7 +29,8 @@ def detail(request, device_type, device_name):
         
 def data(request):
 	post_dict = json.loads(request.body.decode())
-	
+	print(request.method)
+	print(request.POST)
 	# device_ip = post_dict['fields']['ip'] # this would be a shortcut...
 	
 	device_type = post_dict['model']
@@ -61,6 +62,27 @@ def remove(request):
 	
 ### PDMON related views ###
 
-def set_channel(request):
-	post_dict = json.loads(request.body.decode())
-	# print(post_dict['channels'])
+def pdmon(request, device_id):
+	device = get_object_or_404(PDmon, id=device_id)
+	
+	if request.method == 'GET':
+		url = "http://" + device.ip + "/data/get"
+		r = requests.get(url)
+		response = r.text + device.channel_string
+		return HttpResponse(response)
+		
+	elif request.method == 'POST':
+		r_dict = json.loads(request.body.decode())
+		print(r_dict)
+		print(r_dict['channels'])
+		device.set_channels(r_dict['channels'])
+		response = { 'message' : 'Set channels successfully.' }
+		return HttpResponse(response)
+		
+	elif request.method == 'DELETE':
+		# device.delete()
+		response = { 'message' : 'Deleted successfully.' } 
+		return HttpResponse(response)
+	else:
+		response = { 'message' : 'Invalid operation.' }
+		return HttpResponse(response)

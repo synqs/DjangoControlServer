@@ -97,18 +97,18 @@ PDData.component( 'pddata-table', {
 			clearInterval(this.timer);
 		},
 		get_data() { // fetch a single set of data directly from arduino (axios)
-			config = {  method : 'POST',
-						url : '/data/',
-						xsrfCookieName: 'csrftoken',
-						xsrfHeaderName: 'X-CSRFTOKEN',
-						data : this.device };
+			config = {  	method : 'POST',
+					url : '/pdmon/',
+					xsrfCookieName: 'csrftoken',
+					xsrfHeaderName: 'X-CSRFTOKEN',
+					data : this.device };
 			axios(config)
-				.then(response => {
+				//.then(response => {
 					// console.log(response.data['value']);
-					const sofi_data = this.sofi_data(response.data['value']); // is there a quicker way to sort and filter ?
-					this.data = sofi_data;
-					this.datas.unshift(sofi_data); 
-					})
+					//const sofi_data = this.sofi_data(response.data); // is there a quicker way to sort and filter ?
+					//this.data = sofi_data;
+					// this.datas.unshift(sofi_data); 
+					//})
 				.catch(error => console.log(error))
 		},
 		set_channels(arr) {

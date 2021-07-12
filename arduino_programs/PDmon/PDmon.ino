@@ -1,9 +1,11 @@
 /* Load all necessary libraries */
 #include <Bridge.h> // library for communication with linux processor
 #include <Process.h> // library for running processes on the linux processor
+#include <BridgeServer.h>
+#include <BridgeClient.h>
 
 /* Start processes */
-Process date; // process used to get the date
+// Process date; // process used to get the date
 
 /* Define global objects */
 int pins[12] = {A0,A1,A2,A3,A4,A5,6,7,8,9,10,11}; // analog reading of digital pins requires other pin numbers than usually used or labeled on the hardware: 6 for 4, 7 for 6, 11 for 12
@@ -25,7 +27,8 @@ void loop() {
     sprintf(buff,"%02d",i); // label padding for sorting by channels afterwards
     Bridge.put("CH" + String(buff),output); // store the result
   }
-  /* Since there is some trouble with sorting the data, we will leave it like this at the moment
+  
+  /* Since there is some trouble with sorting the data, we will leave it like this at the moment */
   // get the current time
   if(!date.running()) { // check whether the process isn't running
     date.begin("date");
@@ -35,5 +38,4 @@ void loop() {
   while(date.available() > 0) { // read the time given by the linux kernel
     Bridge.put("updated",date.readStringUntil('\n'));
   }
-  */
 }
