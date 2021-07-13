@@ -68,14 +68,16 @@ def pdmon(request, device_id):
 	if request.method == 'GET':
 		url = "http://" + device.ip + "/data/get"
 		r = requests.get(url)
-		response = r.text + device.channel_string
+		print(r.text)
+		channels = channel_buffer(device.channel_string)
+		response = r.text[:-1] + ",\"channels\":" + channels + "}" 
 		return HttpResponse(response)
 		
 	elif request.method == 'POST':
 		r_dict = json.loads(request.body.decode())
-		print(r_dict)
-		print(r_dict['channels'])
-		device.set_channels(r_dict['channels'])
+		print(device.channel_string)
+		print(r_dict['fields']['channel_string'])
+		device.set_channels(r_dict['fields']['channel_string'])
 		response = { 'message' : 'Set channels successfully.' }
 		return HttpResponse(response)
 		
@@ -86,3 +88,11 @@ def pdmon(request, device_id):
 	else:
 		response = { 'message' : 'Invalid operation.' }
 		return HttpResponse(response)
+		
+def channel_buffer(arr):
+	buff = arr.split(',')
+	channels = "["; i = 0;
+	for ch in buff:
+		channels += "\"CH" + buff[i].zfill(2) + "\","
+		i += 1
+	return channels[:-1] + "]"

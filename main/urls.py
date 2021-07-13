@@ -7,5 +7,5 @@ urlpatterns = [
 	path('<str:device_type>/<str:device_name>/', views.detail, name='detail'),
 	path('data/', views.data, name='data'),
 	path('remove/', views.remove, name='remove'),
-	path('pdmon/<int:device_id>/', views.pdmon, name='pdmon'),
+	path('pdmon/<int:device_id>', views.pdmon, name='pdmon'),
 ]

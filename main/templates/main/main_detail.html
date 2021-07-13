@@ -2,30 +2,10 @@
 {% load static %}
 
 {% block content %}
-
-<!-- div class="container" id="test">
-	<testtable></testtable>
-</div>
-
-<script>
-const test = Vue.createApp({
-	delimiters: ['[[', ']]'],
-});
-
-test.component('testtable', {
-	data () { return {
-			info : 'information',
-		}
-	},
-	delimiters: ['[[', ']]'],
-	template: `
-		[[ info ]]
-		<h1><a v-bind:href="{% url 'main:index' %}">Index</a></h1>
-	`,
-});
-
-test.mount('#test');
-</script -->
+<form action="{% url 'main:index' %}">
+	{% csrf_token %}
+	<input type="submit" value="Back to Index" class="btn btn-primary">
+</form>
 
 <div class="container" id="devicedetail">
 	<detail-table v-bind:device="{{ detail }}"></detail-table>

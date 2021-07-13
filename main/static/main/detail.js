@@ -23,8 +23,8 @@ DetailTable.component('detail-table', {
 	`,
 	methods: {
 		remove_axios() {
-			config = {  method : 'POST',
-						url : '/remove/',
+			config = {  method : 'DELETE',
+						url : '/pdmon/' + this.device.pk,
 						xsrfCookieName: 'csrftoken',
 						xsrfHeaderName: 'X-CSRFTOKEN',
 						data : this.device };
@@ -49,6 +49,7 @@ PDData.component( 'pddata-table', {
 	},
 	props: ['device'],
 	template: `
+	{{ this.data }}
 	<button type="button" class="btn btn-success" data-bs-toggle="button" autocomplete="off" v-on:click="start_data()">start</button>
 	<button type="button" class="btn btn-danger" v-on:click="stop_data()">stop</button>
 	<button type="button" class="btn btn-secondary" v-on:click="get_data()">get</button>
@@ -57,7 +58,7 @@ PDData.component( 'pddata-table', {
 		<thead class="thead-dark">
 			<tr>
 			<th>Time</th>
-			<th v-for="ch in get_channels()">{{ ch }}</th>
+			<th v-for="ch in data['channels']">{{ ch }}</th>
 			</tr>
 		</thead>
 		<tbody>
@@ -69,19 +70,10 @@ PDData.component( 'pddata-table', {
 		this.get_data()
 	},
 	methods: {
-		get_channels() { // get an array of desired channels
-			buff = this.device.fields.channel_string.split(',');
-			channels = []; var i = 0;
-			for (ch in buff) {
-				channels[i] = "CH" + buff[i].padStart(2, 0);
-				i++;
-			}
-			return channels;
-		},
 		sofi_data(obj) { // used for sorting and filtering the CHxx values
 			const sort = obj => Object.keys(obj).sort().reduce((res, key) => (res[key] = obj[key], res), {});
-			data = sort(obj)
-			channels = this.get_channels();
+			data = sort(obj['value'])
+			channels = obj['channels']
 			filtered = []; var i = 0;
 			for (ch in data){ if (channels.includes(String(ch))) {
 				filtered[i] = data[ch];
@@ -97,19 +89,21 @@ PDData.component( 'pddata-table', {
 			clearInterval(this.timer);
 		},
 		get_data() { // fetch a single set of data directly from arduino (axios)
-			config = {  	method : 'POST',
-					url : '/pdmon/',
+			config = {  	method : 'GET',
+					url : '/pdmon/' + this.device.pk,
 					xsrfCookieName: 'csrftoken',
 					xsrfHeaderName: 'X-CSRFTOKEN',
 					data : this.device };
 			axios(config)
-				//.then(response => {
-					// console.log(response.data['value']);
-					//const sofi_data = this.sofi_data(response.data); // is there a quicker way to sort and filter ?
-					//this.data = sofi_data;
-					// this.datas.unshift(sofi_data); 
-					//})
-				.catch(error => console.log(error))
+				//.then(response => console.log(response))
+				.then(response => {
+					console.log(response);
+					this.data = response.data;
+					const sofi_data = this.sofi_data(response.data); // is there a quicker way to sort and filter ?
+					this.data['value'] = sofi_data;
+					this.datas.unshift(sofi_data); 
+					})
+				.catch(error => console.log(error));
 		},
 		set_channels(arr) {
 			config = {  method : 'POST',
@@ -119,8 +113,8 @@ PDData.component( 'pddata-table', {
 						data : this.device };
 			axios(config)
 				.then(response => {
-					// console.log(response.data['value']);
-					const sofi_data = this.sofi_data(response.data['value']); // is there a quicker way to sort and filter ?
+					console.log(response.data);
+					const sofi_data = this.sofi_data(response.data); // is there a quicker way to sort and filter ?
 					this.data = sofi_data;
 					this.datas.unshift(sofi_data); 
 					})
