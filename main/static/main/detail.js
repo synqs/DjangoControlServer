@@ -23,11 +23,11 @@ DetailTable.component('detail-table', {
 	`,
 	methods: {
 		remove_axios() {
-			config = {  method : 'DELETE',
-						url : '/pdmon/' + this.device.pk,
-						xsrfCookieName: 'csrftoken',
-						xsrfHeaderName: 'X-CSRFTOKEN',
-						data : this.device };
+			config = {	method : 'DELETE',
+					url : '/pdmon/' + this.device.pk,
+					xsrfCookieName: 'csrftoken',
+					xsrfHeaderName: 'X-CSRFTOKEN',
+					data : this.device };
 			axios(config)
 				.then(response => console.log(response))
 				.catch(error => console.log(error));
@@ -49,7 +49,6 @@ PDData.component( 'pddata-table', {
 	},
 	props: ['device'],
 	template: `
-	{{ this.data }}
 	<button type="button" class="btn btn-success" data-bs-toggle="button" autocomplete="off" v-on:click="start_data()">start</button>
 	<button type="button" class="btn btn-danger" v-on:click="stop_data()">stop</button>
 	<button type="button" class="btn btn-secondary" v-on:click="get_data()">get</button>
@@ -74,7 +73,8 @@ PDData.component( 'pddata-table', {
 			const sort = obj => Object.keys(obj).sort().reduce((res, key) => (res[key] = obj[key], res), {});
 			data = sort(obj['value'])
 			channels = obj['channels']
-			filtered = []; var i = 0;
+			filtered = []; var i = 1;
+			filtered[0] = data['updated'];
 			for (ch in data){ if (channels.includes(String(ch))) {
 				filtered[i] = data[ch];
 				i++;
@@ -101,7 +101,7 @@ PDData.component( 'pddata-table', {
 					this.data = response.data;
 					const sofi_data = this.sofi_data(response.data); // is there a quicker way to sort and filter ?
 					this.data['value'] = sofi_data;
-					this.datas.unshift(sofi_data); 
+					this.datas.unshift(sofi_data);
 					})
 				.catch(error => console.log(error));
 		},
@@ -113,11 +113,7 @@ PDData.component( 'pddata-table', {
 						data : this.device };
 			axios(config)
 				.then(response => {
-					console.log(response.data);
-					const sofi_data = this.sofi_data(response.data); // is there a quicker way to sort and filter ?
-					this.data = sofi_data;
-					this.datas.unshift(sofi_data); 
-					})
+					console.log(response.data);})
 				.catch(error => console.log(error))
 		},
 		/* this method does not work due to missing ACAO-header */
@@ -151,7 +147,7 @@ PDData.component( 'pddata-widget', {
 	props : ['data'],
 	template: `
 		<tr>
-		<td>{{ this.datetime }}</td>
+		<!-- td>{{ this.datetime }}</td -->
 		<td v-for="ch in data">{{ ch }}</td>
 		</tr>
 	`,

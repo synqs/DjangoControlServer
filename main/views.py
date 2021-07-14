@@ -13,6 +13,14 @@ def index(request):
 	context = { 'index' : index }
 	return render(request, 'main/main_list.html', context)
 
+def devices(request):
+	pdmons = get_list_or_404(PDmon)
+	tctrls = get_list_or_404(Tctrl)
+	
+	device_list = serializers.serialize('json', [*pdmons, *tctrls])
+	response = { 'device_list' : device_list }
+	return HTTPResponse(response)
+	
 def detail(request, device_type, device_name):
 	#
 	# post_dict = json.loads(request.body.decode('utf-8'))
@@ -27,38 +35,17 @@ def detail(request, device_type, device_name):
 	context = { 'detail' : detail[1:-1], 'type' : type(device_type) }
 	return render(request, 'main/main_detail.html', context)
         
-def data(request):
-	post_dict = json.loads(request.body.decode())
-	print(request.method)
-	print(request.POST)
-	# device_ip = post_dict['fields']['ip'] # this would be a shortcut...
+def detail_direct(request):
+	post_dict = json.loads(request.body.decode('utf-8'))
 	
-	device_type = post_dict['model']
-	device_name = post_dict['fields']['name']
-	if device_type == 'main.pdmon': typ = PDmon
-	else: typ = Tctrl
+	device_type = post_dict['device_type']
+	device_name = post_dict['device_name']
 	
-	device = get_object_or_404(typ, name=device_name)
+	device = get_list_or_404(typ, name=device_name)
 	
-	url = "http://" + device.ip + "/data/get"
-	r = requests.get(url)
-	data_string = r.text + device.channel_string
-	
-	return HttpResponse(data_string)
-    
-def remove(request):
-	post_dict = json.loads(request.body.decode())
-	
-	device_type = post_dict['model']
-	device_name = post_dict['fields']['name']
-	if device_type == 'main.pdmon': typ = PDmon
-	else: typ = Tctrl
-	
-	device = get_object_or_404(typ, name=device_name)
-
-	# so this view is working, but I commented out this out such that we can have a look at the axios requesting and stuff
-	# device.delete()
-	return HttpResponse('Device Deleted')
+	detail = serializers.serialize('json', device)
+	context = { 'detail' : detail[1:-1], 'type' : type(device_type) }
+	return render(request, 'main/main_detail.html', post_dict)
 	
 ### PDMON related views ###
 
@@ -68,9 +55,9 @@ def pdmon(request, device_id):
 	if request.method == 'GET':
 		url = "http://" + device.ip + "/data/get"
 		r = requests.get(url)
-		print(r.text)
 		channels = channel_buffer(device.channel_string)
 		response = r.text[:-1] + ",\"channels\":" + channels + "}" 
+		print(response)
 		return HttpResponse(response)
 		
 	elif request.method == 'POST':
@@ -86,8 +73,8 @@ def pdmon(request, device_id):
 		response = { 'message' : 'Deleted successfully.' } 
 		return HttpResponse(response)
 	else:
-		response = { 'message' : 'Invalid operation.' }
-		return HttpResponse(response)
+		context = { 'message' : 'Invalid operation.' }
+		return render(request, 'main/main_detail.html', context)
 		
 def channel_buffer(arr):
 	buff = arr.split(',')

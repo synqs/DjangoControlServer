@@ -1,30 +1,10 @@
-const IndexTable = Vue.createApp({
-	/*
-	data() { return {
+const IndexTable = Vue.createApp({});
+
+IndexTable.component('index-table', {
+	data () { return {
 		list : null,
 		}
 	},
-	template: `
-		<index-table v-bind:device_list="list"></index-table>
-		<button v-on:click="get_devices" type="button" class="btn btn-primary">List</button>
-	`,
-	compilerOptions: {
-		delimiters: ['[[', ']]']
-	},
-	mounted () {
-		// this.get_devices()
-	},
-	methods: {		
-		get_devices() {
-			axios.get('http://localhost:8000/devices/')
-		             .then(response => (this.list = response.data))
-		             .catch(error => console.log(error))
-		},
-	},
-	*/
-});
-
-IndexTable.component('index-table', {
 	props: ['device_list'],
 	template: `
 	<h2>Device Index</h2>
@@ -40,9 +20,22 @@ IndexTable.component('index-table', {
 		</thead>
 		<tbody>
 		<device-widget v-for="d in device_list" v-bind:device="d" :key="d.pk"></device-widget>
+		{{ list }}
 		</tbody>
 	</table>
 	`,
+	methods:
+		get_devices() {
+			config = {  	method : 'GET',
+					url : '/devices/',
+					xsrfCookieName: 'csrftoken',
+					xsrfHeaderName: 'X-CSRFTOKEN', };
+			axios(config)
+				.then(response => { 
+					console.log(response);
+					this.list = response.data; });
+				.then(error => console.log(error));
+		}
 })
 
 IndexTable.component('device-widget', {
@@ -59,7 +52,12 @@ IndexTable.component('device-widget', {
 	`,
 	methods: {
 		get_detail() {
-			
+			config = {  	method : 'POST',
+					url : '/detail_direct/',
+					xsrfCookieName: 'csrftoken',
+					xsrfHeaderName: 'X-CSRFTOKEN',
+					data : this.device };
+			axios(config)
 		},
 	},
 })
