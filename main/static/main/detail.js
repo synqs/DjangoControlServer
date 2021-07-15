@@ -65,7 +65,7 @@ PDData.component( 'pddata-table', {
 		</tbody>
 	</table>
 	`,
-	mounted() {
+	mounted () {
 		this.get_data()
 	},
 	methods: {

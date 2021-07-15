@@ -7,19 +7,20 @@ import requests, json
 # Create your views here.
 def index(request):
 	pdmons = get_list_or_404(PDmon)
-	tctrls = Tctrl.objects.all()
+	tctrls = get_list_or_404(Tctrl)
 	
-	index = serializers.serialize('json', [*pdmons, *tctrls])
-	context = { 'index' : index }
-	return render(request, 'main/main_list.html', context)
-
+	device_list = serializers.serialize('json', [*pdmons, *tctrls])
+	context = { 'device_list' : device_list }
+	
+	return render(request, 'main/index.html', context) # keep it like this or use the render-context shortcut...?
+	
 def devices(request):
 	pdmons = get_list_or_404(PDmon)
 	tctrls = get_list_or_404(Tctrl)
 	
 	device_list = serializers.serialize('json', [*pdmons, *tctrls])
-	response = { 'device_list' : device_list }
-	return HTTPResponse(response)
+	
+	return HttpResponse(device_list) # is this clean or corrupted?
 	
 def detail(request, device_type, device_name):
 	#
@@ -33,19 +34,23 @@ def detail(request, device_type, device_name):
 	
 	detail = serializers.serialize('json', device)
 	context = { 'detail' : detail[1:-1], 'type' : type(device_type) }
-	return render(request, 'main/main_detail.html', context)
+	
+	return render(request, 'main/detail.html', context)
         
 def detail_direct(request):
 	post_dict = json.loads(request.body.decode('utf-8'))
 	
-	device_type = post_dict['device_type']
-	device_name = post_dict['device_name']
+	device_name = post_dict['fields']['name']
+	device_type = post_dict['model']
 	
+	if device_type == 'main.pdmon': typ = PDmon
+	else: typ = Tctrl
 	device = get_list_or_404(typ, name=device_name)
+	print(type(typ))
 	
-	detail = serializers.serialize('json', device)
-	context = { 'detail' : detail[1:-1], 'type' : type(device_type) }
-	return render(request, 'main/main_detail.html', post_dict)
+	device_detail = serializers.serialize('json', device)
+	
+	return render(request, 'main/detail.html')
 	
 ### PDMON related views ###
 

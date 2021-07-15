@@ -2,10 +2,9 @@ const IndexTable = Vue.createApp({});
 
 IndexTable.component('index-table', {
 	data () { return {
-		list : null,
+		devices : null,
 		}
 	},
-	props: ['device_list'],
 	template: `
 	<h2>Device Index</h2>
 	<hr class="rounded">
@@ -19,21 +18,23 @@ IndexTable.component('index-table', {
 			</tr>
 		</thead>
 		<tbody>
-		<device-widget v-for="d in device_list" v-bind:device="d" :key="d.pk"></device-widget>
-		{{ list }}
+		<device-widget v-for="d in devices" v-bind:device="d" :key="d.pk"></device-widget>
 		</tbody>
 	</table>
 	`,
+	mounted () {
+		this.get_devices();
+	},
 	methods: {
 		get_devices() {
-			config = {  	method : 'GET',
-					url : '/devices/',
-					xsrfCookieName: 'csrftoken',
-					xsrfHeaderName: 'X-CSRFTOKEN', };
+			config = {	method : 'GET',
+						url : '/devices/',
+						xsrfCookieName: 'csrftoken',
+						xsrfHeaderName: 'X-CSRFTOKEN', };
 			axios(config)
-				.then(response => { 
+				.then(response => {
 					console.log(response);
-					this.list = response.data; });
+					this.devices = response.data})
 				.then(error => console.log(error));
 		},
 	},
@@ -53,14 +54,18 @@ IndexTable.component('device-widget', {
 	`,
 	methods: {
 		get_detail() {
-			config = {  	method : 'POST',
-					url : '/detail_direct/',
-					xsrfCookieName: 'csrftoken',
-					xsrfHeaderName: 'X-CSRFTOKEN',
-					data : this.device };
+			config = {	method : 'POST',
+						url : '/detail_direct/',
+						xsrfCookieName: 'csrftoken',
+						xsrfHeaderName: 'X-CSRFTOKEN',
+						data : this.device };
 			axios(config)
+				.then(response => {
+					console.log(response);
+					console.log(response.request.res.responseUrl);})
+				.then(error => console.log(error));
 		},
 	},
 })
 
-IndexTable.mount('#deviceindex')
+IndexTable.mount('#index')
