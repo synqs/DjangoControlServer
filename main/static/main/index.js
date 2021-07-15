@@ -14,7 +14,7 @@ IndexTable.component('index-table', {
 			<th>#</th>
 			<th>Name</th>
 			<th>IP</th>
-			<th colspan=3>Status</th>
+			<th colspan=4>Status</th>
 			</tr>
 		</thead>
 		<tbody>
@@ -45,24 +45,34 @@ IndexTable.component('device-widget', {
 	template: `
 	<tr>
 	<td>{{ device.model }} # {{ device.pk }}</td>
-	<td><a v-bind:href="'/' + device.model + '/' + device.fields.name">{{ device.fields.name }}</a></td>
+	<td><a v-bind:href="'/' + device.model + '/' + device.pk">{{ device.fields.name }}</a></td>
 	<td>{{ device.fields.ip }}</td>
 	<td>online</td>
-	<td><button v-on:click="get_detail()" class="btn btn-primary">Details</button></td>
+	<td><a v-bind:href="'/' + device.model + '/' + device.pk" class="btn btn-primary">Details</a></td>
 	<td><button class="btn btn-warning">Remove</button></td>
 	</tr>
 	`,
 	methods: {
+		remove() {
+			config = {	method : 'DELETE',
+					url : '/' + this.device.model + '/' + this.device.pk + '/',
+					xsrfCookieName: 'csrftoken',
+					xsrfHeaderName: 'X-CSRFTOKEN',
+					data : this.device };
+			axios(config)
+				.then(response => console.log(response))
+				.catch(error => console.log(error));
+		},
 		get_detail() {
 			config = {	method : 'POST',
-						url : '/detail_direct/',
+						url : '/' + this.device.model + '/' + this.device.pk + '/', //'/detail_direct/',
 						xsrfCookieName: 'csrftoken',
 						xsrfHeaderName: 'X-CSRFTOKEN',
 						data : this.device };
 			axios(config)
 				.then(response => {
 					console.log(response);
-					console.log(response.request.res.responseUrl);})
+					console.log(response.request.res);})
 				.then(error => console.log(error));
 		},
 	},

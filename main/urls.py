@@ -5,7 +5,6 @@ app_name='main'
 urlpatterns = [
 	path('index/', views.index, name='index'),
 	path('devices/', views.devices, name='devices'),
-	path('<str:device_type>/<str:device_name>/', views.detail, name='detail'),
-	path('detail_direct/', views.detail_direct, name='detail_direct'),
-	path('pdmon/<int:device_id>', views.pdmon, name='pdmon'),
+	path('<str:device_type>/<int:device_id>/', views.detail, name='detail'),
+	path('pdmon/<int:device_id>/', views.pdmon, name='pdmon'),
 ]

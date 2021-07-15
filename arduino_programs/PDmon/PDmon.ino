@@ -5,7 +5,7 @@
 #include <BridgeClient.h>
 
 /* Start processes */
-// Process date; // process used to get the date
+Process date; // process used to get the date
 
 /* Define global objects */
 int pins[12] = {A0,A1,A2,A3,A4,A5,6,7,8,9,10,11}; // analog reading of digital pins requires other pin numbers than usually used or labeled on the hardware: 6 for 4, 7 for 6, 11 for 12
@@ -32,7 +32,7 @@ void loop() {
   // get the current time
   if(!date.running()) { // check whether the process isn't running
     date.begin("date");
-    date.addParameter("+%d.%m.%Y %H:%M:%S");
+    date.addParameter("+%H:%M:%S");
     date.run();
   }
   while(date.available() > 0) { // read the time given by the linux kernel

@@ -15,14 +15,14 @@ DetailTable.component('detail-table', {
 			<th>Status : online</th>
 			<th>Owner : nakalab</th>
 			<th>
-				<button class="btn btn-warning" v-on:click="remove_axios()">remove</button>
+				<button class="btn btn-warning" v-on:click="remove()">remove</button>
 			</th>
 			</tr>
 		</thead>
 	</table>
 	`,
 	methods: {
-		remove_axios() {
+		remove() {
 			config = {	method : 'DELETE',
 					url : '/pdmon/' + this.device.pk,
 					xsrfCookieName: 'csrftoken',
@@ -49,10 +49,11 @@ PDData.component( 'pddata-table', {
 	},
 	props: ['device'],
 	template: `
-	<button type="button" class="btn btn-success" data-bs-toggle="button" autocomplete="off" v-on:click="start_data()">start</button>
-	<button type="button" class="btn btn-danger" v-on:click="stop_data()">stop</button>
-	<button type="button" class="btn btn-secondary" v-on:click="get_data()">get</button>
-	<button type="button" class="btn btn-outline-secondary" v-on:click="get_data_direct()">get direct</button>
+	<button class="btn btn-success" data-bs-toggle="button" autocomplete="off" v-on:click="start_data()">start</button>
+	<button class="btn btn-danger" v-on:click="stop_data()">stop</button>
+	<button class="btn btn-secondary" v-on:click="get_data()">get</button>
+	<button class="btn btn-secondary" v-on:click="get_head()">head</button>
+	<button class="btn btn-outline-secondary" v-on:click="get_data_direct()">get direct</button>
 	<table class="table table-striped" responsive="True">
 		<thead class="thead-dark">
 			<tr>
@@ -90,7 +91,7 @@ PDData.component( 'pddata-table', {
 		},
 		get_data() { // fetch a single set of data directly from arduino (axios)
 			config = {  	method : 'GET',
-					url : '/pdmon/' + this.device.pk,
+					url : '/pdmon/' + this.device.pk + '/',
 					xsrfCookieName: 'csrftoken',
 					xsrfHeaderName: 'X-CSRFTOKEN',
 					data : this.device };
@@ -115,6 +116,16 @@ PDData.component( 'pddata-table', {
 				.then(response => {
 					console.log(response.data);})
 				.catch(error => console.log(error))
+		},
+		get_head() { // fetch a single set of data directly from arduino (axios)
+			config = {  	method : 'HEAD',
+					url : '/pdmon/' + this.device.pk,
+					xsrfCookieName: 'csrftoken',
+					xsrfHeaderName: 'X-CSRFTOKEN',
+					data : this.device };
+			axios(config)
+				.then(response => {console.log(response)})
+				.catch(error => console.log(error));
 		},
 		/* this method does not work due to missing ACAO-header */
 		get_data_direct() { // fetch a single set of data directly from arduino (axios)
