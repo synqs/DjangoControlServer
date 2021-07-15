@@ -24,7 +24,7 @@ IndexTable.component('index-table', {
 		</tbody>
 	</table>
 	`,
-	methods:
+	methods: {
 		get_devices() {
 			config = {  	method : 'GET',
 					url : '/devices/',
@@ -35,7 +35,8 @@ IndexTable.component('index-table', {
 					console.log(response);
 					this.list = response.data; });
 				.then(error => console.log(error));
-		}
+		},
+	},
 })
 
 IndexTable.component('device-widget', {
