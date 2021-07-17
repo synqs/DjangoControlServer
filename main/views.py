@@ -11,10 +11,12 @@ def index(request):
 	
 	device_list = serializers.serialize('json', [*pdmons, *tctrls])
 	context = { 'device_list' : device_list }
-	
-	return render(request, 'main/index.html') # keep it like this or use the render-context shortcut...?
-
-
+	if device_list == "":
+		context['message'] = 'No devices available!'
+	else: 
+		context['message'] = 'Device Index'
+	return render(request, 'main/index.html', context) # keep it like this or use the render-context shortcut...?
+'''
 def devices(request):
 	pdmons = get_list_or_404(PDmon)
 	tctrls = get_list_or_404(Tctrl)
@@ -22,7 +24,7 @@ def devices(request):
 	device_list = serializers.serialize('json', [*pdmons, *tctrls])
 	
 	return HttpResponse(device_list) # is this clean or corrupted?
-	
+'''
 def detail(request, device_type, device_id):
 	if device_type == 'main.pdmon': typ = PDmon
 	else: typ = Tctrl
@@ -35,21 +37,22 @@ def detail(request, device_type, device_id):
 	
 ### PDMON related views ###
 
-def pdmon(request, device_name):
-	#r_dict = json.loads(request.body.decode())
-	device = get_object_or_404(PDmon, name=device_name)
+def pdmon(request, device_id):
+	r_dict = json.loads(request.body.decode())
+	device = get_object_or_404(PDmon, id=device_id)
+	print(r_dict)
+	print(request.body)
+	print(request.POST)
 	
+	return HttpResponse({ 'message' : 'fail'})
+	
+	'''
 	if request.method == 'GET':
 		url = "http://" + device.ip + "/data/get"
 		r = requests.get(url)
 		channels = channel_buffer(device.channel_string)
 		response = r.text[:-1] + ",\"channels\":" + channels + "}" 
 		return HttpResponse(response)
-		
-	if request.method == 'HEAD':
-		response = serializers.serialize('json', device)
-		context = { 'detail' : response }
-		return HttpResponse(context)
 		
 	elif request.method == 'POST':
 		r_dict = json.loads(request.body.decode())
@@ -60,12 +63,12 @@ def pdmon(request, device_name):
 		return HttpResponse(response)
 		
 	elif request.method == 'DELETE':
-		# device.delete()
+		device.delete()
 		response = { 'message' : 'Deleted successfully.' } 
-		return HttpResponse(response)
+		return render(request, 'main/index.html', response)
 	else:
 		context = { 'message' : 'Invalid operation.' }
-		return render(request, 'main/main_detail.html', context)
+		return render(request, 'main/main_detail.html', context) '''
 		
 def channel_buffer(arr):
 	buff = arr.split(',')
@@ -74,3 +77,31 @@ def channel_buffer(arr):
 		channels += "\"CH" + buff[i].zfill(2) + "\","
 		i += 1
 	return channels[:-1] + "]"
+
+### TCTRL related views ###
+
+def tctrl(request, device_id):
+	#r_dict = json.loads(request.body.decode())
+	device = get_object_or_404(PDmon, pk=device_id)
+	
+	if request.method == 'GET':
+		url = "http://" + device.ip + "/data/get"
+		r = requests.get(url)
+		response = r.text
+		return HttpResponse(response)
+	
+	elif request.method == 'POST':
+		r_dict = json.loads(request.body.decode())
+		print(device.channel_string)
+		print(r_dict['fields']['channel_string'])
+		device.set_channels(r_dict['fields']['channel_string'])
+		response = { 'message' : 'Set channels successfully.' }
+		return HttpResponse(response)
+		
+	elif request.method == 'DELETE':
+		device.delete()
+		response = { 'message' : 'Deleted successfully.' } 
+		return render(request, 'main/index.html', response)
+	else:
+		context = { 'message' : 'Invalid operation.' }
+		return render(request, 'main/main_detail.html', context)

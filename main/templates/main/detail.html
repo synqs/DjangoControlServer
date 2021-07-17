@@ -2,31 +2,27 @@
 {% load static %}
 
 {% block content %}
-
-{{ detail }}
-{{ detail.model }}
-
-<form action="{% url 'main:index' %}">
-	{% csrf_token %}
-	<input type="submit" value="Back to Index" class="btn btn-primary">
-</form>
+{% if message %}<h2>{{ message }}</h2>{% endif %}
 
 <div class="container" id="devicedetail">
 	<detail-table v-bind:device="{{ detail }}"></detail-table>
 </div>
 
-{% if detail.model == "main.pdmon" %}
+{% if detail.model == main.pdmon %}
 <div class="container" id="pddata">
 	<pddata-table v-bind:device="{{ detail }}"></pddata-table>
 </div>
+<script type="text/javascript" src="{% static 'main/pddata.js' %}"></script>
 
-{% elif detail.model == "main.tctrl" %}
-<div class="container" id="pddata">
+{% elif detail.model == main.tctrl %}
+<div class="container" id="tcdata">
 	<pddata-table v-bind:device="{{ detail }}"></pddata-table>
 </div>
-{% else %}<p> UNKNOWN DEVICE TYPE </p>{% endif %}
+<script type="text/javascript" src="{% static 'main/tcdata.js' %}"></script>
+
+{% endif %}
+
 <script type="text/javascript" src="{% static 'main/detail.js' %}"></script>
-<!-- script src="{% static 'pddata.js' %}"></script -->
 {% endblock %}
 
 {% block redirect %}

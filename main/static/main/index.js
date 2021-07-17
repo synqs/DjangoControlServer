@@ -1,13 +1,8 @@
 const IndexTable = Vue.createApp({});
 
 IndexTable.component('index-table', {
-	data () { return {
-		devices : null,
-		}
-	},
+	props: ['devices'],
 	template: `
-	<h2>Device Index</h2>
-	<hr class="rounded">
 	<table class="table table-striped">
 		<thead class="thead-dark">
 			<tr>
@@ -23,7 +18,7 @@ IndexTable.component('index-table', {
 	</table>
 	`,
 	mounted () {
-		this.get_devices();
+		// this.get_devices(); currently, the index is load with django template tags
 	},
 	methods: {
 		get_devices() {
