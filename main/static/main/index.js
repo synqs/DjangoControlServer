@@ -55,7 +55,7 @@ IndexTable.component('device-widget', {
 	methods: {
 		remove() {
 			config = {	method : 'DELETE',
-					url : '/' + this.device.model + '/' + this.device.pk + '/',
+					url : this.device.model + '/' + this.device.pk + '/',
 					xsrfCookieName: 'csrftoken',
 					xsrfHeaderName: 'X-CSRFTOKEN',
 					data : this.device };

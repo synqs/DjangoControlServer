@@ -3,6 +3,7 @@ import requests
 
 # Create your models here.
 class PDmon(models.Model):
+	# id = models.AutoField(pk=True)
 	name = models.CharField(max_length=20, unique=True)		# should match DNS name eg. nakayun1
 	description = models.CharField(max_length=100, blank=True)	# add. description eg. 2D-MOT path
 	sleeptime = models.FloatField(default=5)			# sleeptime/interval after which to pull the device again

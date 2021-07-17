@@ -91,7 +91,7 @@ PDData.component( 'pddata-table', {
 		},
 		get_data() { // fetch a single set of data directly from arduino (axios)
 			config = {  	method : 'GET',
-					url : '/pdmon/' + this.device.pk + '/',
+					url : '/pdmon/' + this.device.fields.name,
 					xsrfCookieName: 'csrftoken',
 					xsrfHeaderName: 'X-CSRFTOKEN',
 					data : this.device };
@@ -167,75 +167,84 @@ PDData.component( 'pddata-widget', {
 PDData.mount('#pddata')
 
 /* TCTRL APPLICATION */
-/*
+
 const TCData = Vue.createApp({})
 
 TCData.component( 'tcdata-table', {
 	data () { return {
-		datetime : new Date().toLocaleTimeString(),
-		data : {"CH" : "0"},
-		datas : {},
+		data : [],
+		datas : [],
 		}
 	},
 	props: ['device'],
 	template: `
-		<table class="table table-striped" responsive="True">
-			<thead class="thead-dark">
-				<tr>
-				<th>Time</th>
-				<th v-for="key in Object.keys(data)">{{ key }}</th>
-				</tr>
-			</thead>
-			<tbody>
-				<pddata-widget v-bind:data="data" :datetime="datetime"></pddata-widget>
-			</tbody>
-		</table>
-		<button v-on:click="get_data()" class="btn btn-secondary">fetch</button>
-		`,
-	mounted() {
-		setInterval(() => {
-			this.get_data()
-		}, 5000)
+	<button class="btn btn-success" data-bs-toggle="button" autocomplete="off" v-on:click="start_data()">start</button>
+	<button class="btn btn-danger" v-on:click="stop_data()">stop</button>
+	<button class="btn btn-secondary" v-on:click="get_data()">get</button>
+	<table class="table table-striped" responsive="True">
+		<thead class="thead-dark">
+			<tr>
+			<th>Time</th>
+			<th v-for="k in Object.keys(data)">{{ k }}</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tcdata-widget v-for="data in datas" v-bind:data="data"></tcdata-widget>
+		</tbody>
+	</table>
+	`,
+	mounted () {
+		this.get_data()
 	},
 	methods: {
-		get_data() {
-			const sortObject = obj => Object.keys(obj).sort().reduce((res, key) => (res[key] = obj[key], res), {});
-			axios.get('/' + this.device.model + '/' + this.device.fields.name + '/data/')
-		             .then(response => (this.data = sortObject(response.data.value)))
-		             .catch(error => console.log(error));
-			this.datetime = new Date().toLocaleTimeString();
+		start_data() { // start fetching data every dt = sleeptime
+			this.timer = setInterval(()=>{this.get_data()}, 
+					1000*this.device.fields.sleeptime);
 		},
-		/*
-		get_xml(curl) {
-			const xhr = new XMLHttpRequest();
-			const url = 'http://' + this.device.fields.ip + curl;
-
-			xhr.open('GET', url);
-			xhr.setRequestHeader('Access-Control-Request-Method', 'GET');
-			xhr.setRequestHeader('Content-Type', 'text/html');
-			xhr.onreadystatechange = someHandler;
-			xhr.send();
+		stop_data() { // stop fetching data
+			clearInterval(this.timer);
 		},
-		get_axios() {
-			axios.defaults.xsrfHeaderName = "X-CSRFTOKEN"
-			axios.defaults.xsrfCookieName = "csrftoken"
-			const headers = {"X-CSRFTOKEN" : "VPP8z9DLX4E6F1YO96qBWb26SjZ7c2ayaLY88jLjLAUqy14EY2LKdSCFHgI47bD7"}
-			axios.get('http://' + this.device.fields.ip + '/data/get', {headers:headers})
-		             .then(response => (this.data = response.data))
-		             .catch(error => console.log(error))
+		get_data() { // fetch a single set of data directly from arduino (axios)
+			config = {  	method : 'GET',
+					url : '/tctrl/' + this.device.fields.name,
+					xsrfCookieName: 'csrftoken',
+					xsrfHeaderName: 'X-CSRFTOKEN',
+					data : this.device };
+			axios(config)
+				//.then(response => console.log(response))
+				.then(response => {
+					console.log(response);
+					this.data = response.data;
+					this.datas.unshift(sofi_data);
+					})
+				.catch(error => console.log(error));
+		},
+		set_parameters(arr) {
+			config = {  method : 'POST',
+						url : '/tctrl/',
+						xsrfCookieName: 'csrftoken',
+						xsrfHeaderName: 'X-CSRFTOKEN',
+						data : this.device + this.arr };
+			axios(config)
+				.then(response => {
+					console.log(response.data);})
+				.catch(error => console.log(error))
 		},
 	},
 })
 
-TCData.component( 'tcdata-widget', {
-	props : ['datetime','data'],
+PDData.component( 'tcdata-widget', {
+	data () { return {
+		datetime : new Date().toLocaleTimeString(),
+		}
+	},
+	props : ['data'],
 	template: `
 		<tr>
-		<td>{{ datetime }}</td>
-		<td v-for="ch in data">{{ ch }}</td>
+		<!-- td>{{ this.datetime }}</td -->
+		<td v-for="d in data">{{ d }}</td>
 		</tr>
 	`,
 })
 
 TCData.mount('#tcdata')
-*/

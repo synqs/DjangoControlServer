@@ -2,6 +2,10 @@
 {% load static %}
 
 {% block content %}
+
+{{ detail }}
+{{ detail.model }}
+
 <form action="{% url 'main:index' %}">
 	{% csrf_token %}
 	<input type="submit" value="Back to Index" class="btn btn-primary">
@@ -11,10 +15,16 @@
 	<detail-table v-bind:device="{{ detail }}"></detail-table>
 </div>
 
+{% if detail.model == "main.pdmon" %}
 <div class="container" id="pddata">
 	<pddata-table v-bind:device="{{ detail }}"></pddata-table>
 </div>
 
+{% elif detail.model == "main.tctrl" %}
+<div class="container" id="pddata">
+	<pddata-table v-bind:device="{{ detail }}"></pddata-table>
+</div>
+{% else %}<p> UNKNOWN DEVICE TYPE </p>{% endif %}
 <script type="text/javascript" src="{% static 'main/detail.js' %}"></script>
 <!-- script src="{% static 'pddata.js' %}"></script -->
 {% endblock %}

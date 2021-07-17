@@ -35,8 +35,9 @@ def detail(request, device_type, device_id):
 	
 ### PDMON related views ###
 
-def pdmon(request, device_id):
-	device = get_object_or_404(PDmon, id=device_id)
+def pdmon(request, device_name):
+	#r_dict = json.loads(request.body.decode())
+	device = get_object_or_404(PDmon, name=device_name)
 	
 	if request.method == 'GET':
 		url = "http://" + device.ip + "/data/get"
