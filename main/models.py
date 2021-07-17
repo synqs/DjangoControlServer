@@ -20,10 +20,14 @@ class PDmon(models.Model):
 	def http_str(self):
 		return 'http://' + self.ip + '/'
 
-	def set_channels(self, array):
-		print(array)
-		self.channel_string = array
-		return 0
+	def channels(self, array=[]):
+		channels = []
+		if array: buff = array.split(',')
+		else: buff = self.channel_string.split(',')
+		
+		for ch in buff:
+			channels.append("CH" + ch.zfill(2))
+		return channels
 
 class Tctrl(models.Model):
 	id = models.BigAutoField(primary_key=True)

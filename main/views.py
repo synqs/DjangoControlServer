@@ -37,46 +37,49 @@ def detail(request, device_type, device_id):
 	
 ### PDMON related views ###
 
-def pdmon(request, device_id):
+def pdmon(request):
 	r_dict = json.loads(request.body.decode())
-	device = get_object_or_404(PDmon, id=device_id)
-	print(r_dict)
-	print(request.body)
-	print(request.POST)
+	device = get_object_or_404(PDmon, pk=r_dict[0])
+	command = r_dict[1]
+	response = {}
 	
-	return HttpResponse({ 'message' : 'fail'})
-	
-	'''
-	if request.method == 'GET':
-		url = "http://" + device.ip + "/data/get"
-		r = requests.get(url)
-		channels = channel_buffer(device.channel_string)
-		response = r.text[:-1] + ",\"channels\":" + channels + "}" 
+	if command == 'STATUS':
+		response['message'] = 'Device ready.'
+		return HttpResponse(response)
+
+	elif command == 'DETAIL':
+		detail = serializers.serialize('json', device)
+		
+		response['message'] = 'Device available.'
+		response['detail'] = detail[1:-1]
 		return HttpResponse(response)
 		
-	elif request.method == 'POST':
+	elif command == 'DATA':
+		url = "http://" + device.ip + "/data/get"
+		r = requests.get(url)
+
+		response = r.json()
+		response['channels'] = device.channels()
+		response['message'] = 'Data available!'
+		return HttpResponse(json.dumps(response))
+		
+	elif command == 'EDIT':
 		r_dict = json.loads(request.body.decode())
 		print(device.channel_string)
 		print(r_dict['fields']['channel_string'])
 		device.set_channels(r_dict['fields']['channel_string'])
-		response = { 'message' : 'Set channels successfully.' }
+		
+		response['message'] = 'Set channels successfully.'
 		return HttpResponse(response)
 		
 	elif request.method == 'DELETE':
 		device.delete()
-		response = { 'message' : 'Deleted successfully.' } 
+		
+		response['message'] = 'Deleted successfully.'
 		return render(request, 'main/index.html', response)
 	else:
-		context = { 'message' : 'Invalid operation.' }
-		return render(request, 'main/main_detail.html', context) '''
-		
-def channel_buffer(arr):
-	buff = arr.split(',')
-	channels = "["; i = 0;
-	for ch in buff:
-		channels += "\"CH" + buff[i].zfill(2) + "\","
-		i += 1
-	return channels[:-1] + "]"
+		response['message'] = 'Invalid operation.'
+		return HttpResponse(response)
 
 ### TCTRL related views ###
 
