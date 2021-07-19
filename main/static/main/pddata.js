@@ -52,7 +52,7 @@ PDData.component( 'pddata-table', {
 			config = {	method : 'POST',
 						url : '/' + this.device.model + '/',
 						xsrfCookieName: 'csrftoken',
-						xsrfHeaderName: 'X-CSRFTOKEN',
+						xsrfHeaderName: 'HTTP_X_CSRFTOKEN',
 						data : [this.device.pk, 'DATA'] };
 			axios(config)
 				.then(response => {

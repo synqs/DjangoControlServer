@@ -1,4 +1,4 @@
-/* TCTRL APPLICATION */
+	/* TCTRL APPLICATION */
 
 const TCData = Vue.createApp({})
 
@@ -20,11 +20,9 @@ TCData.component( 'tcdata-table', {
 			<button class="btn btn-danger" v-on:click="stop_device()">stop</button>
 			<button class="btn btn-secondary" v-on:click="get_device()">get</button>
 			<button class="btn btn-warning" v-on:click="remove_device()">remove</button>
-			<!-- button class="btn btn-outline-secondary" v-on:click="get_data_direct()">get direct</button -->
 			</div>
 		</div>
 	</div></div>
-	blaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 	<table class="table table-striped" responsive="True">
 		<thead class="thead-dark">
 			<tr>
@@ -36,7 +34,6 @@ TCData.component( 'tcdata-table', {
 			<tcdata-widget v-for="data in datas" v-bind:data="data"></tcdata-widget>
 		</tbody>
 	</table>
-	blaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 	{{ data.value }}
 	`,
 	mounted () {
