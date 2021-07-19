@@ -29,9 +29,11 @@ def detail(request, device_type, device_id):
 	if device_type == 'main.pdmon': typ = PDmon
 	else: typ = Tctrl
 	device = get_list_or_404(typ, id=device_id)
-	
 	detail = serializers.serialize('json', device)
-	context = { 'detail' : detail[1:-1] }
+	djson = json.loads(detail[1:-1])
+	
+	context = djson
+	context['detail'] = detail[1:-1]
 	
 	return render(request, 'main/detail.html', context)
 	
@@ -44,6 +46,9 @@ def pdmon(request):
 	response = {}
 	
 	if command == 'STATUS':
+		detail = serializers.serialize('json', device)
+		djson = json.loads(detail[1:-1])
+		response['device'] = djson
 		response['message'] = 'Device ready.'
 		return HttpResponse(response)
 
@@ -83,28 +88,48 @@ def pdmon(request):
 
 ### TCTRL related views ###
 
-def tctrl(request, device_id):
-	#r_dict = json.loads(request.body.decode())
-	device = get_object_or_404(PDmon, pk=device_id)
+def tctrl(request):
+	print('view')
+	r_dict = json.loads(request.body.decode())
+	device = get_object_or_404(Tctrl, pk=r_dict[0])
+	command = r_dict[1]
+	response = {}
 	
-	if request.method == 'GET':
+	if command == 'STATUS':
+		detail = serializers.serialize('json', device)
+		djson = json.loads(detail[1:-1])
+		response['device'] = djson
+		response['message'] = 'Device ready.'
+		return HttpResponse(response)
+
+	elif command == 'DETAIL':
+		detail = serializers.serialize('json', device)
+		
+		response['message'] = 'Device available.'
+		response['detail'] = detail[1:-1]
+		return HttpResponse(response)
+		
+	elif command == 'DATA':
 		url = "http://" + device.ip + "/data/get"
 		r = requests.get(url)
-		response = r.text
-		return HttpResponse(response)
-	
-	elif request.method == 'POST':
+
+		response = r.json()
+		print(response)
+		response['message'] = 'Data available!'
+		return HttpResponse(json.dumps(response))
+		
+	elif command == 'EDIT':
 		r_dict = json.loads(request.body.decode())
-		print(device.channel_string)
-		print(r_dict['fields']['channel_string'])
-		device.set_channels(r_dict['fields']['channel_string'])
-		response = { 'message' : 'Set channels successfully.' }
+		
+		response['message'] = 'Set parameters successfully.'
 		return HttpResponse(response)
 		
 	elif request.method == 'DELETE':
 		device.delete()
-		response = { 'message' : 'Deleted successfully.' } 
+		
+		response['message'] = 'Deleted successfully.'
 		return render(request, 'main/index.html', response)
 	else:
-		context = { 'message' : 'Invalid operation.' }
-		return render(request, 'main/main_detail.html', context)
+		response['message'] = 'Invalid operation.'
+		return HttpResponse(response)
+
