@@ -5,21 +5,8 @@
 {% if message %}<h2>{{ message }}</h2>{% endif %}
 {% csrf_token %}
 <div class="container" id="devicedetail">
-	<detail-table v-bind:device="{{ detail }}" v-bind:m="'pdmon'" v-bind:pk="{{ pk }}"></detail-table>
+	<detail-table v-bind:device="{{ detail }}" v-bind:pk="{{ pk }}"></detail-table>
 </div>
-
-{% if device.model == main.pdmon %}
-<div class="container" id="pddata">
-	<pddata-table v-bind:device="{{ detail }}"></pddata-table>
-</div>
-<script type="text/javascript" src="{% static 'main/pddata.js' %}"></script>
-
-{% elif device.model == main.tctrl %}
-<div class="container" id="tcdata">
-	<tcdata-table v-bind:device="{{ detail }}"></pddata-table>
-</div>
-<script type="text/javascript" src="{% static 'main/tcdata.js' %}"></script>
-{% endif %}
 
 <script type="text/javascript" src="{% static 'main/detail.js' %}"></script>
 {% endblock %}

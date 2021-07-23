@@ -3,6 +3,8 @@ from django.http import HttpResponse
 from .models import PDmon, Tctrl
 from django.core import serializers
 import requests, json
+from django.views.decorators.csrf import ensure_csrf_cookie
+
 
 # Create your views here.
 def index(request):

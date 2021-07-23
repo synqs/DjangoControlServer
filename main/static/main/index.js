@@ -50,20 +50,20 @@ IndexTable.component('device-widget', {
 	methods: {
 		remove_device() {
 			config = {	method : 'POST',
-						url : '/' + this.device.model + '/',
-						xsrfCookieName: 'csrftoken',
-						xsrfHeaderName: 'X-CSRFTOKEN',
-						data : [this.device.pk, 'DELETE'] };
+					url : '/' + this.device.model + '/',
+					xsrfCookieName: 'csrftoken',
+					xsrfHeaderName: 'X-CSRFTOKEN',
+					data : [this.device.pk, 'DELETE'] };
 			axios(config)
 				.then(response => console.log(response))
 				.catch(error => console.log(error));
 		},
 		get_detail() {
 			config = {	method : 'POST',
-						url : '/' + this.device.model + '/',
-						xsrfCookieName: 'csrftoken',
-						xsrfHeaderName: 'X-CSRFTOKEN',
-						data : [this.device.pk, 'DETAIL'] };
+					url : '/' + this.device.model + '/',
+					xsrfCookieName: 'csrftoken',
+					xsrfHeaderName: 'X-CSRFTOKEN',
+					data : [this.device.pk, 'DETAIL'] };
 			axios(config)
 				.then(response => {
 					console.log(response); })

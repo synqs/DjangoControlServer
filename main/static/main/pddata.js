@@ -1,5 +1,25 @@
 /* PDDATA APPLICATION */
 
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+const csrftoken = getCookie('csrftoken');
+
+//const token = document.head.querySelector('meta[name="csrf-token"]');
+//const tokenn = Cookies.get('csrftoken');
+console.log(csrftoken);
 const PDData = Vue.createApp({})
 
 PDData.component( 'pddata-table', {
@@ -49,16 +69,19 @@ PDData.component( 'pddata-table', {
 			clearInterval(this.timer);
 		},
 		get_device() { // fetch a single set of data directly from arduino (axios)
+			//axios.defaults.xsrfHeaderName = "HELLOWORLD";
+			//axios.defaults.xsrfCookieName = "welcome";
 			config = {	method : 'POST',
-						url : '/' + this.device.model + '/',
-						xsrfCookieName: 'csrftoken',
-						xsrfHeaderName: 'HTTP_X_CSRFTOKEN',
-						data : [this.device.pk, 'DATA'] };
+					url : '/' + this.device.model + '/',
+					//xsrfCookieName: 'csrftoken',
+					//xsrfHeaderName: 'X-CSRFTOKEN',
+					headers : {'X-CSRFTOKEN' : "DzE1LrIokMHdu45j3XTIG2hxPqJEr9QDhy8K6ee4pzvpke6TWtwvwkCzeMwCQxOv"},
+					data : [this.device.pk, 'DATA'] };
 			axios(config)
 				.then(response => {
-					// console.log(response);
-					this.data = response.data;
-					this.datas.unshift(response.data); })
+					console.log(response);
+					//this.data = response.data;
+					//this.datas.unshift(response.data); })
 				.catch(error => console.log(error));
 		},
 		edit_device(arr) {
