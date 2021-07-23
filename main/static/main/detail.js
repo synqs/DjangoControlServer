@@ -199,7 +199,6 @@ DetailTable.component( 'tcdata-table', {
 	<table class="table table-striped" responsive="True">
 		<thead class="thead-dark">
 			<tr>
-			<th>Time</th>
 			<th v-for="k in key">{{ k }}</th>
 			</tr>
 		</thead>
@@ -260,14 +259,9 @@ DetailTable.component( 'tcdata-table', {
 })
 
 DetailTable.component('tcdata-widget', {
-	data () { return {
-		datetime : new Date().toLocaleTimeString(),
-		}
-	},
 	props : ['data'],
 	template: `
 		<tr>
-		<td>{{ this.datetime }}</td>
 		<td v-for="d in data.value">{{ d }}</td>
 		</tr>
 	`,

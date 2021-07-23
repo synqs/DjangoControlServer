@@ -66,6 +66,7 @@ def pdmon(request):
 		r = requests.get(url)
 
 		response = r.json()
+		print(response)
 		response['channels'] = device.channels()
 		response['message'] = 'Data available!'
 		return HttpResponse(json.dumps(response))
