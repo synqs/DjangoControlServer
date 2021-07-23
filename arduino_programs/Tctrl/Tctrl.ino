@@ -2,6 +2,7 @@
 #include <Bridge.h>
 #include <BridgeServer.h>
 #include <BridgeClient.h>
+#include <Process.h> // library for running processes on the linux processor
 
 /* Define global objects */
 int Temp_in = A1;
@@ -25,6 +26,8 @@ double kp, ki, kd, G, tauI, tauD;
 
 char mode;
 
+/* Start processes */
+Process date; // process used to get the date
 // Listen to the default port 5555, the Yún webserver
 // will forward there all the HTTP requests you send
 BridgeServer server;
@@ -68,6 +71,15 @@ void loop() {
   Bridge.put("G", String(G));
   Bridge.put("tauI", String(tauI));
   Bridge.put("tauD", String(tauD));
+  
+  if(!date.running()) { // check whether the process isn't running
+    date.begin("date");
+    date.addParameter("+%H:%M:%S");
+    date.run();
+  }
+  while(date.available() > 0) { // read the time given by the linux kernel
+    Bridge.put("updated",date.readStringUntil('\n'));
+  }
   
   // Get clients coming from server
   BridgeClient client = server.accept();
