@@ -36,11 +36,15 @@ IndexTable.component('index-table', {
 })
 
 IndexTable.component('device-widget', {
+	data ()  { return {
+		detail : [],
+		}
+	},
 	props: ['device'],
 	template: `
 	<tr>
 	<td>{{ device.model }} # {{ device.pk }}</td>
-	<td><a v-bind:href="'/' + device.model + '/' + device.pk">{{ device.fields.name }}</a></td>
+	<td><a v-bind:href="'/' + this.device.model + '/' + this.device.pk + '/'">{{ device.fields.name }}</a></td>
 	<td>{{ device.fields.ip }}</td>
 	<td>online</td>
 	<td><button class="btn btn-primary" v-on:click="get_detail()">Details</button></td>
@@ -66,8 +70,9 @@ IndexTable.component('device-widget', {
 					data : [this.device.pk, 'DETAIL'] };
 			axios(config)
 				.then(response => {
-					console.log(response); })
-				.then(error => console.log(error));
+					console.log(response); 
+					this.detail = response.data; })
+				.catch(error => console.log(error));
 		},
 	},
 })

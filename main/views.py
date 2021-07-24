@@ -4,7 +4,7 @@ from .models import PDmon, Tctrl
 from django.core import serializers
 import requests, json
 from django.views.decorators.csrf import ensure_csrf_cookie
-
+from django.forms.models import model_to_dict
 
 # Create your views here.
 def index(request):
@@ -27,39 +27,38 @@ def devices(request):
 	
 	return HttpResponse(device_list) # is this clean or corrupted?
 '''
-def detail(request, device_type, device_id):
-	if device_type == 'main.pdmon': typ = PDmon
-	else: typ = Tctrl
-	device = get_list_or_404(typ, id=device_id)
-	detail = serializers.serialize('json', device)
-	djson = json.loads(detail[1:-1])
+def detail(request, device_typ, device_id):
+	if device_typ == 'main.pdmon' : typ = PDmon
+	else : typ = Tctrl
+	device = get_object_or_404(typ, id=device_id)
+	detail = serializers.serialize('json', [device])
 	
-	context = djson
-	context['detail'] = detail[1:-1]
+	response = {}
+	response['device'] = json.loads(detail[1:-1])
+	response['message'] = 'Device ready.'
 	
-	return render(request, 'main/detail.html', context)
+	return render(request, 'main/detail.html', response)
 	
 ### PDMON related views ###
 
 def pdmon(request):
 	r_dict = json.loads(request.body.decode())
-	device = get_object_or_404(PDmon, pk=r_dict[0])
+	device = get_object_or_404(PDmon, id=r_dict[0])
 	command = r_dict[1]
 	response = {}
 	
 	if command == 'STATUS':
-		detail = serializers.serialize('json', device)
-		djson = json.loads(detail[1:-1])
-		response['device'] = djson
 		response['message'] = 'Device ready.'
 		return HttpResponse(response)
 
 	elif command == 'DETAIL':
-		detail = serializers.serialize('json', device)
+		detail = serializers.serialize('json', [device])
 		
+		response['device'] = json.loads(detail[1:-1])
 		response['message'] = 'Device available.'
-		response['detail'] = detail[1:-1]
-		return HttpResponse(response)
+		
+		#return render(request, 'main/detail.html', response)
+		return HttpResponse(json.dumps(response))
 		
 	elif command == 'DATA':
 		url = "http://" + device.ip + "/data/get"

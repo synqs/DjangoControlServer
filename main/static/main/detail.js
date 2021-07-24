@@ -25,7 +25,7 @@ DetailTable.component('detail-table', {
 		dev : [],
 		}
 	},
-	props: ['device', 'm', 'pk'],
+	props: ['device', 'model', 'pk'],
 	template: `
 	<div class="card mb-3 card-xxl">
 			<div class="card-header text-light bg-dark">
@@ -40,7 +40,7 @@ DetailTable.component('detail-table', {
 	</template>
 	<template v-else-if="device.model == 'main.tctrl'">
 		<tcdata-table v-bind:device="device"></tcdata-table>
-	</template>
+	</template -->
 	`,
 	mounted () {
 		// this.get_device()
@@ -48,14 +48,14 @@ DetailTable.component('detail-table', {
 	methods : {
 		get_device() { // fetch a single set of data directly from arduino (axios)
 		config = {	method : 'POST',
-				url : '/' + this.m + '/',
+				url : '/' + 'main.pdmon' + '/',
 				xsrfCookieName: 'csrftoken',
 				xsrfHeaderName: 'X-CSRFTOKEN',
-				data : [this.pk, 'STATUS'] };
+				data : [this.pk, 'DETAIL'] };
 		axios(config)
 			.then(response => {
 				console.log(response);
-				this.device = response.data; })
+				this.dev = response.data; })
 			.catch(error => console.log(error));
 		},
 	},

@@ -1,5 +1,6 @@
 from django.db import models
 import requests
+from django.shortcuts import render
 
 # Create your models here.
 class PDmon(models.Model):
