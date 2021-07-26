@@ -3,8 +3,7 @@ from django.http import HttpResponse
 from .models import PDmon, Tctrl
 from django.core import serializers
 import requests, json
-from django.views.decorators.csrf import ensure_csrf_cookie
-from django.forms.models import model_to_dict
+from requests.exceptions import HTTPError
 
 # Create your views here.
 def index(request):
@@ -46,92 +45,92 @@ def pdmon(request):
 	device = get_object_or_404(PDmon, id=r_dict[0])
 	command = r_dict[1]
 	response = {}
-	
-	if command == 'STATUS':
-		response['message'] = 'Device ready.'
-		return HttpResponse(response)
+	url = "http://" + device.ip + "/data/get"
 
-	elif command == 'DETAIL':
-		detail = serializers.serialize('json', [device])
-		
-		response['device'] = json.loads(detail[1:-1])
-		response['message'] = 'Device available.'
-		
-		#return render(request, 'main/detail.html', response)
-		return HttpResponse(json.dumps(response))
-		
-	elif command == 'DATA':
-		url = "http://" + device.ip + "/data/get"
+	try:
 		r = requests.get(url)
+		r.raise_for_status()
+	except HTTPError as http_err:
+		response['message'] = http_err 
+	except Exception as err:
+		response['message'] = err 
 
-		response = r.json()
-		print(response)
-		response['channels'] = device.channels()
-		response['message'] = 'Data available!'
-		return HttpResponse(json.dumps(response))
-		
-	elif command == 'EDIT':
-		r_dict = json.loads(request.body.decode())
-		print(device.channel_string)
-		print(r_dict['fields']['channel_string'])
-		device.set_channels(r_dict['fields']['channel_string'])
-		
-		response['message'] = 'Set channels successfully.'
-		return HttpResponse(response)
-		
-	elif request.method == 'DELETE':
-		device.delete()
-		
-		response['message'] = 'Deleted successfully.'
-		return render(request, 'main/index.html', response)
 	else:
-		response['message'] = 'Invalid operation.'
-		return HttpResponse(response)
+		if command == 'STATUS':
+			response['message'] = 'Device ready.'
+
+		elif command == 'DETAIL':
+			detail = serializers.serialize('json', [device])
+		
+			response['device'] = json.loads(detail[1:-1])
+			response['message'] = 'Device available.'
+			#return render(request, 'main/detail.html', response)
+		
+		elif command == 'DATA':
+			response = r.json()
+
+			response['channels'] = device.channels()
+			response['message'] = 'Data available!'
+		
+		elif command == 'EDIT':
+			r_dict = json.loads(request.body.decode())
+			print(device.channel_string)
+			print(r_dict['fields']['channel_string'])
+			device.set_channels(r_dict['fields']['channel_string'])
+			response['message'] = 'Set parameters successfully.'
+		
+		elif command == 'DELETE':
+			# device.delete()
+			response['message'] = 'Deleted successfully.'
+		else:
+			response['message'] = 'Invalid operation.'
+	
+	return HttpResponse(json.dumps(response))
 
 ### TCTRL related views ###
 
 def tctrl(request):
-	print('view')
 	r_dict = json.loads(request.body.decode())
 	device = get_object_or_404(Tctrl, pk=r_dict[0])
 	command = r_dict[1]
 	response = {}
+	url = "http://" + device.ip + "/data/get"
 	
-	if command == 'STATUS':
-		detail = serializers.serialize('json', device)
-		djson = json.loads(detail[1:-1])
-		response['device'] = djson
-		response['message'] = 'Device ready.'
-		return HttpResponse(response)
+	try:
+		r = requests.get(url, timeout = 10)
+		r.raise_for_status()
+	except HTTPError as http_err:
+		print(http_error)
+		response['message'] = str(http_err)
+	except Exception as err:
+		print(err)
+		response['message'] = f'HTTP error occurred: {err}'
 
-	elif command == 'DETAIL':
-		detail = serializers.serialize('json', device)
-		
-		response['message'] = 'Device available.'
-		response['detail'] = detail[1:-1]
-		return HttpResponse(response)
-		
-	elif command == 'DATA':
-		url = "http://" + device.ip + "/data/get"
-		r = requests.get(url)
-
-		response = r.json()
-		print(response)
-		response['message'] = 'Data available!'
-		return HttpResponse(json.dumps(response))
-		
-	elif command == 'EDIT':
-		r_dict = json.loads(request.body.decode())
-		
-		response['message'] = 'Set parameters successfully.'
-		return HttpResponse(response)
-		
-	elif request.method == 'DELETE':
-		device.delete()
-		
-		response['message'] = 'Deleted successfully.'
-		return render(request, 'main/index.html', response)
 	else:
-		response['message'] = 'Invalid operation.'
-		return HttpResponse(response)
+		if command == 'STATUS':
+			response['message'] = 'Device ready.'
+
+		elif command == 'DETAIL':
+			detail = serializers.serialize('json', [device])
+		
+			response['device'] = json.loads(detail[1:-1])
+			response['message'] = 'Device available.'
+			#return render(request, 'main/detail.html', response)
+		
+		elif command == 'DATA':
+			response = r.json()
+			response['message'] = 'Data available!'
+		
+		elif command == 'EDIT':
+			r_dict = json.loads(request.body.decode())
+		
+			response['message'] = 'Set parameters successfully.'
+		
+		elif command == 'DELETE':
+			# device.delete()
+			response['message'] = 'Deleted successfully.'
+		else:
+			response['message'] = 'Invalid operation.'
+	
+	return HttpResponse(json.dumps(response))
 

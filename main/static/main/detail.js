@@ -40,7 +40,7 @@ DetailTable.component('detail-table', {
 	</template>
 	<template v-else-if="device.model == 'main.tctrl'">
 		<tcdata-table v-bind:device="device"></tcdata-table>
-	</template -->
+	</template>
 	`,
 	mounted () {
 		// this.get_device()
@@ -67,6 +67,7 @@ DetailTable.component( 'pddata-table', {
 	data () { return {
 		data : [],
 		datas : [],
+		config : [],
 		}
 	},
 	props: ['device'],
@@ -98,9 +99,22 @@ DetailTable.component( 'pddata-table', {
 	</table>
 	`,
 	mounted () {
-		this.get_device()
+		this.init_device()
 	},
 	methods: {
+		init_device() { // initialize device and create config for further axios requests
+			config = {	method : 'POST',
+					url : '/' + this.device.model + '/',
+					xsrfCookieName: 'csrftoken',
+					xsrfHeaderName: 'X-CSRFTOKEN',
+					data : [this.device.pk, 'STATUS'] };
+			this.config = config;
+			axios(config)
+				.then(response => {
+					console.log(response);
+					this.data = response.data;
+					});
+		},
 		start_device() { // start fetching data every dt = sleeptime
 			this.timer = setInterval(()=>{this.get_device()}, 
 					1000*this.device.fields.sleeptime);
@@ -109,38 +123,29 @@ DetailTable.component( 'pddata-table', {
 			clearInterval(this.timer);
 		},
 		get_device() { // fetch a single set of data directly from arduino (axios)
-			config = {	method : 'POST',
-					url : '/' + this.device.model + '/',
-					xsrfCookieName: 'csrftoken',
-					xsrfHeaderName: 'X-CSRFTOKEN',
-					//headers : {'X-CSRFTOKEN' : token},
-					data : [this.device.pk, 'DATA'] };
+			config = this.config;
+			config['data'][1] = 'DATA';
+			console.log(config);
 			axios(config)
 				.then(response => {
-					console.log(response);
+					console.log(response.data);
 					this.data = response.data;
 					this.datas.unshift(response.data); 
 					})
 				.catch(error => console.log(error));
 		},
 		edit_device(arr) {
-			config = {  method : 'POST',
-						url : '/pdmon/' + this.device.pk,
-						xsrfCookieName: 'csrftoken',
-						xsrfHeaderName: 'X-CSRFTOKEN',
-						data : [this.device, EDIT] };
+			config = this.config;
+			config['data'][1] = 'EDIT';
 			axios(config)
 				.then(response => {
 					console.log(response.data);
-					this.data['message'] = response.data['message']; })
+					this.data = response.data; })
 				.catch(error => console.log(error));
 		},
 		remove_device() {
-			config = {	method : 'DELETE',
-						url : '/' + this.device.model + '/',
-						xsrfCookieName: 'csrftoken',
-						xsrfHeaderName: 'X-CSRFTOKEN',
-						data : [this.device.pk, 'DELETE'] };
+			config = this.config;
+			config['data'][1] = 'DELETE';
 			axios(config)
 				.then(response => console.log(response))
 				.catch(error => console.log(error));
@@ -179,6 +184,7 @@ DetailTable.component( 'tcdata-table', {
 		data : [],
 		datas : [],
 		key : [],
+		config : [],
 		}
 	},
 	props: ['device'],
@@ -208,9 +214,22 @@ DetailTable.component( 'tcdata-table', {
 	</table>
 	`,
 	mounted () {
-		this.get_device()
+		this.init_device()
 	},
 	methods: {
+		init_device() { // initialize device and create config for further axios requests
+			config = {	method : 'POST',
+					url : '/' + this.device.model + '/',
+					xsrfCookieName: 'csrftoken',
+					xsrfHeaderName: 'X-CSRFTOKEN',
+					data : [this.device.pk, 'STATUS'] };
+			this.config = config;
+			axios(config)
+				.then(response => {
+					console.log(response);
+					this.data = response.data;
+					});
+		},
 		start_device() { // start fetching data every dt = sleeptime
 			this.timer = setInterval(()=>{this.get_device()}, 
 					1000*this.device.fields.sleeptime);
@@ -219,11 +238,9 @@ DetailTable.component( 'tcdata-table', {
 			clearInterval(this.timer);
 		},
 		get_device() { // fetch a single set of data directly from arduino (axios)
-			config = {	method : 'POST',
-					url : '/' + this.device.model + '/',
-					xsrfCookieName: 'csrftoken',
-					xsrfHeaderName: 'X-CSRFTOKEN',
-					data : [this.device.pk, 'DATA'] };
+			config = this.config;
+			config['data'][1] = 'DATA';
+			console.log(config);
 			axios(config)
 				.then(response => {
 					console.log(response.data);
@@ -234,11 +251,8 @@ DetailTable.component( 'tcdata-table', {
 				.catch(error => console.log(error));
 		},
 		edit_device(arr) {
-			config = {  	method : 'POST',
-					url : '/pdmon/' + this.device.pk,
-					xsrfCookieName: 'csrftoken',
-					xsrfHeaderName: 'X-CSRFTOKEN',
-					data : [this.device, EDIT] };
+			config = this.config;
+			config['data'][1] = 'EDIT';
 			axios(config)
 				.then(response => {
 					console.log(response.data);
@@ -246,11 +260,8 @@ DetailTable.component( 'tcdata-table', {
 				.catch(error => console.log(error));
 		},
 		remove_device() {
-			config = {	method : 'DELETE',
-					url : '/' + this.device.model + '/',
-					xsrfCookieName: 'csrftoken',
-					xsrfHeaderName: 'X-CSRFTOKEN',
-					data : [this.device.pk, 'DELETE'] };
+			config = this.config;
+			config['data'][1] = 'DELETE';
 			axios(config)
 				.then(response => console.log(response))
 				.catch(error => console.log(error));
