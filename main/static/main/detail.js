@@ -35,12 +35,7 @@ DetailTable.component('detail-table', {
 				IP : {{ device.fields.ip }}, Sleeptime : {{ device.fields.sleeptime }} s
 			</div>
 	</div>
-	<template v-if="device.model == 'main.pdmon'">
-		<pddata-table v-bind:device="device"></pddata-table>
-	</template>
-	<template v-else-if="device.model == 'main.tctrl'">
-		<tcdata-table v-bind:device="device"></tcdata-table>
-	</template>
+	<data-widget v-bind:device="device"></data-widget>
 	`,
 	mounted () {
 		// this.get_device()
@@ -61,12 +56,12 @@ DetailTable.component('detail-table', {
 	},
 })
 
-/* PDDATA APPLICATION */
-
-DetailTable.component( 'pddata-table', {
+/* Widget to display data from device */
+DetailTable.component( 'data-widget', {
 	data () { return {
 		data : [],
 		datas : [],
+		key : [],
 		config : [],
 		}
 	},
@@ -74,7 +69,8 @@ DetailTable.component( 'pddata-table', {
 	template: `
 	<div class="container mb-3"><div class="row">
 		<div class="col">
-			<button class="btn btn-info btn-block">{{ data['message'] }}</button>
+			<!-- div class="alert alert-info" role="alert">{{ data['message'] }}</div -->
+			<button class="btn btn-outline-info btn-block" enabled>{{ data['message'] }}</button>
 		</div>
 		<div class="col">
 			<div class="btn-group w-100">
@@ -85,33 +81,38 @@ DetailTable.component( 'pddata-table', {
 			</div>
 		</div>
 	</div></div>
-	
 	<table class="table table-striped" responsive="True">
 		<thead class="thead-dark">
 			<tr>
-			<th>Time</th>
-			<th v-for="ch in data['channels']">{{ ch }}</th>
+				<th v-for="k in key">{{ k }}</th>
 			</tr>
 		</thead>
 		<tbody>
-			<pddata-widget v-for="data in datas" v-bind:data="data"></pddata-widget>
+			<tr v-for="data in datas">
+				<td v-for="k in key">{{ data['value'][k] }}</td>
+			</tr>
 		</tbody>
 	</table>
 	`,
 	mounted () {
-		this.init_device()
+		this.init_device();
 	},
 	methods: {
+		convert_voltage(v) {
+			const p = 10**((v-7.75)/0.75) * 10000000;
+			return p
+		},
 		init_device() { // initialize device and create config for further axios requests
 			config = {	method : 'POST',
-					url : '/' + this.device.model + '/',
+					url : '/device/',
 					xsrfCookieName: 'csrftoken',
 					xsrfHeaderName: 'X-CSRFTOKEN',
-					data : [this.device.pk, 'STATUS'] };
+					data : [this.device.model, this.device.pk, 'STATUS'] };
 			this.config = config;
 			axios(config)
 				.then(response => {
-					console.log(response);
+					// console.log(response);
+					this.key = response.data['keys'];
 					this.data = response.data;
 					});
 		},
@@ -124,11 +125,10 @@ DetailTable.component( 'pddata-table', {
 		},
 		get_device() { // fetch a single set of data directly from arduino (axios)
 			config = this.config;
-			config['data'][1] = 'DATA';
+			config['data'][2] = 'DATA';
 			console.log(config);
 			axios(config)
 				.then(response => {
-					console.log(response.data);
 					this.data = response.data;
 					this.datas.unshift(response.data); 
 					})
@@ -136,7 +136,7 @@ DetailTable.component( 'pddata-table', {
 		},
 		edit_device(arr) {
 			config = this.config;
-			config['data'][1] = 'EDIT';
+			config['data'][2] = 'EDIT';
 			axios(config)
 				.then(response => {
 					console.log(response.data);
@@ -145,9 +145,12 @@ DetailTable.component( 'pddata-table', {
 		},
 		remove_device() {
 			config = this.config;
-			config['data'][1] = 'DELETE';
+			config['data'][2] = 'DELETE';
 			axios(config)
-				.then(response => console.log(response))
+				.then(response => {
+					console.log(response);
+					this.data = response.data;
+					})
 				.catch(error => console.log(error));
 		},
 		/* this method does not work due to missing ACAO-header
@@ -160,122 +163,12 @@ DetailTable.component( 'pddata-table', {
 					headers: {	'Access-Control-Allow-Origin' : '*',
 							'Content-Type' : 'application/json',
 							'crossdomain' : 'true'}, 
-					data : this.device };
+							data : this.device };
 			axios(config)
 				.then(response => console.log(response)
 				.catch(error => console.log(error))
 		}, */
 	},
-})
-
-DetailTable.component( 'pddata-widget', {
-	props : ['data'],
-	template: `
-		<tr>
-		<td>{{ data['value']['updated'] }}</td>
-		<td v-for="ch in data['channels']">{{ data.value[ch] }}</td>
-		</tr>
-	`,
-})
-
-/* TCTRL APPLICATION */
-DetailTable.component( 'tcdata-table', {
-	data () { return {
-		data : [],
-		datas : [],
-		key : [],
-		config : [],
-		}
-	},
-	props: ['device'],
-	template: `
-	<div class="container mb-3"><div class="row">
-		<div class="col">
-			<button class="btn btn-info btn-block">{{ data['message'] }}</button>
-		</div>
-		<div class="col">
-			<div class="btn-group w-100">
-			<button class="btn btn-success" data-bs-toggle="button" autocomplete="off" v-on:click="start_device()">start</button>
-			<button class="btn btn-danger" v-on:click="stop_device()">stop</button>
-			<button class="btn btn-secondary" v-on:click="get_device()">get</button>
-			<button class="btn btn-warning" v-on:click="remove_device()">remove</button>
-			</div>
-		</div>
-	</div></div>
-	<table class="table table-striped" responsive="True">
-		<thead class="thead-dark">
-			<tr>
-			<th v-for="k in key">{{ k }}</th>
-			</tr>
-		</thead>
-		<tbody>
-			<tcdata-widget v-for="data in datas" v-bind:data="data"></tcdata-widget>
-		</tbody>
-	</table>
-	`,
-	mounted () {
-		this.init_device()
-	},
-	methods: {
-		init_device() { // initialize device and create config for further axios requests
-			config = {	method : 'POST',
-					url : '/' + this.device.model + '/',
-					xsrfCookieName: 'csrftoken',
-					xsrfHeaderName: 'X-CSRFTOKEN',
-					data : [this.device.pk, 'STATUS'] };
-			this.config = config;
-			axios(config)
-				.then(response => {
-					console.log(response);
-					this.data = response.data;
-					});
-		},
-		start_device() { // start fetching data every dt = sleeptime
-			this.timer = setInterval(()=>{this.get_device()}, 
-					1000*this.device.fields.sleeptime);
-		},
-		stop_device() { // stop fetching data
-			clearInterval(this.timer);
-		},
-		get_device() { // fetch a single set of data directly from arduino (axios)
-			config = this.config;
-			config['data'][1] = 'DATA';
-			console.log(config);
-			axios(config)
-				.then(response => {
-					console.log(response.data);
-					this.key = Object.keys(response.data['value']); // this is weird 
-					this.data = response.data;
-					this.datas.unshift(response.data); 
-					})
-				.catch(error => console.log(error));
-		},
-		edit_device(arr) {
-			config = this.config;
-			config['data'][1] = 'EDIT';
-			axios(config)
-				.then(response => {
-					console.log(response.data);
-					this.data['message'] = response.data['message']; })
-				.catch(error => console.log(error));
-		},
-		remove_device() {
-			config = this.config;
-			config['data'][1] = 'DELETE';
-			axios(config)
-				.then(response => console.log(response))
-				.catch(error => console.log(error));
-		},
-	},
-})
-
-DetailTable.component('tcdata-widget', {
-	props : ['data'],
-	template: `
-		<tr>
-		<td v-for="d in data.value">{{ d }}</td>
-		</tr>
-	`,
 })
 
 /* At last, mount the detail-app */

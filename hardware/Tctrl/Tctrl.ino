@@ -68,9 +68,9 @@ void loop() {
   Bridge.put("T", String(input));
   Bridge.put("error", String(error));
   Bridge.put("output", String(output));
-  Bridge.put("G", String(G));
-  Bridge.put("tauI", String(tauI));
-  Bridge.put("tauD", String(tauD));
+  Bridge.put("P", String(G));
+  Bridge.put("I", String(tauI));
+  Bridge.put("D", String(tauD));
   
   if(!date.running()) { // check whether the process isn't running
     date.begin("date");

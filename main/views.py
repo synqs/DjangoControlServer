@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404, get_list_or_404
 from django.http import HttpResponse
+from . import models
 from .models import PDmon, Tctrl
 from django.core import serializers
 import requests, json
@@ -38,13 +39,19 @@ def detail(request, device_typ, device_id):
 	
 	return render(request, 'main/detail.html', response)
 	
-### PDMON related views ###
+### device related views ###
 
-def pdmon(request):
+def device(request):
 	r_dict = json.loads(request.body.decode())
-	device = get_object_or_404(PDmon, id=r_dict[0])
-	command = r_dict[1]
+	command = r_dict[2]
 	response = {}
+	print(r_dict)
+
+	if r_dict[0] == 'main.pdmon' : typ = PDmon
+	else : typ = Tctrl
+
+	device = get_object_or_404(models.PDmon, id=r_dict[1])
+	print(type(device))
 	url = "http://" + device.ip + "/data/get"
 
 	try:
@@ -57,6 +64,7 @@ def pdmon(request):
 
 	else:
 		if command == 'STATUS':
+			response['keys'] = device.keys()
 			response['message'] = 'Device ready.'
 
 		elif command == 'DETAIL':
@@ -69,7 +77,6 @@ def pdmon(request):
 		elif command == 'DATA':
 			response = r.json()
 
-			response['channels'] = device.channels()
 			response['message'] = 'Data available!'
 		
 		elif command == 'EDIT':
@@ -108,6 +115,7 @@ def tctrl(request):
 
 	else:
 		if command == 'STATUS':
+			response['keys'] = device.keys()
 			response['message'] = 'Device ready.'
 
 		elif command == 'DETAIL':

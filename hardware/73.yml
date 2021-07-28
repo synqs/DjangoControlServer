@@ -1,0 +1,122 @@
+pyrpl:
+  background_color: ''
+  dock_positions: "\0\0\0\xFF\0\0\0\0\xFD\0\0\0\x01\0\0\0\x02\0\0\a~\0\0\x03\xAE\xFC\
+    \x01\0\0\0\x01\xFC\0\0\0\0\0\0\a~\0\0\0\xBE\0\xFF\xFF\xFF\xFC\x02\0\0\0\x02\xFC\
+    \0\0\0\x15\0\0\x03\xAE\0\0\0\xF8\0\xFF\xFF\xFF\xFC\x02\0\0\0\x03\xFC\0\0\0\x15\
+    \0\0\x02\xA1\0\0\0P\0\xFF\xFF\xFF\xFC\x01\0\0\0\x02\xFB\0\0\0\x12\0a\0s\0g\0s\0\
+    \ \0(\07\03\0)\x01\0\0\0\0\0\0\x03\x12\0\0\0]\0\xFF\xFF\xFF\xFB\0\0\0\x16\0s\0\
+    c\0o\0p\0e\0s\0 \0(\07\03\0)\x01\0\0\x03\x16\0\0\x04h\0\0\0]\0\xFF\xFF\xFF\xFB\
+    \0\0\0\x10\0i\0q\0s\0 \0(\07\03\0)\x01\0\0\x02\xBA\0\0\0\xA1\0\0\0P\0\xFF\xFF\xFF\
+    \xFB\0\0\0\x12\0p\0i\0d\0s\0 \0(\07\03\0)\x01\0\0\x03_\0\0\0d\0\0\0P\0\xFF\xFF\
+    \xFF\xFC\0\0\x02\xCE\0\0\0\xA2\0\0\0\0\0\xFF\xFF\xFF\xFA\xFF\xFF\xFF\xFF\x01\0\
+    \0\0\a\xFB\0\0\0\x12\0i\0i\0r\0s\0 \0(\07\03\0)\0\0\0\0\0\xFF\xFF\xFF\xFF\0\0\0\
+    \x16\0\xFF\xFF\xFF\xFB\0\0\0\x14\0t\0r\0i\0g\0s\0 \0(\07\03\0)\0\0\0\0\0\xFF\xFF\
+    \xFF\xFF\0\0\0\x16\0\xFF\xFF\xFF\xFB\0\0\0(\0n\0e\0t\0w\0o\0r\0k\0a\0n\0a\0l\0\
+    y\0z\0e\0r\0 \0(\07\03\0)\0\0\0\0\0\xFF\xFF\xFF\xFF\0\0\0\x16\0\xFF\xFF\xFF\xFB\
+    \0\0\0*\0s\0p\0e\0c\0t\0r\0u\0m\0a\0n\0a\0l\0y\0z\0e\0r\0 \0(\07\03\0)\0\0\0\0\
+    \0\xFF\xFF\xFF\xFF\0\0\0\x16\0\xFF\xFF\xFF\xFB\0\0\0 \0c\0u\0r\0v\0e\0v\0i\0e\0\
+    w\0e\0r\0 \0(\07\03\0)\0\0\0\0\0\xFF\xFF\xFF\xFF\0\0\0\x16\0\xFF\xFF\xFF\xFB\0\
+    \0\0 \0p\0y\0r\0p\0l\0c\0o\0n\0f\0i\0g\0 \0(\07\03\0)\0\0\0\0\0\xFF\xFF\xFF\xFF\
+    \0\0\0\x16\0\xFF\xFF\xFF\xFB\0\0\0\x18\0l\0o\0c\0k\0b\0o\0x\0 \0(\07\03\0)\0\0\
+    \0\0\0\xFF\xFF\xFF\xFF\0\0\0\x16\0\xFF\xFF\xFF\0\0\a~\0\0\0\0\0\0\0\x04\0\0\0\x04\
+    \0\0\0\b\0\0\0\b\xFC\0\0\0\0"
+  gui: true
+  loglevel: info
+  modules:
+  - NetworkAnalyzer
+  - SpectrumAnalyzer
+  - CurveViewer
+  - PyrplConfig
+  - Lockbox
+  name: '73'
+  window_position:
+  - -8
+  - 0
+  - 1918
+  - 983
+redpitaya:
+  autostart: true
+  delay: 0.05
+  frequency_correction: 1.0
+  hostname: 129.206.182.73
+  leds_off: true
+  monitor_server_name: monitor_server
+  password: root
+  port: 2222
+  reloadfpga: true
+  reloadserver: false
+  serverbinfilename: fpga.bin
+  serverdirname: //opt//pyrpl//
+  silence_env: false
+  sshport: 22
+  timeout: 1
+  user: root
+scope:
+  curve_name: scope curve
+  running_state: running_continuous
+  input2: out1
+  duration: 0.134217728
+  rolling_mode: false
+  input1: in1
+  trigger_source: ch2_positive_edge
+  ch1_active: true
+  threshold: 0.0400390625
+  hysteresis: 0.0
+  ch2_active: true
+networkanalyzer:
+  curve_name: networkanalyzer curve
+spectrumanalyzer:
+  curve_name: spectrumanalyzer curve
+lockbox:
+  sequence:
+  - outputs: {}
+asg0:
+  frequency: 10.011717677116394
+  output_direct: out1
+  trigger_source: immediately
+  waveform: ramp
+  amplitude: 0.199951171875
+  offset: 0.0
+iq2:
+  input: 'off'
+iq1:
+  input: 'off'
+iq0:
+  acbandwidth: 2428.6599415484384
+  amplitude: 0.09999847412109375
+  bandwidth:
+  - 607.1371904487975
+  - 37.94553157665012
+  frequency: 9999.98883344233
+  gain: 1.0
+  output_direct: 'off'
+  phase: 50.0000000372529
+  quadrature_factor: 100.0
+  output_signal: quadrature
+  input: in1
+asg1:
+  amplitude: 0.2003173828125
+  frequency: 9999.959729611874
+  output_direct: 'off'
+  trigger_source: immediately
+  waveform: sin
+  offset: 0.0
+pid0:
+  inputfilter:
+  - 0
+  - 0
+  - 0
+  - 0
+  input: iq0
+  output_direct: 'off'
+  p: 1.0
+  setpoint: -0.0140380859375
+  i: 0.0
+  max_voltage: 0.9998779296875
+  min_voltage: -1.0
+pid1:
+  input: 'off'
+  output_direct: 'off'
+pid2:
+  input: 'off'
+  output_direct: 'off'

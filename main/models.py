@@ -12,8 +12,7 @@ class PDmon(models.Model):
 	port = models.CharField(max_length=4, blank=True)		# device port
 	
 	# parameters/values for pdmon
-	channel_string = models.CharField(max_length=27, default='0,1,2,3,4,5,6,7,8,9,10,11')
-	# data_string = models.CharField(max_length=100, blank=True)	# store data in string
+	channel_string = models.CharField(max_length=27, default='0,1,2,3,4,5,6,7,8,9,10,11') # 0-5 corresponds to the analog pins
 
 	def __str__(self):
 		return self.name
@@ -21,8 +20,8 @@ class PDmon(models.Model):
 	def http_str(self):
 		return 'http://' + self.ip + '/'
 
-	def channels(self, array=[]):
-		channels = []
+	def keys(self, array=[]):
+		channels = ['updated']
 		if array: buff = array.split(',')
 		else: buff = self.channel_string.split(',')
 		
@@ -53,6 +52,10 @@ class Tctrl(models.Model):
 
 	def http_str(self):
 		return 'http://' + self.ip + '/'
+
+	def keys(self):
+		keys = ['updated', 'setpoint', 'T', 'error', 'output', 'P', 'I', 'D']
+		return keys
 
 	def set_setpoint(self):
 		try:
