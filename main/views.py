@@ -15,8 +15,6 @@ def index(request):
 	context = { 'device_list' : device_list }
 	if device_list == "":
 		context['message'] = 'No devices available!'
-	else: 
-		context['message'] = 'Device Index'
 	return render(request, 'main/index.html', context) # keep it like this or use the render-context shortcut...?
 '''
 def devices(request):
@@ -43,15 +41,14 @@ def detail(request, device_typ, device_id):
 
 def device(request):
 	r_dict = json.loads(request.body.decode())
+	print(r_dict)
 	command = r_dict[2]
 	response = {}
-	print(r_dict)
 
 	if r_dict[0] == 'main.pdmon' : typ = PDmon
 	else : typ = Tctrl
 
-	device = get_object_or_404(models.PDmon, id=r_dict[1])
-	print(type(device))
+	device = get_object_or_404(typ, id=r_dict[1])
 	url = "http://" + device.ip + "/data/get"
 
 	try:
@@ -72,7 +69,7 @@ def device(request):
 		
 			response['device'] = json.loads(detail[1:-1])
 			response['message'] = 'Device available.'
-			#return render(request, 'main/detail.html', response)
+			return render(request, 'main/detail.html', response)
 		
 		elif command == 'DATA':
 			response = r.json()

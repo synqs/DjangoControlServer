@@ -2,7 +2,6 @@
 {% load static %}
 
 {% block content %}
-<!-- {% if message %}<h2>{{ message }}</h2>{% endif %} -->
 <!-- {% csrf_token %} -->
 <div class="container" id="devicedetail">
 	<!-- detail-table v-bind:model="'pdmon'" v-bind:pk="{{ device.pk }}"></detail-table -->
@@ -10,11 +9,4 @@
 </div>
 
 <script type="text/javascript" src="{% static 'main/detail.js' %}"></script>
-{% endblock %}
-
-{% block redirect %}
-<form action="{% url 'main:index' %}">
-	{% csrf_token %}
-	<input type="submit" value="Back to Index" class="btn btn-primary">
-</form>
 {% endblock %}

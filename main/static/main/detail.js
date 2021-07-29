@@ -1,19 +1,19 @@
 /* In order to obtain the correct csrf-tokens the Django docs suggest this function. However, it is not needed ?! (https://docs.djangoproject.com/en/3.2/ref/csrf/) */
 function getCookie(name) {
-    let cookieValue = null;
-    if (document.cookie && document.cookie !== '') {
-        const cookies = document.cookie.split(';');
-        for (let i = 0; i < cookies.length; i++) {
-            const cookie = cookies[i].trim();
-            // Does this cookie string begin with the name we want?
-            if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                break;
-            }
-        }
-    }
-    return cookieValue;
-}
+	let cookieValue = null;
+	if (document.cookie && document.cookie !== '') {
+		const cookies = document.cookie.split(';');
+		for (let i = 0; i < cookies.length; i++) {
+			const cookie = cookies[i].trim();
+			if (cookie.substring(0, name.length + 1) === (name + '=')) { // Does this cookie string begin with the name we want?
+				cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+				break;
+			}
+		}
+	}
+	return cookieValue;
+};
+
 const token = getCookie('csrftoken');
 console.log(token);
 
@@ -27,13 +27,11 @@ DetailTable.component('detail-table', {
 	},
 	props: ['device', 'model', 'pk'],
 	template: `
-	<div class="card mb-3 card-xxl">
-			<div class="card-header text-light bg-dark">
-				<h4>{{ device.fields.name }} : {{ device.fields.description }}</h4>
-			</div>
-			<div class="card-body text-dark bg-light">
-				IP : {{ device.fields.ip }}, Sleeptime : {{ device.fields.sleeptime }} s
-			</div>
+	<div class="card mb-3">
+			<div class="card-header text-light bg-dark"><div class="row">
+				<h4 class="col">{{ device.fields.name }} : {{ device.fields.description }}</h4>
+				<h4 class="col">IP : {{ device.fields.ip }}, Sleeptime : {{ device.fields.sleeptime }} s</h4>
+			</div></div>
 	</div>
 	<data-widget v-bind:device="device"></data-widget>
 	`,
@@ -67,20 +65,21 @@ DetailTable.component( 'data-widget', {
 	},
 	props: ['device'],
 	template: `
-	<div class="container mb-3"><div class="row">
-		<div class="col">
+	<div class="row mb-3">
+		<div class="col-md-4">
 			<!-- div class="alert alert-info" role="alert">{{ data['message'] }}</div -->
-			<button class="btn btn-outline-info btn-block" enabled>{{ data['message'] }}</button>
+			<button class="btn btn-outline-info btn-block" disabled>{{ data['message'] }}</button>
 		</div>
-		<div class="col">
+		<div class="col-md-8">
 			<div class="btn-group w-100">
 			<button class="btn btn-success" data-bs-toggle="button" autocomplete="off" v-on:click="start_device()">start</button>
 			<button class="btn btn-danger" v-on:click="stop_device()">stop</button>
 			<button class="btn btn-secondary" v-on:click="get_device()">get</button>
+			<button class="btn btn-primary" onclick="exportTableToCSV('test.csv')">export as CSV</button>
 			<button class="btn btn-warning" v-on:click="remove_device()">remove</button>
 			</div>
 		</div>
-	</div></div>
+	</div>
 	<table class="table table-striped" responsive="True">
 		<thead class="thead-dark">
 			<tr>
@@ -97,6 +96,9 @@ DetailTable.component( 'data-widget', {
 	mounted () {
 		this.init_device();
 	},
+	updated () {
+		console.log('update');
+	},
 	methods: {
 		convert_voltage(v) {
 			const p = 10**((v-7.75)/0.75) * 10000000;
@@ -111,7 +113,6 @@ DetailTable.component( 'data-widget', {
 			this.config = config;
 			axios(config)
 				.then(response => {
-					// console.log(response);
 					this.key = response.data['keys'];
 					this.data = response.data;
 					});
@@ -126,7 +127,6 @@ DetailTable.component( 'data-widget', {
 		get_device() { // fetch a single set of data directly from arduino (axios)
 			config = this.config;
 			config['data'][2] = 'DATA';
-			console.log(config);
 			axios(config)
 				.then(response => {
 					this.data = response.data;
@@ -172,4 +172,34 @@ DetailTable.component( 'data-widget', {
 })
 
 /* At last, mount the detail-app */
-DetailTable.mount('#devicedetail')
+DetailTable.mount('#devicedetail');
+
+function downloadCSV(csv, filename) {
+	var csvFile;
+	var downloadLink;
+	csvFile = new Blob([csv], {type: "text/csv"}); // CSV file
+
+	downloadLink = document.createElement("a"); // Download link
+	downloadLink.download = filename; // File name
+	downloadLink.href = window.URL.createObjectURL(csvFile); // Create a link to the file
+	downloadLink.style.display = "none"; // Hide download link
+
+	document.body.appendChild(downloadLink); // Add the link to DOM
+
+	downloadLink.click(); // Click download link
+}
+
+function exportTableToCSV(filename) {
+	var csv = [];
+	var rows = document.querySelectorAll("table tr");
+
+	for (var i = 0; i < rows.length; i++) {
+		var row = [], cols = rows[i].querySelectorAll("td, th");
+
+		for (var j = 0; j < cols.length; j++) {
+			row.push(cols[j].innerText);
+		}
+		csv.push(row.join(","));
+	}
+	downloadCSV(csv.join("\n"), filename); // Download CSV file
+}

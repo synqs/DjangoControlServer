@@ -9,7 +9,8 @@ IndexTable.component('index-table', {
 			<th>#</th>
 			<th>Name</th>
 			<th>IP</th>
-			<th colspan=4>Status</th>
+			<th>Status</th>
+			<th colspan=2></th>
 			</tr>
 		</thead>
 		<tbody>
@@ -37,42 +38,57 @@ IndexTable.component('index-table', {
 
 IndexTable.component('device-widget', {
 	data ()  { return {
-		detail : [],
+		status : [],
+		config : [],
 		}
 	},
 	props: ['device'],
 	template: `
 	<tr>
-	<td>{{ device.model }} # {{ device.pk }}</td>
-	<td><a v-bind:href="'/' + this.device.model + '/' + this.device.pk + '/'">{{ device.fields.name }}</a></td>
-	<td>{{ device.fields.ip }}</td>
-	<td>online</td>
-	<td><button class="btn btn-primary" v-on:click="get_detail()">Details</button></td>
+	<td>{{ this.device.model }} # {{ this.device.pk }}</td>
+	<td><a v-bind:href="'/' + this.device.model + '/' + this.device.pk + '/'">{{ this.device.fields.name }}</a></td>
+	<td>{{ this.device.fields.ip }}</td>
+	<td>{{ this.status }}</td>
+	<!-- td><button class="btn btn-outline-primary" v-on:click="init_device(device.model, device.pk)">Status</button></td -->
+	<td><button class="btn btn-primary" v-on:click="detail_device()">Details</button></td>
 	<td><button class="btn btn-warning">Remove</button></td>
 	</tr>
 	`,
+	mounted () {
+		this.init_device(this.device.model, this.device.pk);
+	},
 	methods: {
-		remove_device() {
+		init_device(model, pk) {
 			config = {	method : 'POST',
-					url : '/' + this.device.model + '/',
+					url : '/device/',
 					xsrfCookieName: 'csrftoken',
 					xsrfHeaderName: 'X-CSRFTOKEN',
-					data : [this.device.pk, 'DELETE'] };
+					data : [model, pk, 'STATUS'] };
+			this.config = config;
+			var sstatus = {};
+			axios(config)
+				.then(response => { 
+					this.status = response.data['message'];
+				})
+				.catch(error => console.log(error));
+		},
+		remove_device() {
+			config = this.config;
+			config['data'][2] = 'DELETE';
 			axios(config)
 				.then(response => console.log(response))
 				.catch(error => console.log(error));
 		},
-		get_detail() {
-			config = {	method : 'POST',
-					url : '/' + this.device.model + '/',
-					xsrfCookieName: 'csrftoken',
-					xsrfHeaderName: 'X-CSRFTOKEN',
-					data : [this.device.pk, 'DETAIL'] };
+		detail_device() {
+			window.location.replace('/device/');
+			/*
+			config = this.config;
+			config['data'][2] = 'DETAIL';
 			axios(config)
 				.then(response => {
 					console.log(response); 
 					this.detail = response.data; })
-				.catch(error => console.log(error));
+				.catch(error => console.log(error)); */
 		},
 	},
 })
