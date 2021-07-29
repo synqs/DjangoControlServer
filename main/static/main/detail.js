@@ -80,6 +80,24 @@ DetailTable.component( 'data-widget', {
 			</div>
 		</div>
 	</div>
+	
+	<v-container><v-layout column style="height: 90vh">
+		<v-flex md6 style="overflow: auto">        <--- added overflow
+      		<v-data-table class="elevation-1">
+		<thead class="thead-dark">
+			<tr>
+				<th v-for="k in key">{{ k }}</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr v-for="data in datas">
+				<td v-for="k in key">{{ data['value'][k] }}</td>
+			</tr>
+		</tbody>
+      		</v-data-table>
+    		</v-flex>
+  	</v-layout><v-container>
+  	
 	<table class="table table-striped" responsive="True">
 		<thead class="thead-dark">
 			<tr>
@@ -96,11 +114,15 @@ DetailTable.component( 'data-widget', {
 	mounted () {
 		this.init_device();
 	},
-	updated () {
-		console.log('update');
+	updated () { // export data every new day automatically
+		if (this.data['value'] && this.data['value']['updated'] == '00:00:00') {
+			console.log('time');
+			var day = '30/07/2021'
+			exportTableToCSV(day + '.csv')
+		}
 	},
 	methods: {
-		convert_voltage(v) {
+		convert_voltage(v) { // conversion formular to obtain preassure
 			const p = 10**((v-7.75)/0.75) * 10000000;
 			return p
 		},

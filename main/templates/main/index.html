@@ -2,7 +2,7 @@
 {% load static %}
 
 {% block content %}
-
+{% csrf_token %}
 {% if message %}<h2>{{ message }}</h2>{% endif %}
 
 <div class=container id="index">
