@@ -50,9 +50,7 @@ IndexTable.component('device-widget', {
 	<td>{{ this.device.fields.ip }}</td>
 	<td>{{ this.status }}</td>
 	<!-- td><button class="btn btn-outline-primary" v-on:click="init_device(device.model, device.pk)">Status</button></td -->
-	<td><form action="String(this.device.model) + '/' + Str(this.device.pk) + '/'" metnod="post">
-		<button class="btn btn-primary">Details</button>
-	</form></td>
+	<td><<button class="btn btn-primary" v-on:click=this.detail_device()>Details</button></td>
 	<td><button class="btn btn-warning">Remove</button></td>
 	</tr>
 	`,
@@ -82,8 +80,8 @@ IndexTable.component('device-widget', {
 				.catch(error => console.log(error));
 		},
 		detail_device() {
-			//window.location.replace('/device/');
-			
+			window.location.replace(this.device.model + '/' + this.device.pk + '/');
+			/*
 			config = this.config;
 			config['data'][2] = 'DETAIL';
 			axios(config)
@@ -91,7 +89,7 @@ IndexTable.component('device-widget', {
 					console.log(response); 
 					//this.detail = response.data; 
 					})
-				.catch(error => console.log(error));
+				.catch(error => console.log(error)); */
 		},
 	},
 })

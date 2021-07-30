@@ -77,11 +77,14 @@ def device(request):
 			response['message'] = 'Data available!'
 		
 		elif command == 'EDIT':
-			r_dict = json.loads(request.body.decode())
-			print(device.channel_string)
-			print(r_dict['fields']['channel_string'])
-			device.set_channels(r_dict['fields']['channel_string'])
-			response['message'] = 'Set parameters successfully.'
+			params = r_dict[3]
+			print(params); print(type(params))
+			for p in params:
+				print('set_' + p, params[p])
+				com = 'set_' + p + '(' + params[p] + ')'
+				print(com)
+			
+			response['message'] = 'Parameters updated successfully.'
 		
 		elif command == 'DELETE':
 			# device.delete()

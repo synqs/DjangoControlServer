@@ -65,40 +65,24 @@ DetailTable.component( 'data-widget', {
 	},
 	props: ['device'],
 	template: `
-	<div class="row mb-3">
-		<div class="col-md-4">
-			<!-- div class="alert alert-info" role="alert">{{ data['message'] }}</div -->
-			<button class="btn btn-outline-info btn-block" disabled>{{ data['message'] }}</button>
+	<div class="row mb-3" style="height: 40px;">
+		<div class="col-md-4 mh-100">
+			<div class="alert alert-info h-100 text-center align-middle px-0" style="padding-top: 0.375rem" role="alert">{{ data['message'] }}</div>
+			<!-- button class="btn btn-outline-info btn-block" disabled>{{ data['message'] }}</button -->
 		</div>
-		<div class="col-md-8">
-			<div class="btn-group w-100">
+		<div class="col-md-8 mh-100">
+			<div class="btn-group w-100 h-100">
 			<button class="btn btn-success" data-bs-toggle="button" autocomplete="off" v-on:click="start_device()">start</button>
 			<button class="btn btn-danger" v-on:click="stop_device()">stop</button>
 			<button class="btn btn-secondary" v-on:click="get_device()">get</button>
+			<button class="btn btn-info" v-on:click="edit_device()">edit</button>
 			<button class="btn btn-primary" onclick="exportTableToCSV('test.csv')">export as CSV</button>
 			<button class="btn btn-warning" v-on:click="remove_device()">remove</button>
 			</div>
 		</div>
 	</div>
-	
-	<v-container><v-layout column style="height: 90vh">
-		<v-flex md6 style="overflow: auto">        <--- added overflow
-      		<v-data-table class="elevation-1">
-		<thead class="thead-dark">
-			<tr>
-				<th v-for="k in key">{{ k }}</th>
-			</tr>
-		</thead>
-		<tbody>
-			<tr v-for="data in datas">
-				<td v-for="k in key">{{ data['value'][k] }}</td>
-			</tr>
-		</tbody>
-      		</v-data-table>
-    		</v-flex>
-  	</v-layout><v-container>
   	
-	<table class="table table-striped" responsive="True">
+	<div class="table-responsive" style="height: 100px;"><table class="table table-striped mh-100">
 		<thead class="thead-dark">
 			<tr>
 				<th v-for="k in key">{{ k }}</th>
@@ -109,7 +93,7 @@ DetailTable.component( 'data-widget', {
 				<td v-for="k in key">{{ data['value'][k] }}</td>
 			</tr>
 		</tbody>
-	</table>
+	</table></div>
 	`,
 	mounted () {
 		this.init_device();
@@ -159,6 +143,7 @@ DetailTable.component( 'data-widget', {
 		edit_device(arr) {
 			config = this.config;
 			config['data'][2] = 'EDIT';
+			config['data'][3] = { 'channel' : '0,1,2,3,4,5' };
 			axios(config)
 				.then(response => {
 					console.log(response.data);
@@ -225,3 +210,5 @@ function exportTableToCSV(filename) {
 	}
 	downloadCSV(csv.join("\n"), filename); // Download CSV file
 }
+
+Math.random().toString().substr(2, 5);
