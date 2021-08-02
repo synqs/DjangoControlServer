@@ -9,7 +9,7 @@ IndexTable.component('index-table', {
 			<th>#</th>
 			<th>Name</th>
 			<th>IP</th>
-			<th>Status</th>
+			<th style="width: 250px; ">Status</th>
 			<th colspan=2></th>
 			</tr>
 		</thead>
@@ -38,7 +38,7 @@ IndexTable.component('index-table', {
 
 IndexTable.component('device-widget', {
 	data ()  { return {
-		status : [],
+		status : 'Trying to connect...',
 		config : [],
 		}
 	},
@@ -50,7 +50,7 @@ IndexTable.component('device-widget', {
 	<td>{{ this.device.fields.ip }}</td>
 	<td>{{ this.status }}</td>
 	<!-- td><button class="btn btn-outline-primary" v-on:click="init_device(device.model, device.pk)">Status</button></td -->
-	<td><<button class="btn btn-primary" v-on:click=this.detail_device()>Details</button></td>
+	<td><button class="btn btn-primary" v-on:click=this.detail_device()>Details</button></td>
 	<td><button class="btn btn-warning">Remove</button></td>
 	</tr>
 	`,

@@ -14,83 +14,69 @@ function getCookie(name) {
 	return cookieValue;
 };
 
-const token = getCookie('csrftoken');
-console.log(token);
+//const token = getCookie('csrftoken');
+//const display = document.getElementById("cors");
+//console.log(token);
 
 /* This is the main app for the detail page - below follow tables for PDmons and Tctrls */
 const DetailTable = Vue.createApp({})
 
 DetailTable.component('detail-table', {
 	data() { return {
-		dev : [],
-		}
-	},
-	props: ['device', 'model', 'pk'],
-	template: `
-	<div class="card mb-3">
-			<div class="card-header text-light bg-dark"><div class="row">
-				<h4 class="col">{{ device.fields.name }} : {{ device.fields.description }}</h4>
-				<h4 class="col">IP : {{ device.fields.ip }}, Sleeptime : {{ device.fields.sleeptime }} s</h4>
-			</div></div>
-	</div>
-	<data-widget v-bind:device="device"></data-widget>
-	`,
-	mounted () {
-		// this.get_device()
-	},
-	methods : {
-		get_device() { // fetch a single set of data directly from arduino (axios)
-		config = {	method : 'POST',
-				url : '/' + 'main.pdmon' + '/',
-				xsrfCookieName: 'csrftoken',
-				xsrfHeaderName: 'X-CSRFTOKEN',
-				data : [this.pk, 'DETAIL'] };
-		axios(config)
-			.then(response => {
-				console.log(response);
-				this.dev = response.data; })
-			.catch(error => console.log(error));
-		},
-	},
-})
-
-/* Widget to display data from device */
-DetailTable.component( 'data-widget', {
-	data () { return {
-		data : [],
+		data : { message : 'Trying to connect...'},
 		datas : [],
 		key : [],
 		config : [],
+		editForm : []
 		}
+	},
+	compilerOptions: {
+		delimiters: ['[[', ']]'],
 	},
 	props: ['device'],
 	template: `
+	<div class="card mb-3">
+			<div class="card-header text-light bg-dark"><div class="row">
+				<h4 class="col">[[ device.fields.name ]] : [[ device.fields.description ]]</h4>
+				<h4 class="col">IP : [[ device.fields.ip ]], Sleeptime : [[ device.fields.sleeptime ]] s</h4>
+			</div></div>
+	</div>
+
 	<div class="row mb-3" style="height: 40px;">
 		<div class="col-md-4 mh-100">
-			<div class="alert alert-info h-100 text-center align-middle px-0" style="padding-top: 0.375rem" role="alert">{{ data['message'] }}</div>
-			<!-- button class="btn btn-outline-info btn-block" disabled>{{ data['message'] }}</button -->
+			<div class="alert alert-info h-100 text-center align-middle px-0" style="padding-top: 0.375rem" role="alert">[[ data['message'] ]]</div>
+			<!-- button class="btn btn-outline-info btn-block" disabled>[[ data['message'] ]]</button -->
 		</div>
 		<div class="col-md-8 mh-100">
 			<div class="btn-group w-100 h-100">
 			<button class="btn btn-success" data-bs-toggle="button" autocomplete="off" v-on:click="start_device()">start</button>
 			<button class="btn btn-danger" v-on:click="stop_device()">stop</button>
 			<button class="btn btn-secondary" v-on:click="get_device()">get</button>
-			<button class="btn btn-info" v-on:click="edit_device()">edit</button>
 			<button class="btn btn-primary" onclick="exportTableToCSV('test.csv')">export as CSV</button>
 			<button class="btn btn-warning" v-on:click="remove_device()">remove</button>
 			</div>
 		</div>
 	</div>
+	<!-- p id="cors"></p -->
+	
+	
+	<div v-if="this.device.model == 'main.tctrl'" class="row mb-3 align-items-center mx-auto" style="height: 40px;">
+		<div class="col"><input type="text" v-model="this.editForm.setpoint" placeholder="setpoint"></div>
+		<div class="col"><input type="text" v-model="this.editForm.P" placeholder="P"></div>
+		<div class="col"><input type="text" v-model="editForm.I" placeholder="I"></div>
+		<div class="col"><input type="text" v-model="editForm.D" placeholder="D"></div>
+		<div class="col"><button class="btn btn-info" v-on:click="edit_device()">submit</button></div>
+	</div>
   	
-	<div class="table-responsive" style="height: 100px;"><table class="table table-striped mh-100">
+	<div class="table-responsive" style="height: 500px;"><table class="table table-striped mh-100">
 		<thead class="thead-dark">
 			<tr>
-				<th v-for="k in key">{{ k }}</th>
+				<th v-for="k in key">[[ k ]]</th>
 			</tr>
 		</thead>
 		<tbody>
 			<tr v-for="data in datas">
-				<td v-for="k in key">{{ data['value'][k] }}</td>
+				<td v-for="k in key">[[ data['value'][k] ]]</td>
 			</tr>
 		</tbody>
 	</table></div>
@@ -143,7 +129,8 @@ DetailTable.component( 'data-widget', {
 		edit_device(arr) {
 			config = this.config;
 			config['data'][2] = 'EDIT';
-			config['data'][3] = { 'channel' : '0,1,2,3,4,5' };
+			console.log(this.editForm);
+			config['data'][3] = this.editForm;
 			axios(config)
 				.then(response => {
 					console.log(response.data);
@@ -212,3 +199,4 @@ function exportTableToCSV(filename) {
 }
 
 Math.random().toString().substr(2, 5);
+//document.getElementById("cors") = token;

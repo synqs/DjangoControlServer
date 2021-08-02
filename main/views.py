@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404, get_list_or_404
 from django.http import HttpResponse
-from . import models
 from .models import PDmon, Tctrl
+from .forms import UpdateSetpointForm
 from django.core import serializers
 import requests, json
 from requests.exceptions import HTTPError
@@ -79,11 +79,22 @@ def device(request):
 		elif command == 'EDIT':
 			params = r_dict[3]
 			print(params); print(type(params))
+			
+			'''
 			for p in params:
 				print('set_' + p, params[p])
 				com = 'set_' + p + '(' + params[p] + ')'
 				print(com)
+			'''
+			#device.save(description="updated")
+			for name in update_data:
+    				setattr(a, name, update_data['name'])
+
+			# don't forget to save the object after modifying
+			a.save()
+			#form = UpdateSetpointForm(params)
 			
+			#if form.is_valid():
 			response['message'] = 'Parameters updated successfully.'
 		
 		elif command == 'DELETE':
@@ -94,51 +105,7 @@ def device(request):
 	
 	return HttpResponse(json.dumps(response))
 
-### TCTRL related views ###
-
-def tctrl(request):
-	r_dict = json.loads(request.body.decode())
-	device = get_object_or_404(Tctrl, pk=r_dict[0])
-	command = r_dict[1]
-	response = {}
-	url = "http://" + device.ip + "/data/get"
-	
-	try:
-		r = requests.get(url, timeout = 10)
-		r.raise_for_status()
-	except HTTPError as http_err:
-		print(http_error)
-		response['message'] = str(http_err)
-	except Exception as err:
-		print(err)
-		response['message'] = f'HTTP error occurred: {err}'
-
-	else:
-		if command == 'STATUS':
-			response['keys'] = device.keys()
-			response['message'] = 'Device ready.'
-
-		elif command == 'DETAIL':
-			detail = serializers.serialize('json', [device])
-		
-			response['device'] = json.loads(detail[1:-1])
-			response['message'] = 'Device available.'
-			#return render(request, 'main/detail.html', response)
-		
-		elif command == 'DATA':
-			response = r.json()
-			response['message'] = 'Data available!'
-		
-		elif command == 'EDIT':
-			r_dict = json.loads(request.body.decode())
-		
-			response['message'] = 'Set parameters successfully.'
-		
-		elif command == 'DELETE':
-			# device.delete()
-			response['message'] = 'Deleted successfully.'
-		else:
-			response['message'] = 'Invalid operation.'
-	
-	return HttpResponse(json.dumps(response))
-
+def setSetpoint(request):
+	print('blub')
+	form = UpdateSetpoint(request.POST)
+	return HttpResponse({'form' : form })
