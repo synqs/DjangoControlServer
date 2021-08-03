@@ -61,11 +61,11 @@ DetailTable.component('detail-table', {
 	
 	
 	<div v-if="this.device.model == 'main.tctrl'" class="row mb-3 align-items-center mx-auto" style="height: 40px;">
-		<div class="col"><input type="text" v-model="this.editForm.setpoint" placeholder="setpoint"></div>
-		<div class="col"><input type="text" v-model="this.editForm.P" placeholder="P"></div>
-		<div class="col"><input type="text" v-model="editForm.I" placeholder="I"></div>
-		<div class="col"><input type="text" v-model="editForm.D" placeholder="D"></div>
-		<div class="col"><button class="btn btn-info" v-on:click="edit_device()">submit</button></div>
+		<div class="col"><input v-model="this.editForm.setpoint" placeholder="setpoint"></div>
+		<div class="col"><input v-model="this.editForm.P" placeholder="P"></div>
+		<div class="col"><input v-model="editForm.I" placeholder="I"></div>
+		<div class="col"><input v-model="editForm.D" placeholder="D"></div>
+		<div class="col mh-75 text-center"><button class="btn btn-block btn-info mh-100 py-1" v-on:click="edit_device()">submit</button></div>
 	</div>
   	
 	<div class="table-responsive" style="height: 500px;"><table class="table table-striped mh-100">
@@ -97,11 +97,12 @@ DetailTable.component('detail-table', {
 			return p
 		},
 		init_device() { // initialize device and create config for further axios requests
+			payload = { model : this.device.model, pk : this.device.pk };
 			config = {	method : 'POST',
 					url : '/device/',
 					xsrfCookieName: 'csrftoken',
 					xsrfHeaderName: 'X-CSRFTOKEN',
-					data : [this.device.model, this.device.pk, 'STATUS'] };
+					data : ['STATUS', payload] };
 			this.config = config;
 			axios(config)
 				.then(response => {
@@ -118,7 +119,7 @@ DetailTable.component('detail-table', {
 		},
 		get_device() { // fetch a single set of data directly from arduino (axios)
 			config = this.config;
-			config['data'][2] = 'DATA';
+			config['data'][0] = 'DATA';
 			axios(config)
 				.then(response => {
 					this.data = response.data;
@@ -128,9 +129,9 @@ DetailTable.component('detail-table', {
 		},
 		edit_device(arr) {
 			config = this.config;
-			config['data'][2] = 'EDIT';
+			config['data'][0] = 'EDIT';
 			console.log(this.editForm);
-			config['data'][3] = this.editForm;
+			config['data'][1]['params'] = this.editForm;
 			axios(config)
 				.then(response => {
 					console.log(response.data);
@@ -139,7 +140,7 @@ DetailTable.component('detail-table', {
 		},
 		remove_device() {
 			config = this.config;
-			config['data'][2] = 'DELETE';
+			config['data'][0] = 'DELETE';
 			axios(config)
 				.then(response => {
 					console.log(response);

@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404, get_list_or_404
-from django.http import HttpResponse
+from django.http import HttpResponse, Http404
 from .models import PDmon, Tctrl
 from .forms import UpdateSetpointForm
 from django.core import serializers
@@ -40,17 +40,27 @@ def detail(request, device_typ, device_id):
 ### device related views ###
 
 def device(request):
+	print(request.body)
 	r_dict = json.loads(request.body.decode())
 	print(r_dict)
-	command = r_dict[2]
+	command = r_dict[0]
 	response = {}
 
-	if r_dict[0] == 'main.pdmon' : typ = PDmon
+	if r_dict[1]['model'] == 'main.pdmon' : typ = PDmon
 	else : typ = Tctrl
 
-	device = get_object_or_404(typ, id=r_dict[1])
+	try:
+		device = get_object_or_404(typ, pk=r_dict[1]['pk'])
+	except Http404 as err404:
+		if command == 'ADD':
+			print('Add')
+			device = typ.objects.create(name=r_dict[1]['name'])
+			device.save()
+		else:
+			response['message'] = 'No such device.'
+		
 	url = "http://" + device.ip + "/data/get"
-
+	
 	try:
 		r = requests.get(url)
 		r.raise_for_status()
@@ -92,9 +102,6 @@ def device(request):
 
 			# don't forget to save the object after modifying
 			a.save()
-			#form = UpdateSetpointForm(params)
-			
-			#if form.is_valid():
 			response['message'] = 'Parameters updated successfully.'
 		
 		elif command == 'DELETE':
