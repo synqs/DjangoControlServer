@@ -196,7 +196,7 @@ void analogCommand(BridgeClient client) {
     Bridge.put("setpoint", String(setpoint)); // add some kind of confirmation?
   }
   
-  if (component == "gain") { // edit gain
+  if (component == "P") { // edit gain
     float value = 0;
     value = client.parseFloat();
     if (value){
@@ -205,26 +205,26 @@ void analogCommand(BridgeClient client) {
       ki = G / tauI;
       kd = G * tauD;
     }
-    Bridge.put("G", String(G));
+    Bridge.put("P", String(G));
   }
   
-  if (component == "integral") { // edit tauI
+  if (component == "I") { // edit tauI
     float value = 0;
     value = client.parseFloat();
     if (value){
       tauI = value;
       ki = G / tauI;
     }
-    Bridge.put("tauI", String(tauI));
+    Bridge.put("I", String(tauI));
   }
   
-  if (component == "differential") { // edit tauD
+  if (component == "D") { // edit tauD
     float value = 0;
     value = client.parseFloat();
     if (value){
       tauD = value;
       kd = G*tauD;
     }
-    Bridge.put("tauD", String(tauD));
+    Bridge.put("D", String(tauD));
   }
 }

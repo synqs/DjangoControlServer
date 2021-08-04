@@ -28,6 +28,15 @@ class PDmon(models.Model):
 		for ch in buff:
 			channels.append("CH" + ch.zfill(2))
 		return channels
+		
+	def set(self, param):
+		try:
+			set_str = 'arduino/write/' + param + '/' + getattr(self, param) + '/';
+			addr = self.http_str() + set_str;
+			r = requests.get(addr) # , timeout = self.timeout,proxies=proxies);
+			return r.ok;
+		except ConnectionError:
+			return False
 
 class Tctrl(models.Model):
 	id = models.BigAutoField(primary_key=True)
@@ -43,9 +52,9 @@ class Tctrl(models.Model):
 	value = models.FloatField(blank=True, default=0)
 	output = models.FloatField(blank=True, default=0)
 	error = models.FloatField(blank=True, default=0)
-	gain = models.FloatField(blank=True, default=1)
-	tauI = models.FloatField(blank=True, default=100)
-	tauD =  models.FloatField(blank=True, default=0)
+	P = models.FloatField(blank=True, default=1)
+	I = models.FloatField(blank=True, default=100)
+	D =  models.FloatField(blank=True, default=0)
 	
 	keyss = ['updated', 'setpoint', 'T', 'error', 'output', 'P', 'I', 'D']
 	
@@ -59,38 +68,11 @@ class Tctrl(models.Model):
 		keys = ['updated', 'setpoint', 'T', 'error', 'output', 'P', 'I', 'D']
 		return keys
 
-	def set_setpoint(self):
+	def set(self, param):
 		try:
-			set_str = 'arduino/write/setpoint/' + str(self['setpoint']) + '/';
-			addr = self.http_str() + set_str;
-			r = requests.get(addr) # add timeout and proxies ?
-			return r.ok;
-		except ConnectionError:
-			return False
-
-	def set_gain(self):
-		try:
-			set_str = 'arduino/write/gain/' + str(self.gain) + '/';
+			set_str = 'arduino/write/' + param + '/' + getattr(self, param) + '/';
 			addr = self.http_str() + set_str;
 			r = requests.get(addr) # , timeout = self.timeout,proxies=proxies);
-			return r.ok;
-		except ConnectionError:
-			return False
-
-	def set_integral(self):
-		try:
-			set_str = 'arduino/write/integral/' + str(self.integral) + '/';
-			addr = self.http_str() + set_str;
-			r = requests.get(addr) # , timeout = self.timeout,proxies=proxies);
-			return r.ok;
-		except ConnectionError:
-			return False
-
-	def set_differential(self):
-		try:
-			set_str = 'arduino/write/differential/' + str(self.diff) + '/';
-			addr = self.http_str() + set_str;
-			r = requests.get(addr, timeout = self.timeout,proxies=proxies);
 			return r.ok;
 		except ConnectionError:
 			return False

@@ -85,8 +85,8 @@ DetailTable.component('detail-table', {
 	},
 	updated () { // export data every new day automatically
 		if (this.data['value'] && this.data['value']['updated'] == '00:00:00') {
-			console.log('time');
-			var day = '30/07/2021'
+			const date = new Date();
+			var day = date.getDay() + '_' + date.getMonth() + '_' + date.getFullYear();
 			exportTableToCSV(day + '.csv')
 		}
 	},

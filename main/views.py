@@ -87,11 +87,9 @@ def device(request):
 			elif command == 'EDIT':
 				params = r_dict[1]['params'];
 				for p in params:
-	    				print(p); print(params[p])
 	    				setattr(device, p, params[p])
-	    			
-	    			device.set_setpoint()
-				# don't forget to save the object after modifying
+	    				device.set(p)
+	    				
 				device.save()
 				response['message'] = 'Parameters updated successfully.'
 			else:
