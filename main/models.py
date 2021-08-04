@@ -18,7 +18,7 @@ class PDmon(models.Model):
 		return self.name
 
 	def http_str(self):
-		return 'http://' + self.ip + '/'
+		return 'http://' + self.ip + '/data/get'
 
 	def keys(self, array=[]):
 		channels = ['updated']
@@ -51,7 +51,7 @@ class Tctrl(models.Model):
 		return self.name
 
 	def http_str(self):
-		return 'http://' + self.ip + '/'
+		return 'http://' + self.ip + '/data/get'
 
 	def keys(self):
 		keys = ['updated', 'setpoint', 'T', 'error', 'output', 'P', 'I', 'D']

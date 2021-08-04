@@ -40,7 +40,6 @@ def detail(request, device_typ, device_id):
 ### device related views ###
 
 def device(request):
-	print(request.body)
 	r_dict = json.loads(request.body.decode())
 	print(r_dict)
 	command = r_dict[0]
@@ -48,69 +47,57 @@ def device(request):
 
 	if r_dict[1]['model'] == 'main.pdmon' : typ = PDmon
 	else : typ = Tctrl
-
-	try:
-		device = get_object_or_404(typ, pk=r_dict[1]['pk'])
-	except Http404 as err404:
-		if command == 'ADD':
-			print('Add')
-			device = typ.objects.create(name=r_dict[1]['name'])
-			device.save()
-		else:
-			response['message'] = 'No such device.'
-		
-	url = "http://" + device.ip + "/data/get"
 	
-	try:
-		r = requests.get(url)
-		r.raise_for_status()
-	except HTTPError as http_err:
-		response['message'] = http_err 
-	except Exception as err:
-		response['message'] = err 
+	if command == 'DELETE':
+		get_object_or_404(typ, pk=r_dict[1]['pk']).delete()
+		response['message'] = 'Deleted successfully.'
+	if command == 'ADD':
+		#device = typ.objects.create(name=r_dict[1])
+		#device.save()
+		response['message'] = 'New device added.'
 
-	else:
-		if command == 'STATUS':
-			response['keys'] = device.keys()
-			response['message'] = 'Device ready.'
+	else: 
+		try:
+			device = get_object_or_404(typ, pk=r_dict[1]['pk'])
+			url = device.http_str()
+			r = requests.get(url)
+			r.raise_for_status()
+		except HTTPError as http_err:
+			response['message'] = str(http_err) 
+		except Exception as err:
+			response['message'] = str(err) 
 
-		elif command == 'DETAIL':
-			detail = serializers.serialize('json', [device])
-		
-			response['device'] = json.loads(detail[1:-1])
-			response['message'] = 'Device available.'
-			return render(request, 'main/detail.html', response)
-		
-		elif command == 'DATA':
-			response = r.json()
-
-			response['message'] = 'Data available!'
-		
-		elif command == 'EDIT':
-			params = r_dict[3]
-			print(params); print(type(params))
-			
-			'''
-			for p in params:
-				print('set_' + p, params[p])
-				com = 'set_' + p + '(' + params[p] + ')'
-				print(com)
-			'''
-			#device.save(description="updated")
-			for name in update_data:
-    				setattr(a, name, update_data['name'])
-
-			# don't forget to save the object after modifying
-			a.save()
-			response['message'] = 'Parameters updated successfully.'
-		
-		elif command == 'DELETE':
-			# device.delete()
-			response['message'] = 'Deleted successfully.'
 		else:
-			response['message'] = 'Invalid operation.'
+			if command == 'STATUS':
+				response['keys'] = device.keys()
+				response['message'] = 'Device ready.'
+
+			elif command == 'DETAIL':
+				detail = serializers.serialize('json', [device])
+		
+				response['device'] = json.loads(detail[1:-1])
+				response['message'] = 'Device available.'
+				return render(request, 'main/detail.html', response)
+		
+			elif command == 'DATA':
+				response = r.json()
+
+				response['message'] = 'Data available!'
+		
+			elif command == 'EDIT':
+				params = r_dict[1]['params'];
+				for p in params:
+	    				print(p); print(params[p])
+	    				setattr(device, p, params[p])
+
+				# don't forget to save the object after modifying
+				device.save()
+				print(device.tauD)
+				response['message'] = 'Parameters updated successfully.'
+			else:
+				response['message'] = 'Invalid operation.'
 	
-	return HttpResponse(json.dumps(response))
+		return HttpResponse(json.dumps(response))
 
 def setSetpoint(request):
 	print('blub')
