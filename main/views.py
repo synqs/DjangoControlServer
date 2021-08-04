@@ -58,8 +58,8 @@ def device(request):
 
 	else: 
 		try:
-			device = get_object_or_404(typ, pk=r_dict[1]['pk'])
-			url = device.http_str()
+			device = get_object_or_404(typ, pk=r_dict[1]['pk']) # also consider 'update_or_create()'
+			url = device.http_str() + 'data/get'
 			r = requests.get(url)
 			r.raise_for_status()
 		except HTTPError as http_err:
@@ -89,10 +89,10 @@ def device(request):
 				for p in params:
 	    				print(p); print(params[p])
 	    				setattr(device, p, params[p])
-
+	    			
+	    			device.set_setpoint()
 				# don't forget to save the object after modifying
 				device.save()
-				print(device.tauD)
 				response['message'] = 'Parameters updated successfully.'
 			else:
 				response['message'] = 'Invalid operation.'

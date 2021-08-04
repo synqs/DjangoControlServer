@@ -18,7 +18,7 @@ class PDmon(models.Model):
 		return self.name
 
 	def http_str(self):
-		return 'http://' + self.ip + '/data/get'
+		return 'http://' + self.ip + '/'
 
 	def keys(self, array=[]):
 		channels = ['updated']
@@ -47,11 +47,13 @@ class Tctrl(models.Model):
 	tauI = models.FloatField(blank=True, default=100)
 	tauD =  models.FloatField(blank=True, default=0)
 	
+	keyss = ['updated', 'setpoint', 'T', 'error', 'output', 'P', 'I', 'D']
+	
 	def __str__(self):
 		return self.name
 
 	def http_str(self):
-		return 'http://' + self.ip + '/data/get'
+		return 'http://' + self.ip + '/'
 
 	def keys(self):
 		keys = ['updated', 'setpoint', 'T', 'error', 'output', 'P', 'I', 'D']
@@ -59,7 +61,7 @@ class Tctrl(models.Model):
 
 	def set_setpoint(self):
 		try:
-			set_str = '/arduino/write/setpoint/' + str(self.setpoint) + '/';
+			set_str = 'arduino/write/setpoint/' + str(self['setpoint']) + '/';
 			addr = self.http_str() + set_str;
 			r = requests.get(addr) # add timeout and proxies ?
 			return r.ok;
@@ -68,7 +70,7 @@ class Tctrl(models.Model):
 
 	def set_gain(self):
 		try:
-			set_str = '/arduino/write/gain/' + str(self.gain) + '/';
+			set_str = 'arduino/write/gain/' + str(self.gain) + '/';
 			addr = self.http_str() + set_str;
 			r = requests.get(addr) # , timeout = self.timeout,proxies=proxies);
 			return r.ok;
@@ -77,7 +79,7 @@ class Tctrl(models.Model):
 
 	def set_integral(self):
 		try:
-			set_str = '/arduino/write/integral/' + str(self.integral) + '/';
+			set_str = 'arduino/write/integral/' + str(self.integral) + '/';
 			addr = self.http_str() + set_str;
 			r = requests.get(addr) # , timeout = self.timeout,proxies=proxies);
 			return r.ok;
@@ -86,7 +88,7 @@ class Tctrl(models.Model):
 
 	def set_differential(self):
 		try:
-			set_str = '/arduino/write/differential/' + str(self.diff) + '/';
+			set_str = 'arduino/write/differential/' + str(self.diff) + '/';
 			addr = self.http_str() + set_str;
 			r = requests.get(addr, timeout = self.timeout,proxies=proxies);
 			return r.ok;

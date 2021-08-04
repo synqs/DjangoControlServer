@@ -23,10 +23,11 @@ const DetailTable = Vue.createApp({})
 
 DetailTable.component('detail-table', {
 	data() { return {
-		data : { message : 'Trying to connect...'},
-		datas : {},
-		status : {},
-		config : {},
+		data : [],
+		datas : [],
+		status : 'Trying to connect...',
+		key : [],
+		config : [],
 		editForm : {},
 		}
 	},
@@ -44,8 +45,8 @@ DetailTable.component('detail-table', {
 
 	<div class="row mb-3" style="height: 40px;">
 		<div class="col-md-4 mh-100">
-			<div class="alert alert-info h-100 text-center align-middle px-0" style="padding-top: 0.375rem" role="alert">[[ data['message'] ]]</div>
-			<!-- button class="btn btn-outline-info btn-block" disabled>[[ data['message'] ]]</button -->
+			<div class="alert alert-info h-100 text-center align-middle px-0" style="padding-top: 0.375rem" role="alert">[[ status ]]</div>
+			<!-- button class="btn btn-outline-info btn-block" disabled>[[ status ]]</button -->
 		</div>
 		<div class="col-md-8 mh-100">
 			<div class="btn-group w-100 h-100">
@@ -57,9 +58,7 @@ DetailTable.component('detail-table', {
 			</div>
 		</div>
 	</div>
-	<!-- p id="cors"></p -->
-	
-	[[ device ]]
+
 	<div v-if="this.device.model == 'main.tctrl'" class="row mb-3 align-items-center mx-auto" style="height: 40px;">
 		<div class="col"><input v-model="this.editForm['setpoint']" placeholder="setpoint"></div>
 		<div class="col"><input v-model="this.editForm['P']" placeholder="P"></div>
@@ -71,12 +70,12 @@ DetailTable.component('detail-table', {
 	<div class="table-responsive" style="height: 500px;"><table class="table table-striped mh-100">
 		<thead class="thead-dark">
 			<tr>
-				<th v-for="k in data['keys']">[[ k ]]</th>
+				<th v-for="k in key">[[ k ]]</th>
 			</tr>
 		</thead>
 		<tbody>
 			<tr v-for="data in datas">
-				<td v-for="k in data['keys']">[[ data['value'][k] ]]</td>
+				<td v-for="k in key">[[ data['value'][k] ]]</td>
 			</tr>
 		</tbody>
 	</table></div>
@@ -105,7 +104,11 @@ DetailTable.component('detail-table', {
 					data : ['STATUS', payload] };
 			this.config = config;
 			axios(config)
-				.then(response => this.data = response.data)
+				.then(response => {
+					this.data = response.data;
+					this.key = response.data['keys'];
+					this.status = response.data['message'];
+				})
 				.catch(error => console.log(error));
 		},
 		start_device() { // start fetching data every dt = sleeptime
@@ -121,7 +124,8 @@ DetailTable.component('detail-table', {
 			axios(config)
 				.then(response => {
 					this.data = response.data;
-					this.datas.unshift(response.data); 
+					this.datas.unshift(response.data);
+					this.status = response.data['message']; 
 					})
 				.catch(error => console.log(error));
 		},
@@ -132,7 +136,7 @@ DetailTable.component('detail-table', {
 			axios(config)
 				.then(response => {
 					console.log(response.data);
-					this.data['message'] = response.data['message']; })
+					this.status = response.data['message']; })
 				.catch(error => console.log(error));
 		},
 		remove_device() {
@@ -141,7 +145,7 @@ DetailTable.component('detail-table', {
 			axios(config)
 				.then(response => {
 					console.log(response);
-					this.data['message'] = response.data['message'];
+					this.status = response.data['message'];
 					})
 				.catch(error => console.log(error));
 		},
