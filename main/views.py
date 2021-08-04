@@ -41,7 +41,6 @@ def detail(request, device_typ, device_id):
 
 def device(request):
 	r_dict = json.loads(request.body.decode())
-	print(r_dict)
 	command = r_dict[0]
 	response = {}
 
