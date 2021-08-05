@@ -43,13 +43,13 @@ DetailTable.component('detail-table', {
 			</div>
 	</div>
 
-	<div class="row mb-3" style="height: 40px;">
-		<div class="col-md-4 mh-100">
-			<div class="alert alert-info h-100 text-center align-middle px-0" style="padding-top: 0.375rem" role="alert">[[ status ]]</div>
-			<!-- button class="btn btn-outline-info btn-block" disabled>[[ status ]]</button -->
+	<div class="row mb-3" style="height : 37.53px;">
+		<div class="col mh-100">
+			<div class="alert alert-info mh-100 text-center text-align-top" role="alert">[[ status ]]</div>
+			<!-- div class="card bg-info">[[ status ]]</div -->
 		</div>
-		<div class="col-md-8 mh-100">
-			<div class="btn-group w-100 h-100">
+		<div class="col mh-100">
+			<div class="btn-group w-100">
 			<button class="btn btn-success" data-bs-toggle="button" autocomplete="off" v-on:click="start_device()">start</button>
 			<button class="btn btn-danger" v-on:click="stop_device()">stop</button>
 			<button class="btn btn-secondary" v-on:click="get_device()">get</button>
@@ -59,22 +59,22 @@ DetailTable.component('detail-table', {
 		</div>
 	</div>
 
-	<div v-if="this.device.model == 'main.tctrl'" class="row mb-3 align-items-center" style="height: 40px;">
-		<div class="col"><input v-model="this.editForm['setpoint']" placeholder="setpoint"></div>
-		<div class="col"><input v-model="this.editForm['P']" placeholder="P"></div>
-		<div class="col"><input v-model="this.editForm['I']" placeholder="I"></div>
-		<div class="col"><input v-model="this.editForm['D']" placeholder="D"></div>
-		<div class="col"><input v-model="this.editForm['sleeptime']" placeholder="sleeptime"></div>
-		<div class="col mh-75 text-center"><button class="btn btn-block btn-info mh-100 py-1" v-on:click="edit_device()">submit</button></div>
+	<div v-if="this.device.model == 'main.tctrl'" class="row mb-3">
+		<div class="col"><input v-model="this.editForm['setpoint']" class="form-control" placeholder="setpoint"></div>
+		<div class="col"><input v-model="this.editForm['P']" class="form-control" placeholder="P"></div>
+		<div class="col"><input v-model="this.editForm['I']" class="form-control" placeholder="I"></div>
+		<div class="col"><input v-model="this.editForm['D']" class="form-control" placeholder="D"></div>
+		<div class="col"><input v-model="this.editForm['sleeptime']" class="form-control" placeholder="sleeptime"></div>
+		<div class="col"><button class="btn btn-info" v-on:click="edit_device()">submit</button></div>
 	</div>
   	
-  	<div v-if="this.device.model == 'main.pdmon'" class="row mb-3 mx-auto align-items-center" style="height: 40px;">
-  		<div class="col"><input v-model="this.editForm['channel_string']" placeholder="channels: 0, 1, 2..."></div>
-  		<div class="col mh-75 text-center"><button class="btn btn-block btn-info mh-100 py-1" v-on:click="edit_device()">submit</button></div>
+  	<div v-if="this.device.model == 'main.pdmon'" class="row mb-3">
+  		<div class="col"><input v-model="this.editForm['channel_string']" class="form-control" placeholder="channels: 0, 1, 2..."></div>
+  		<div class="col"><button class="btn btn-info w-100" v-on:click="edit_device()">submit</button></div>
   	</div>
   	
 	<div class="table-responsive" style="height: 500px;"><table class="table table-striped mh-100">
-		<thead class="thead-dark">
+		<thead class="table-dark">
 			<tr>
 				<th v-for="k in key">[[ k ]]</th>
 			</tr>

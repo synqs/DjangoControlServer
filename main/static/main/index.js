@@ -2,29 +2,36 @@ const IndexTable = Vue.createApp({});
 
 IndexTable.component('index-table', {
 	data ()  { return {
-		status : [],
-		config : [],
+		status : null,
+		config : {	method : 'POST',
+					url : '/device/',
+					xsrfCookieName: 'csrftoken',
+					xsrfHeaderName: 'X-CSRFTOKEN',
+					data : [] },
 		addForm : {},
 		}
 	},
 	props: ['devices'],
 	template: `
 	
-	{{ status['global'] }}
+	<div v-if="this.status" class="alert alert-dismissible fade show" role="alert">
+		{{ this.status }}
+		<button class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+	</div>
 	
-	<div class="row mb-3 mx-auto" style="height: 30px;">
-		<div class="col mh-100"><select class="h-100 w-100" v-model="this.addForm['model']" placeholder="model">
+	<div class="row mb-3">
+		<div class="col"><select v-model="this.addForm['model']" class="form-select">
 			<option>PDmon</option>
 			<option>Tctrl</option>
 		</select></div>
-		<div class="col mh-100"><input v-model="this.addForm['name']" placeholder="name"></div>
-		<div class="col mh-100"><input v-model="this.addForm['ip']" placeholder="IP"></div>
-		<div class="col mh-100"><input v-model="this.addForm['sleeptime']" placeholder="sleeptime"></div>
-		<div class="col mh-100"><button class="btn btn-block btn-info mh-100 py-1" v-on:click="add_device()">submit</button></div>
+		<div class="col"><input v-model="this.addForm['name']" class="form-control" placeholder="name"></div>
+		<div class="col"><input v-model="this.addForm['ip']" class="form-control" placeholder="IP"></div>
+		<div class="col"><input v-model="this.addForm['sleeptime']" class="form-control" placeholder="sleeptime"></div>
+		<div class="col"><button class="btn btn-info w-100" v-on:click="add_device()">submit</button></div>
 	</div>
 	
 	<table class="table table-striped">
-		<thead class="thead-dark">
+		<thead class="table-dark">
 			<tr>
 			<th>#</th>
 			<th>Name</th>
@@ -39,7 +46,7 @@ IndexTable.component('index-table', {
 	</table>
 	`,
 	methods: {
-		add_device(arr) {
+		add_device() {
 			console.log(this.addForm); console.log(typeof(this.addForm));
 			config = this.config;
 			config['data'][0] = 'ADD';
@@ -48,7 +55,7 @@ IndexTable.component('index-table', {
 			axios(config)
 				.then(response => {
 					console.log(response.data);
-					this.data = response.data; })
+					this.status = response.data['message']; })
 				.catch(error => console.log(error));
 		},
 	},
@@ -93,6 +100,7 @@ IndexTable.component('device-widget', {
 		remove_device() {
 			config = this.config;
 			config['data'][0] = 'DELETE';
+			console.log(config)
 			axios(config)
 				.then(response => {
 					console.log(response);

@@ -8,8 +8,7 @@ class PDmon(models.Model):
 	name = models.CharField(max_length=20, unique=True)		# should match DNS name eg. nakayun1
 	description = models.CharField(max_length=100, blank=True)	# add. description eg. 2D-MOT path
 	sleeptime = models.FloatField(default=5)			# sleeptime/interval after which to pull the device again
-	ip = models.CharField(max_length=20, blank=True)		# device ip
-	port = models.CharField(max_length=4, blank=True)		# device port
+	ip = models.CharField(max_length=20)				# device ip
 	
 	# parameters/values for pdmon
 	channel_string = models.CharField(max_length=27, default='0,1,2,3,4,5,6,7,8,9,10,11') # 0-5 corresponds to the analog pins
@@ -36,10 +35,8 @@ class Tctrl(models.Model):
 	id = models.BigAutoField(primary_key=True)
 	name = models.CharField(max_length=20, unique=True)		# should match DNS name eg. nakayun1
 	description = models.CharField(max_length=100, blank=True)	# add. description eg. 2D-MOT path
-	sleeptime = models.FloatField(default=5) # sleeptime/interval after which to pull the device again
-
+	sleeptime = models.FloatField(default=5) 			# sleeptime/interval after which to pull the device again
 	ip = models.CharField(max_length=20, blank=True)		# device ip
-	port = models.CharField(max_length=4, blank=True)		# device port
 
 	# parameters/values for tctrl
 	setpoint = models.IntegerField(blank=True, default=25)

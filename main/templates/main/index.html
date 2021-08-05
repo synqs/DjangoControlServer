@@ -5,7 +5,7 @@
 {% csrf_token %}
 {% if message %}<h2>{{ message }}</h2>{% endif %}
 
-<div class=container id="index">
+<div class="container" id="index">
 	<!--index-table></index-table> see views... should we pass the index with the view or load it with axios? -->
 	<index-table v-bind:devices="{{ device_list }}"></index-table>
 </div>
