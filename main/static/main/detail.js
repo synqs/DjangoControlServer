@@ -37,10 +37,10 @@ DetailTable.component('detail-table', {
 	props: ['device'],
 	template: `
 	<div class="card mb-3">
-			<div class="card-header text-light bg-dark"><div class="row">
-				<h4 class="col">[[ device.fields.name ]] : [[ device.fields.description ]]</h4>
-				<h4 class="col">IP : [[ device.fields.ip ]], Sleeptime : [[ device.fields.sleeptime ]] s</h4>
-			</div></div>
+			<div class="card-header text-light bg-dark">
+				<h4>[[ device.fields.name ]] : [[ device.fields.description ]]</h4>
+				<h6>IP : [[ device.fields.ip ]], Sleeptime : [[ device.fields.sleeptime ]] s</h6>
+			</div>
 	</div>
 
 	<div class="row mb-3" style="height: 40px;">
@@ -59,13 +59,19 @@ DetailTable.component('detail-table', {
 		</div>
 	</div>
 
-	<div v-if="this.device.model == 'main.tctrl'" class="row mb-3 align-items-center mx-auto" style="height: 40px;">
+	<div v-if="this.device.model == 'main.tctrl'" class="row mb-3 align-items-center" style="height: 40px;">
 		<div class="col"><input v-model="this.editForm['setpoint']" placeholder="setpoint"></div>
 		<div class="col"><input v-model="this.editForm['P']" placeholder="P"></div>
 		<div class="col"><input v-model="this.editForm['I']" placeholder="I"></div>
 		<div class="col"><input v-model="this.editForm['D']" placeholder="D"></div>
+		<div class="col"><input v-model="this.editForm['sleeptime']" placeholder="sleeptime"></div>
 		<div class="col mh-75 text-center"><button class="btn btn-block btn-info mh-100 py-1" v-on:click="edit_device()">submit</button></div>
 	</div>
+  	
+  	<div v-if="this.device.model == 'main.pdmon'" class="row mb-3 mx-auto align-items-center" style="height: 40px;">
+  		<div class="col"><input v-model="this.editForm['channel_string']" placeholder="channels: 0, 1, 2..."></div>
+  		<div class="col mh-75 text-center"><button class="btn btn-block btn-info mh-100 py-1" v-on:click="edit_device()">submit</button></div>
+  	</div>
   	
 	<div class="table-responsive" style="height: 500px;"><table class="table table-striped mh-100">
 		<thead class="thead-dark">
@@ -137,7 +143,9 @@ DetailTable.component('detail-table', {
 			axios(config)
 				.then(response => {
 					console.log(response.data);
-					this.status = response.data['message']; })
+					this.status = response.data['message'];
+					this.key = response.data['keys'];
+					})
 				.catch(error => console.log(error));
 		},
 		remove_device() {

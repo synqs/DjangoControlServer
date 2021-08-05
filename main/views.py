@@ -51,6 +51,7 @@ def device(request):
 		get_object_or_404(typ, pk=r_dict[1]['pk']).delete()
 		response['message'] = 'Deleted successfully.'
 	if command == 'ADD':
+		print(r_dict['params'])
 		#device = typ.objects.create(name=r_dict[1])
 		#device.save()
 		response['message'] = 'New device added.'
@@ -90,6 +91,7 @@ def device(request):
 	    				device.set(p)
 	    				
 				device.save()
+				response['keys'] = device.keys()
 				response['message'] = 'Parameters updated successfully.'
 			else:
 				response['message'] = 'Invalid operation.'

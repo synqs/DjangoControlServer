@@ -28,15 +28,9 @@ class PDmon(models.Model):
 		for ch in buff:
 			channels.append("CH" + ch.zfill(2))
 		return channels
-		
+	
 	def set(self, param):
-		try:
-			set_str = 'arduino/write/' + param + '/' + getattr(self, param) + '/';
-			addr = self.http_str() + set_str;
-			r = requests.get(addr) # , timeout = self.timeout,proxies=proxies);
-			return r.ok;
-		except ConnectionError:
-			return False
+		return True
 
 class Tctrl(models.Model):
 	id = models.BigAutoField(primary_key=True)
@@ -55,8 +49,6 @@ class Tctrl(models.Model):
 	P = models.FloatField(blank=True, default=1)
 	I = models.FloatField(blank=True, default=100)
 	D =  models.FloatField(blank=True, default=0)
-	
-	keyss = ['updated', 'setpoint', 'T', 'error', 'output', 'P', 'I', 'D']
 	
 	def __str__(self):
 		return self.name

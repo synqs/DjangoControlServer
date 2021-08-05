@@ -4,7 +4,7 @@ IndexTable.component('index-table', {
 	data ()  { return {
 		status : [],
 		config : [],
-		addForm : [],
+		addForm : {},
 		}
 	},
 	props: ['devices'],
@@ -13,8 +13,7 @@ IndexTable.component('index-table', {
 	{{ status['global'] }}
 	
 	<div class="row mb-3 mx-auto" style="height: 30px;">
-		<div class="col mh-100"><select class="h-100 w-100" v-model="this.addForm.model">
-			<option disabled>model</option>
+		<div class="col mh-100"><select class="h-100 w-100" v-model="this.addForm['model']" placeholder="model">
 			<option>PDmon</option>
 			<option>Tctrl</option>
 		</select></div>
