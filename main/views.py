@@ -88,8 +88,8 @@ def device(request):
 			elif command == 'EDIT':
 				params = r_dict[1]['params'];
 				for p in params:
-	    				setattr(device, p, params[p])
-	    				device.set(p)
+					setattr(device, p, params[p])
+					device.set(p)
 	    				
 				device.save()
 				response['keys'] = device.keys()

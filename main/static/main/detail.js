@@ -36,19 +36,16 @@ DetailTable.component('detail-table', {
 	},
 	props: ['device'],
 	template: `
-	<div class="card mb-3">
-			<div class="card-header text-light bg-dark">
+	<div class="row mb-3">
+		<div class="col"><div class="card">
+			<div class="card-header text-light bg-dark" style="height : 87.07px;">
 				<h4>[[ device.fields.name ]] : [[ device.fields.description ]]</h4>
 				<h6>IP : [[ device.fields.ip ]], Sleeptime : [[ device.fields.sleeptime ]] s</h6>
 			</div>
-	</div>
-
-	<div class="row mb-3" style="height : 37.53px;">
-		<div class="col mh-100">
-			<div class="alert alert-info mh-100 text-center text-align-top" role="alert">[[ status ]]</div>
-			<!-- div class="card bg-info">[[ status ]]</div -->
-		</div>
-		<div class="col mh-100">
+		</div></div>
+		<div class="col">
+			<div class="alert alert-info text-center py-1" role="alert">[[ status ]]</div>
+			
 			<div class="btn-group w-100">
 			<button class="btn btn-success" data-bs-toggle="button" autocomplete="off" v-on:click="start_device()">start</button>
 			<button class="btn btn-danger" v-on:click="stop_device()">stop</button>
@@ -58,33 +55,33 @@ DetailTable.component('detail-table', {
 			</div>
 		</div>
 	</div>
-
+	
 	<div v-if="this.device.model == 'main.tctrl'" class="row mb-3">
 		<div class="col"><input v-model="this.editForm['setpoint']" class="form-control" placeholder="setpoint"></div>
 		<div class="col"><input v-model="this.editForm['P']" class="form-control" placeholder="P"></div>
 		<div class="col"><input v-model="this.editForm['I']" class="form-control" placeholder="I"></div>
 		<div class="col"><input v-model="this.editForm['D']" class="form-control" placeholder="D"></div>
 		<div class="col"><input v-model="this.editForm['sleeptime']" class="form-control" placeholder="sleeptime"></div>
-		<div class="col"><button class="btn btn-info" v-on:click="edit_device()">submit</button></div>
+		<div class="col"><button class="btn btn-info w-100" v-on:click="edit_device()">submit</button></div>
 	</div>
   	
   	<div v-if="this.device.model == 'main.pdmon'" class="row mb-3">
-  		<div class="col"><input v-model="this.editForm['channel_string']" class="form-control" placeholder="channels: 0, 1, 2..."></div>
+  		<div class="col"><input v-model="this.editForm['channels']" class="form-control" placeholder="channels: A0,A2,A5 -> 101001"></div>
+  		<div class="col"><input v-model="this.editForm['sleeptime']" class="form-control" placeholder="sleeptime"></div>
   		<div class="col"><button class="btn btn-info w-100" v-on:click="edit_device()">submit</button></div>
   	</div>
   	
-	<div class="table-responsive" style="height: 500px;"><table class="table table-striped mh-100">
-		<thead class="table-dark">
-			<tr>
-				<th v-for="k in key">[[ k ]]</th>
-			</tr>
-		</thead>
-		<tbody>
-			<tr v-for="data in datas">
-				<td v-for="k in key">[[ data['value'][k] ]]</td>
-			</tr>
-		</tbody>
-	</table></div> 
+  	<div class="row">
+  		<div class="col">
+  			<div class="table-responsive" style="height: 600px;"><table class="table table-striped mh-100">
+				<thead class="table-dark"><tr><th v-for="k in key">[[ k ]]</th></tr></thead>
+				<tbody><tr v-for="data in datas"><td v-for="k in key">[[ data['value'][k] ]]</td></tr></tbody>
+			</table></div>
+		</div>
+		<div class="col">
+			<div id="plot" style="width:800px;height:600px;"></div>
+		</div>
+	</div>
 	`,
 	mounted () {
 		this.init_device();
@@ -132,7 +129,12 @@ DetailTable.component('detail-table', {
 				.then(response => {
 					this.data = response.data;
 					this.datas.unshift(response.data);
-					this.status = response.data['message']; 
+					this.status = response.data['message'];
+					
+					Plotly.extendTraces('plot', {
+						x:[[response.data['updated']], [response.data['updated']], [response.data['updated']]],
+						y:[[response.data['setpoint']], [response.data['T']], [response.data['output']]],
+						}, [0,1,2]); 
 					})
 				.catch(error => console.log(error));
 		},
@@ -158,27 +160,15 @@ DetailTable.component('detail-table', {
 					})
 				.catch(error => console.log(error));
 		},
-		/* this method does not work due to missing ACAO-header
-		get_data_direct() { // fetch a single set of data directly from arduino (axios)
-			config = {  	method : 'GET',
-					url : 'http://' + this.device.fields.ip + '/data/get',
-					xsrfCookieName: 'csrftoken',
-					xsrfHeaderName: 'X-CSRFTOKEN',
-					proxy : { host: 'proxy.kip.uni-heidelberg.de', port : 8080 },
-					headers: {	'Access-Control-Allow-Origin' : '*',
-							'Content-Type' : 'application/json',
-							'crossdomain' : 'true'}, 
-							data : this.device };
-			axios(config)
-				.then(response => console.log(response)
-				.catch(error => console.log(error))
-		}, */
 	},
 })
 
 /* At last, mount the detail-app */
 DetailTable.mount('#devicedetail');
 
+//document.onreadystatechange = () => {
+//  if (document.readyState === 'complete') {
+/* These are functions for translating the html data to csv and downloading the log */
 function downloadCSV(csv, filename) {
 	var csvFile;
 	var downloadLink;
@@ -208,6 +198,45 @@ function exportTableToCSV(filename) {
 	}
 	downloadCSV(csv.join("\n"), filename); // Download CSV file
 }
+
+
+/* These are the functions for creating the plots */
+PLOT = document.getElementById('plot');
+
+var setpoint_trace = {
+	x: [],
+	y: [],
+	name: 'setpoint',
+	mode: 'lines+markers',
+	type: 'scatter'
+};
+
+var input_trace = {
+	x: [],
+	y: [],
+	name: 'T',
+	mode: 'lines+markers',
+	type: 'scatter'
+};
+
+var output_trace = {
+	x: [],
+	y: [],
+	name: 'output',
+	mode: 'lines+markers',
+	type: 'scatter'
+};
+
+var data = [setpoint_trace, input_trace, output_trace];
+
+var layout = {
+	title: 'input trace',  // more about "layout.title": #layout-title
+	xaxis: { title: 'time' },
+	yaxis: { title: 'control', side: 'right' },
+};
+
+Plotly.newPlot(PLOT, data, layout);
+//}};
 
 Math.random().toString().substr(2, 5);
 //document.getElementById("cors") = token;
