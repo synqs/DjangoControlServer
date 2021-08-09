@@ -1,3 +1,10 @@
+Hey,
+
+thanks for the hints. Tried it out but without any success. IPV6 is now disabled for the wired connection and I used "sudo dhclient -r (eth0) && sudo dhclient (eth0)" to get a new lease. Now even the Ethernet + VPN solutions does not work for me anymore... Now only eduroam + VPN is working
+
+Kind regards, Ingrid
+
+
 /* In order to obtain the correct csrf-tokens the Django docs suggest this function. However, it is not needed ?! (https://docs.djangoproject.com/en/3.2/ref/csrf/) */
 function getCookie(name) {
 	let cookieValue = null;
@@ -134,8 +141,9 @@ DetailTable.component('detail-table', {
 					this.datas.unshift(response.data);
 					this.status = response.data['message'];
 					
-					//this.update_plot(response.data['value'], ['updated', 'T', 'output']);
 					if (data['value']) {
+						//this.update_plot(response.data['value'], ['updated', 'T', 'output']);
+						
 						Plotly.extendTraces('plot', {
 							x:[[response.data['value']['updated']], [response.data['value']['updated']], [response.data['value']['updated']]],
 							y:[[response.data['value']['setpoint']], [response.data['value']['T']], [response.data['value']['output']]],},
