@@ -1,10 +1,3 @@
-Hey,
-
-thanks for the hints. Tried it out but without any success. IPV6 is now disabled for the wired connection and I used "sudo dhclient -r (eth0) && sudo dhclient (eth0)" to get a new lease. Now even the Ethernet + VPN solutions does not work for me anymore... Now only eduroam + VPN is working
-
-Kind regards, Ingrid
-
-
 /* In order to obtain the correct csrf-tokens the Django docs suggest this function. However, it is not needed ?! (https://docs.djangoproject.com/en/3.2/ref/csrf/) */
 function getCookie(name) {
 	let cookieValue = null;
@@ -36,6 +29,7 @@ DetailTable.component('detail-table', {
 		key : [],
 		config : [],
 		editForm : {},
+		update_keys : {},
 		}
 	},
 	compilerOptions: {
@@ -81,17 +75,23 @@ DetailTable.component('detail-table', {
   	<div class="row">
   		<div class="col">
   			<div class="table-responsive" style="height: 600px;"><table class="table table-striped mh-100">
-				<thead class="table-dark"><tr><th v-for="k in key">[[ k ]]</th></tr></thead>
+				<thead class="table-dark"><tr><th v-for="k in key">
+					<input type="checkbox" v-model="this.update_keys[k]"/>
+					[[ k ]]
+				</th></tr></thead>
 				<tbody><tr v-for="data in datas"><td v-for="k in key">[[ data['value'][k] ]]</td></tr></tbody>
 			</table></div>
 		</div>
 		<div class="col">
-			<div id="plot" style="width:800px;height:600px;"></div>
+			<div id="init_plot" style="width:800px;height:600px;"></div>
 		</div>
 	</div>
+	
+	[[ this.update_keys ]]
 	`,
 	mounted () {
 		this.init_device();
+		this.init_plot();
 	},
 	updated () { // export data every new day automatically
 		if (this.data['value'] && this.data['value']['updated'] == '00:00:00') {
@@ -141,15 +141,16 @@ DetailTable.component('detail-table', {
 					this.datas.unshift(response.data);
 					this.status = response.data['message'];
 					
-					if (data['value']) {
-						//this.update_plot(response.data['value'], ['updated', 'T', 'output']);
-						
+					if (response.data['value']) {
+						this.update_plot(response.data['value'], ['updated', 'T', 'output']);
+						/*
 						Plotly.extendTraces('plot', {
 							x:[[response.data['value']['updated']], [response.data['value']['updated']], [response.data['value']['updated']]],
 							y:[[response.data['value']['setpoint']], [response.data['value']['T']], [response.data['value']['output']]],},
 							[0,1,2]); 
-						}
-					})
+						} */
+					};}
+				)
 				.catch(error => console.log(error));
 		},
 		edit_device(arr) {
@@ -174,16 +175,39 @@ DetailTable.component('detail-table', {
 					})
 				.catch(error => console.log(error));
 		},
-		update_plot(update_data, update_keys) {
-			var update_x; var update_y; 
-			var num_traces = range(len(update_keys));
-			
-			for ( u in num_traces ) {
-				update_x[u] = [update_data[key[0]]];
-				update_y[u] = [update_data[key[u]]]; 
+		init_plot() {
+			INIT_PLOT = document.getElementById('init_plot');
+			var init_data = [];
+			for ( u in this.key) {
+				console.log(this.key);
+				var u = {
+					x: [],
+					y: [],
+					name: u,
+					mode: 'lines+markers',
+					type: 'scatter'
+				};
+				init_data.push(u);
 			};
+			console.log(init_data);
+			var init_layout = {};
 			
-			Plotly.extendTraces('plot', {x:update_x,y:update_y,},num_traces); 
+			Plotly.newPlot(INIT_PLOT, init_data, init_layout);
+		},
+		update_plot(update_data, update_keys) {
+			console.log(update_data);
+			var update_x = []; var update_y = []; var traces = [];
+			var num_traces = update_keys.length;
+			
+			for ( u in update_keys ) {
+				update_x[u] = [update_data[update_keys[0]]];
+				update_y[u] = [update_data[update_keys[parseInt(u)]]]; 
+				traces.push(parseInt(u));
+			};
+			console.log(update_x); console.log(update_y); 
+			console.log(traces);
+			
+			Plotly.extendTraces('init_plot', {x:update_x,y:update_y,},traces); 
 		},
 	},
 })
@@ -191,8 +215,6 @@ DetailTable.component('detail-table', {
 /* At last, mount the detail-app */
 DetailTable.mount('#devicedetail');
 
-//document.onreadystatechange = () => {
-//  if (document.readyState === 'complete') {
 /* These are functions for translating the html data to csv and downloading the log */
 function downloadCSV(csv, filename) {
 	var csvFile;
@@ -226,7 +248,7 @@ function exportTableToCSV(filename) {
 
 
 /* These are the functions for creating the plots */
-PLOT = document.getElementById('plot');
+/*PLOT = document.getElementById('plot');
 
 var setpoint_trace = {
 	x: [],
@@ -252,7 +274,7 @@ var output_trace = {
 	type: 'scatter'
 };
 
-var data = [setpoint_trace, input_trace, output_trace];
+var data = []; //setpoint_trace, input_trace, output_trace];
 
 var layout = {
 	title: 'input trace',  // more about "layout.title": #layout-title
@@ -261,7 +283,6 @@ var layout = {
 };
 
 Plotly.newPlot(PLOT, data, layout);
-//}};
 
 Math.random().toString().substr(2, 5);
-//document.getElementById("cors") = token;
+//document.getElementById("cors") = token;*/
