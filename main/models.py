@@ -25,7 +25,6 @@ class PDmon(models.Model):
 		keys = ['updated']
 
 		for i in range(len(self.channels)):
-			print(i)
 			if self.channels[i] == '1':
 				print(i)
 				keys.append("A" + str(i))

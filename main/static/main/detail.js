@@ -113,7 +113,10 @@ DetailTable.component('detail-table', {
 					this.key = response.data['keys'];
 					this.status = response.data['message'];
 				})
-				.catch(error => console.log(error));
+				.catch(error => {
+					this.status = error;
+					console.log(error)
+				});
 		},
 		start_device() { // start fetching data every dt = sleeptime
 			this.timer = setInterval(()=>{this.get_device()}, 
@@ -131,10 +134,13 @@ DetailTable.component('detail-table', {
 					this.datas.unshift(response.data);
 					this.status = response.data['message'];
 					
-					Plotly.extendTraces('plot', {
-						x:[[response.data['updated']], [response.data['updated']], [response.data['updated']]],
-						y:[[response.data['setpoint']], [response.data['T']], [response.data['output']]],
-						}, [0,1,2]); 
+					//this.update_plot(response.data['value'], ['updated', 'T', 'output']);
+					if (data['value']) {
+						Plotly.extendTraces('plot', {
+							x:[[response.data['value']['updated']], [response.data['value']['updated']], [response.data['value']['updated']]],
+							y:[[response.data['value']['setpoint']], [response.data['value']['T']], [response.data['value']['output']]],},
+							[0,1,2]); 
+						}
 					})
 				.catch(error => console.log(error));
 		},
@@ -159,6 +165,17 @@ DetailTable.component('detail-table', {
 					this.status = response.data['message'];
 					})
 				.catch(error => console.log(error));
+		},
+		update_plot(update_data, update_keys) {
+			var update_x; var update_y; 
+			var num_traces = range(len(update_keys));
+			
+			for ( u in num_traces ) {
+				update_x[u] = [update_data[key[0]]];
+				update_y[u] = [update_data[key[u]]]; 
+			};
+			
+			Plotly.extendTraces('plot', {x:update_x,y:update_y,},num_traces); 
 		},
 	},
 })
