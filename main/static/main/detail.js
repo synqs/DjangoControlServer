@@ -29,7 +29,6 @@ DetailTable.component('detail-table', {
 		key : [],
 		config : [],
 		editForm : {},
-		update_keys : {},
 		}
 	},
 	compilerOptions: {
@@ -72,26 +71,17 @@ DetailTable.component('detail-table', {
   		<div class="col"><button class="btn btn-info w-100" v-on:click="edit_device()">submit</button></div>
   	</div>
   	
-  	<div class="row">
-  		<div class="col">
-  			<div class="table-responsive" style="height: 600px;"><table class="table table-striped mh-100">
-				<thead class="table-dark"><tr><th v-for="k in key">
-					<input type="checkbox" v-model="this.update_keys[k]"/>
-					[[ k ]]
-				</th></tr></thead>
-				<tbody><tr v-for="data in datas"><td v-for="k in key">[[ data['value'][k] ]]</td></tr></tbody>
-			</table></div>
-		</div>
-		<div class="col">
-			<div id="init_plot" style="width:800px;height:600px;"></div>
-		</div>
-	</div>
-	
-	[[ this.update_keys ]]
+  	<div id="init_plot" style="width:1600px;height:650px;"></div>
+  	
+  	<div class="table-responsive" style="height: 350px;"><table class="table table-striped mh-100">
+		<thead class="table-dark"><tr>
+			<th v-for="k in key">[[ k ]]</th>
+		</tr></thead>
+		<tbody><tr v-for="data in datas"><td v-for="k in key">[[ data['value'][k] ]]</td></tr></tbody>
+	</table></div>
 	`,
 	mounted () {
 		this.init_device();
-		this.init_plot();
 	},
 	updated () { // export data every new day automatically
 		if (this.data['value'] && this.data['value']['updated'] == '00:00:00') {
@@ -119,6 +109,8 @@ DetailTable.component('detail-table', {
 					this.data = response.data;
 					this.key = response.data['keys'];
 					this.status = response.data['message'];
+					
+					this.init_plot(this.key);
 				})
 				.catch(error => {
 					this.status = error;
@@ -142,15 +134,9 @@ DetailTable.component('detail-table', {
 					this.status = response.data['message'];
 					
 					if (response.data['value']) {
-						this.update_plot(response.data['value'], ['updated', 'T', 'output']);
-						/*
-						Plotly.extendTraces('plot', {
-							x:[[response.data['value']['updated']], [response.data['value']['updated']], [response.data['value']['updated']]],
-							y:[[response.data['value']['setpoint']], [response.data['value']['T']], [response.data['value']['output']]],},
-							[0,1,2]); 
-						} */
-					};}
-				)
+						this.update_plot(response.data['value'], this.key);
+					};
+				})
 				.catch(error => console.log(error));
 		},
 		edit_device(arr) {
@@ -175,19 +161,20 @@ DetailTable.component('detail-table', {
 					})
 				.catch(error => console.log(error));
 		},
-		init_plot() {
+		init_plot(init_keys) {
 			INIT_PLOT = document.getElementById('init_plot');
 			var init_data = [];
-			for ( u in this.key) {
-				console.log(this.key);
-				var u = {
+			console.log(init_keys);
+			for ( var u = 0; u < init_keys.length - 1; u++) {
+				console.log(u);
+				var t = {
 					x: [],
 					y: [],
-					name: u,
+					name: init_keys[u+1],
 					mode: 'lines+markers',
 					type: 'scatter'
 				};
-				init_data.push(u);
+				init_data.push(t);
 			};
 			console.log(init_data);
 			var init_layout = {};
@@ -195,17 +182,14 @@ DetailTable.component('detail-table', {
 			Plotly.newPlot(INIT_PLOT, init_data, init_layout);
 		},
 		update_plot(update_data, update_keys) {
-			console.log(update_data);
 			var update_x = []; var update_y = []; var traces = [];
-			var num_traces = update_keys.length;
 			
-			for ( u in update_keys ) {
-				update_x[u] = [update_data[update_keys[0]]];
-				update_y[u] = [update_data[update_keys[parseInt(u)]]]; 
-				traces.push(parseInt(u));
+			for ( var u = 0; u < update_keys.length - 1; u++) {
+				update_x[u] = [update_data['updated']];
+				update_y[u] = [update_data[update_keys[u+1]]]; 
+				traces.push(u);
 			};
-			console.log(update_x); console.log(update_y); 
-			console.log(traces);
+			console.log(update_x); console.log(update_y); console.log(traces);
 			
 			Plotly.extendTraces('init_plot', {x:update_x,y:update_y,},traces); 
 		},
