@@ -14,6 +14,10 @@ function getCookie(name) {
 	return cookieValue;
 };
 
+function range(start, end) {
+    return (new Array(end - start + 1)).fill(undefined).map((_, i) => i + start);
+}
+
 //const token = getCookie('csrftoken');
 //const display = document.getElementById("cors");
 //console.log(token);
@@ -65,10 +69,17 @@ DetailTable.component('detail-table', {
 		<div class="col"><button class="btn btn-info w-100" v-on:click="edit_device()">submit</button></div>
 	</div>
   	
+  	<!-- div class="col" v-for="i in Array(6).keys()">
+  			<input type="checkbox" class="btn-check" id="i" v-on:click="this.conversion(i)"> 
+  			<label class="btn btn-outline-secondary" for="i">A[[ i ]]</label>
+  	</div -->
+  		
   	<div v-if="this.device.model == 'main.pdmon'" class="row mb-3">
-  		<div class="col"><input v-model="this.editForm['channels']" class="form-control" placeholder="channels: A0,A2,A5 -> 101001"></div>
-  		<div class="col"><input v-model="this.editForm['sleeptime']" class="form-control" placeholder="sleeptime"></div>
-  		<div class="col"><button class="btn btn-info w-100" v-on:click="edit_device()">submit</button></div>
+  		<div class="col" v-for="i in Array(6).keys()"><div class="form-check form-switch text-center text-align-middle">
+  			<input class="form-check-input" type="checkbox" v-on:click="this.conversion(i)"> A[[ i ]]
+  		</div></div>
+  		<div class="col-3"><input v-model="this.editForm['sleeptime']" class="form-control" placeholder="sleeptime"></div>
+  		<div class="col-3"><button class="btn btn-info w-100" v-on:click="edit_device()">submit</button></div>
   	</div>
   	
   	<div id="init_plot" style="width:1600px;height:650px;"></div>
@@ -114,7 +125,7 @@ DetailTable.component('detail-table', {
 				})
 				.catch(error => {
 					this.status = error;
-					console.log(error)
+					console.log(error);
 				});
 		},
 		start_device() { // start fetching data every dt = sleeptime
@@ -137,7 +148,10 @@ DetailTable.component('detail-table', {
 						this.update_plot(response.data['value'], this.key);
 					};
 				})
-				.catch(error => console.log(error));
+				.catch(error => {
+					this.status = error;
+					console.log(error);
+				});
 		},
 		edit_device(arr) {
 			config = this.config;
@@ -159,14 +173,15 @@ DetailTable.component('detail-table', {
 					console.log(response);
 					this.status = response.data['message'];
 					})
-				.catch(error => console.log(error));
+				.catch(error => {
+					this.status = error;
+					console.log(error);
+				});
 		},
 		init_plot(init_keys) {
 			INIT_PLOT = document.getElementById('init_plot');
 			var init_data = [];
-			console.log(init_keys);
 			for ( var u = 0; u < init_keys.length - 1; u++) {
-				console.log(u);
 				var t = {
 					x: [],
 					y: [],
@@ -176,7 +191,6 @@ DetailTable.component('detail-table', {
 				};
 				init_data.push(t);
 			};
-			console.log(init_data);
 			var init_layout = {};
 			
 			Plotly.newPlot(INIT_PLOT, init_data, init_layout);
@@ -189,9 +203,18 @@ DetailTable.component('detail-table', {
 				update_y[u] = [update_data[update_keys[u+1]]]; 
 				traces.push(u);
 			};
-			console.log(update_x); console.log(update_y); console.log(traces);
 			
 			Plotly.extendTraces('init_plot', {x:update_x,y:update_y,},traces); 
+		},
+		conversion(channel) {
+			var index = this.key.indexOf('A'+channel);
+			if (index !== -1) {
+    				this.key[index] = 'P' + channel;
+			}
+			else {
+				var newindex = this.key.indexOf('P'+channel);
+				this.key[newindex] = 'A' + channel;
+			}
 		},
 	},
 })
@@ -229,7 +252,6 @@ function exportTableToCSV(filename) {
 	}
 	downloadCSV(csv.join("\n"), filename); // Download CSV file
 }
-
 
 /* These are the functions for creating the plots */
 /*PLOT = document.getElementById('plot');

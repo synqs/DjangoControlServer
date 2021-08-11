@@ -13,7 +13,6 @@ BridgeServer server;
 /* Define global objects */
 int pins[6] = {A0, A1, A2, A3, A4, A5}; // analog reading of pins
 float values[6] = {0, 0, 0, 0, 0, 0}; // running average values
-String channels = "111111"; // channel values to put into bridge
 
 /* Setup the arduino */
 void setup() {
@@ -29,13 +28,13 @@ void setup() {
 /* Actual code */
 void loop() {
   for (int i = 0; i < 6; i++) { // read selected pins and store result
-    char output[4]; // output char
-    int k = String(channels.charAt(i)).toInt();
-    if (k == 1) {
-      // values[k] = 0.5*(values[k] + analogRead(pins[k])); // smooth the measured value
-      dtostrf(analogRead(pins[i])*5.000/1023.0, sizeof(output), 3, output); // read and convert value
-      Bridge.put("A" + String(i), output); // store the result
-    }
+    char v_output[4]; char p_output[4]; // output char
+    // values[k] = 0.5*(values[k] + analogRead(pins[k])); // smooth the measured value
+    dtostrf(analogRead(pins[i])*5.000/1023.0, sizeof(v_output), 3, v_output); // read and convert value
+    Bridge.put("A" + String(i), v_output); // store the result
+    
+    dtostrf(analogRead(pins[i])*5.000/1023.0, sizeof(p_output), 3, p_output); // read and convert value
+    Bridge.put("P" + String(i), p_output); // store the result
   }
 
   // get the current time
@@ -85,4 +84,9 @@ void writeCommand(BridgeClient client) {
     }
     Bridge.put("channels", channels); // add some kind of confirmation?
   }
+}
+
+float conversion(float volatge) {
+	float presuure = 10**((voltage-7.75)/0.75)*1000000;
+	return pressure
 }

@@ -12,7 +12,7 @@ class PDmon(models.Model):
 	# parameters/values for pdmon
 	sleeptime = models.FloatField(default=5)			# interval after which to pull the device again
 	
-	channels = models.CharField(max_length=6, default='111111') 	# corresponds to the analog pins A0, A1...
+	channels = models.CharField(max_length=6, default='012345') 	# corresponds to the analog pins A0, A1...
 	dVmax = models.FloatField(blank=True, default=0.5)
 
 	def __str__(self):
@@ -24,10 +24,8 @@ class PDmon(models.Model):
 	def keys(self):
 		keys = ['updated']
 
-		for i in range(len(self.channels)):
-			if self.channels[i] == '1':
-				print(i)
-				keys.append("A" + str(i))
+		for i in self.channels:
+			keys.append("A" + str(i))
 		return keys
 	
 	def set(self, param):
