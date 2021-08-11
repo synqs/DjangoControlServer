@@ -2,22 +2,25 @@ const IndexTable = Vue.createApp({});
 
 IndexTable.component('index-table', {
 	data ()  { return {
-		status : null,
+		status : {},
 		config : {	method : 'POST',
-					url : '/device/',
-					xsrfCookieName: 'csrftoken',
-					xsrfHeaderName: 'X-CSRFTOKEN',
-					data : [] },
+				url : '/device/',
+				xsrfCookieName: 'csrftoken',
+				xsrfHeaderName: 'X-CSRFTOKEN',
+				data : [] },
 		addForm : {},
 		}
+	},
+	compilerOptions: {
+		delimiters: ['[[', ']]'],
 	},
 	props: ['devices'],
 	template: `
 	
-	<div v-if="this.status" class="alert alert-dismissible fade show" role="alert">
-		{{ this.status }}
+	<!-- div v-if="this.status" class="alert alert-dismissible fade show" role="alert">
+		[[ this.status ]]
 		<button class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-	</div>
+	</div -->
 	
 	<div class="row mb-3">
 		<div class="col"><select v-model="this.addForm['model']" class="form-select">
@@ -40,12 +43,28 @@ IndexTable.component('index-table', {
 			<th colspan=2></th>
 			</tr>
 		</thead>
-		<tbody>
-			<device-widget v-for="device in devices" v-bind:device="device"></device-widget>
+		<tbody><tr v-for="device in devices">
+			<td>[[ device.model ]] # [[ device.pk ]]</td>
+			<td><a v-bind:href="'/' + device.model + '/' + device.pk + '/'">[[ device.fields.name ]]</a></td>
+			<td>[[ device.fields.ip ]]</td>
+			<td>[[ this.status[device.fields.name] ]]</td>
+			<td><button class="btn btn-warning" v-on:click="remove_device(dev)">Remove</button></td>
+		</tr>
+			<!-- device-widget v-for="device in devices" v-bind:device="device"></device-widget -->
 		</tbody>
 	</table>
+	
+	[[ this.status ]]
 	`,
+	mounted () {
+		this.init_index();
+	},
 	methods: {
+		init_index() {
+			for (dev in this.devices) {
+				this.init_device(this.devices[dev]);
+			};
+		},
 		add_device() {
 			console.log(this.addForm); console.log(typeof(this.addForm));
 			config = this.config;
@@ -58,33 +77,9 @@ IndexTable.component('index-table', {
 					this.status = response.data['message']; })
 				.catch(error => console.log(error));
 		},
-	},
-})
-
-IndexTable.component('device-widget', {
-	data ()  { return {
-		status : 'Trying to connect...',
-		config : [],
-		}
-	},
-	props: ['device'],
-	template: `
-	<tr>
-		<td>{{ this.device.model }} # {{ this.device.pk }}</td>
-		<td><a v-bind:href="'/' + this.device.model + '/' + this.device.pk + '/'">{{ this.device.fields.name }}</a></td>
-		<td>{{ this.device.fields.ip }}</td>
-		<td>{{ this.status }}</td>
-		<!-- td><button class="btn btn-outline-primary" v-on:click="init_device(device.model, device.pk)">Status</button></td -->
-		<td><button class="btn btn-primary" v-on:click="detail_device()">Details</button></td>
-		<td><button class="btn btn-warning" v-on:click="remove_device()">Remove</button></td>
-	</tr>
-	`,
-	mounted () {
-		this.init_device(this.device.model, this.device.pk);
-	},
-	methods: {
-		init_device(model, pk) {
-			payload = { 'model' : model, 'pk' : pk};
+		init_device(device) {
+			console.log(device);
+			payload = { 'model' : device['model'], 'pk' : device['pk'] };
 			config = {	method : 'POST',
 					url : '/device/',
 					xsrfCookieName: 'csrftoken',
@@ -93,7 +88,7 @@ IndexTable.component('device-widget', {
 			this.config = config;
 			axios(config)
 				.then(response => { 
-					this.status = response.data['message'];
+					this.status[device['fields']['name']] = response.data['message'];
 				})
 				.catch(error => console.log(error));
 		},
@@ -108,6 +103,7 @@ IndexTable.component('device-widget', {
 				})
 				.catch(error => console.log(error));
 		},
+		/* currently not in use
 		detail_device() {
 			//window.location.replace('/device/');
 			
@@ -119,8 +115,8 @@ IndexTable.component('device-widget', {
 					//this.detail = response.data; 
 					})
 				.catch(error => console.log(error));
+		}, */
+		overview_device() {
 		},
 	},
 })
-
-IndexTable.mount('#index')
