@@ -44,7 +44,7 @@ DetailTable.component('detail-table', {
 		<div class="col"><div class="card">
 			<div class="card-header text-light bg-dark" style="height : 87.07px;">
 				<h4>[[ device.fields.name ]] : [[ device.fields.description ]]</h4>
-				<h6>IP : [[ device.fields.ip ]], Sleeptime : [[ device.fields.sleeptime ]] s</h6>
+				<h6>IP : [[ device.fields.ip ]]</h6>
 			</div>
 		</div></div>
 		<div class="col">
