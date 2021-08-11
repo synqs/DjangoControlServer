@@ -47,6 +47,7 @@ void loop() {
     Bridge.put("updated", date.readStringUntil('\n'));
   }
 
+  /*
   // Get clients coming from server
   BridgeClient client = server.accept();
 
@@ -57,11 +58,11 @@ void loop() {
 
     // Close connection and free resources.
     client.stop();
-  }
+  }*/
   
-  delay(50);
+  delay(0);
 }
-
+/*
 void process(BridgeClient client) {
   // read the command
   String command = client.readStringUntil('/');
@@ -84,9 +85,9 @@ void writeCommand(BridgeClient client) {
     }
     Bridge.put("channels", channels); // add some kind of confirmation?
   }
-}
+} */
 
-float conversion(float volatge) {
-	float presuure = 10**((voltage-7.75)/0.75)*1000000;
-	return pressure
+float conversion(float voltage) {
+	float pressure = pow(10,(voltage-7.75)/0.75)*1000000;
+	return pressure;
 }
