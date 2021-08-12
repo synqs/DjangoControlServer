@@ -2,13 +2,10 @@ const IndexTable = Vue.createApp({});
 
 IndexTable.component('index-table', {
 	data ()  { return {
-		status : {},
-		config : {	method : 'POST',
-				url : '/device/',
-				xsrfCookieName: 'csrftoken',
-				xsrfHeaderName: 'X-CSRFTOKEN',
-				data : [] },
+		status : { global : "Connecting to devices..." },
+		config : {},
 		addForm : {},
+		overview : [],
 		}
 	},
 	compilerOptions: {
@@ -17,10 +14,10 @@ IndexTable.component('index-table', {
 	props: ['devices'],
 	template: `
 	
-	<!-- div v-if="this.status" class="alert alert-dismissible fade show" role="alert">
-		[[ this.status ]]
-		<button class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-	</div -->
+	<div class="alert alert-info alert-dismissible fade show" role="alert">
+		[[ this.status['global'] ]]
+		<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+	</div>
 	
 	<div class="row mb-3">
 		<div class="col"><select v-model="this.addForm['model']" class="form-select">
@@ -32,29 +29,34 @@ IndexTable.component('index-table', {
 		<div class="col"><input v-model="this.addForm['sleeptime']" class="form-control" placeholder="sleeptime"></div>
 		<div class="col"><button class="btn btn-info w-100" v-on:click="add_device()">submit</button></div>
 	</div>
-	
 	<table class="table table-striped">
 		<thead class="table-dark">
 			<tr>
-			<th>#</th>
 			<th>Name</th>
+			<th>Description</th>
 			<th>IP</th>
 			<th style="width: 250px; ">Status</th>
 			<th colspan=2></th>
 			</tr>
 		</thead>
 		<tbody><tr v-for="device in devices">
-			<td>[[ device.model ]] # [[ device.pk ]]</td>
 			<td><a v-bind:href="'/' + device.model + '/' + device.pk + '/'">[[ device.fields.name ]]</a></td>
+			<td>[[ device.fields.description ]]</td>
 			<td>[[ device.fields.ip ]]</td>
 			<td>[[ this.status[device.fields.name] ]]</td>
-			<td><button class="btn btn-warning" v-on:click="remove_device(dev)">Remove</button></td>
+			<td><button class="btn btn-warning" v-on:click="remove_device(device)">Remove</button></td>
+			<td><div class="form-check form-switch text-center text-align-middle">
+  				<input class="form-check-input" type="checkbox" data-bind="value: device.fields.name" v-model="this.overview">
+  			</div></td>
 		</tr>
 			<!-- device-widget v-for="device in devices" v-bind:device="device"></device-widget -->
 		</tbody>
 	</table>
-	
-	[[ this.status ]]
+	[[ this.overview ]]
+
+	<div class="row">
+		<div class="col" v-for="device in this.overview">[[ device ]]</div>
+	</div>
 	`,
 	mounted () {
 		this.init_index();
@@ -73,12 +75,14 @@ IndexTable.component('index-table', {
 			console.log(config);
 			axios(config)
 				.then(response => {
-					console.log(response.data);
-					this.status = response.data['message']; })
-				.catch(error => console.log(error));
+					//console.log(response.data);
+					this.status['global'] = response.data['message']; })
+				.catch(error => {
+					this.status['global'] = error;
+					console.log(error);
+				});
 		},
 		init_device(device) {
-			console.log(device);
 			payload = { 'model' : device['model'], 'pk' : device['pk'] };
 			config = {	method : 'POST',
 					url : '/device/',
@@ -89,8 +93,13 @@ IndexTable.component('index-table', {
 			axios(config)
 				.then(response => { 
 					this.status[device['fields']['name']] = response.data['message'];
+					this.status['global'] = "All devices ready!";
 				})
-				.catch(error => console.log(error));
+				.catch(error => {
+					this.status[device['fields']['name']] = error;
+					this.status['global'] = "There was an error...";
+					console.log(error);
+				});
 		},
 		remove_device() {
 			config = this.config;
@@ -101,7 +110,10 @@ IndexTable.component('index-table', {
 					console.log(response);
 					this.status = response.data['message'];
 				})
-				.catch(error => console.log(error));
+				.catch(error => {
+					this.status['global'] = error;
+					console.log(error);
+				});
 		},
 		/* currently not in use
 		detail_device() {
@@ -119,4 +131,7 @@ IndexTable.component('index-table', {
 		overview_device() {
 		},
 	},
-})
+});
+
+/* At last, mount the index-app */
+IndexTable.mount('#index');
