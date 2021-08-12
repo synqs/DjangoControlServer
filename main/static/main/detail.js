@@ -95,12 +95,14 @@ DetailTable.component('detail-table', {
 		this.init_device();
 	},
 	updated () { // export data every new day automatically
-		if (this.data['value'] && this.data['value']['updated'] == '12:00:00') {
-			// Date().toLocaleString(    [], {day: '2-digit', month: '2-digit', year: '4-digit'})
+		if (this.data['value'] && this.data['value']['updated'].slice(11,18) == '14:26:0') {
+			console.log("TIME");
+			Date().toLocaleString(    [], {day: '2-digit', month: '2-digit', year: '4-digit'})
 			const date = new Date();
 			var day = date.getDay() + '_' + date.getMonth() + '_' + date.getFullYear();
 			exportTableToCSV(day + '.csv')
 		}
+		setTimeout(function() {}, 10000);
 	},
 	methods: {
 		convert_voltage(v) { // conversion formular to obtain preassure
@@ -118,10 +120,12 @@ DetailTable.component('detail-table', {
 			axios(config)
 				.then(response => {
 					this.data = response.data;
-					this.key = response.data['keys'];
 					this.status = response.data['message'];
 					
-					this.init_plot(this.key);
+					if ( response.data['keys'] ) {
+						this.key = response.data['keys'];
+						this.init_plot(response.data['keys']);
+					}
 				})
 				.catch(error => {
 					this.status = error;

@@ -98,6 +98,7 @@ def device(request):
 			else:
 				response['message'] = 'Invalid operation.'
 	
+	print(response)
 	return HttpResponse(json.dumps(response))
 
 def setSetpoint(request):

@@ -48,7 +48,7 @@ IndexTable.component('index-table', {
 			<td><button class="btn btn-warning" v-on:click="remove_device(device)">Remove</button></td>
 			<td><div class="form-check form-switch text-center text-align-middle">
   				<slider v-bind:value="[[ device.fields.name ]]" :model="this.overview"></slider>
-  				<!-- input class="form-check-input" type="checkbox" value=val v-model="this.overview" -->
+  				<input class="form-check-input" type="checkbox" value="device.fields.name" v-model="this.overview">
   			</div></td>
 		</tr></tbody>
 	</table>
