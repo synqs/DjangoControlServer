@@ -26,6 +26,7 @@ IndexTable.component('index-table', {
 		</select></div>
 		<div class="col"><input v-model="this.addForm['name']" class="form-control" placeholder="name"></div>
 		<div class="col"><input v-model="this.addForm['ip']" class="form-control" placeholder="IP"></div>
+		<div class="col"><input v-model="this.addForm['description']" class="form-control" placeholder="description"></div>
 		<div class="col"><input v-model="this.addForm['sleeptime']" class="form-control" placeholder="sleeptime"></div>
 		<div class="col"><button class="btn btn-info w-100" v-on:click="add_device()">submit</button></div>
 	</div>
@@ -39,18 +40,17 @@ IndexTable.component('index-table', {
 			<th colspan=2></th>
 			</tr>
 		</thead>
-		<tbody><tr v-for="device in devices">
+		<tbody><tr v-for="device in devices" :val="device.fields.name">
 			<td><a v-bind:href="'/' + device.model + '/' + device.pk + '/'">[[ device.fields.name ]]</a></td>
 			<td>[[ device.fields.description ]]</td>
 			<td>[[ device.fields.ip ]]</td>
 			<td>[[ this.status[device.fields.name] ]]</td>
 			<td><button class="btn btn-warning" v-on:click="remove_device(device)">Remove</button></td>
 			<td><div class="form-check form-switch text-center text-align-middle">
-  				<input class="form-check-input" type="checkbox" data-bind="value: device.fields.name" v-model="this.overview">
+  				<slider v-bind:value="[[ device.fields.name ]]" :model="this.overview"></slider>
+  				<!-- input class="form-check-input" type="checkbox" value=val v-model="this.overview" -->
   			</div></td>
-		</tr>
-			<!-- device-widget v-for="device in devices" v-bind:device="device"></device-widget -->
-		</tbody>
+		</tr></tbody>
 	</table>
 	[[ this.overview ]]
 
@@ -131,6 +131,17 @@ IndexTable.component('index-table', {
 		overview_device() {
 		},
 	},
+});
+
+IndexTable.component('slider', {
+	data () { return {
+		model : '',
+		}
+	},
+	props : ['value'],
+	template: `
+		<input class="form-check-input" type="checkbox" value=value v-model=model>
+	`,
 });
 
 /* At last, mount the index-app */

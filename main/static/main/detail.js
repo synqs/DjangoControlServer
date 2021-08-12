@@ -95,7 +95,7 @@ DetailTable.component('detail-table', {
 		this.init_device();
 	},
 	updated () { // export data every new day automatically
-		if (this.data['value'] && this.data['value']['updated'] == '00:00:00') {
+		if (this.data['value'] && this.data['value']['updated'] == '12:00:00') {
 			// Date().toLocaleString(    [], {day: '2-digit', month: '2-digit', year: '4-digit'})
 			const date = new Date();
 			var day = date.getDay() + '_' + date.getMonth() + '_' + date.getFullYear();
