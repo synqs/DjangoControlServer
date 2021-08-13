@@ -55,7 +55,6 @@ DetailTable.component('detail-table', {
 			<button class="btn btn-danger" v-on:click="stop_device()">stop</button>
 			<button class="btn btn-secondary" v-on:click="get_device()">get</button>
 			<button class="btn btn-primary" onclick="exportTableToCSV('test.csv')">export as CSV</button>
-			<button class="btn btn-warning" v-on:click="remove_device()">remove</button>
 			</div>
 		</div>
 	</div>

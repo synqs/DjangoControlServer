@@ -47,15 +47,15 @@ IndexTable.component('index-table', {
 			<td>[[ this.status[device.fields.name] ]]</td>
 			<td><button class="btn btn-warning" v-on:click="remove_device(device)">Remove</button></td>
 			<td><div class="form-check form-switch text-center text-align-middle">
-  				<slider v-bind:value="[[ device.fields.name ]]" :model="this.overview"></slider>
-  				<input class="form-check-input" type="checkbox" value="device.fields.name" v-model="this.overview">
+  				<input class="form-check-input" type="checkbox" v-on:click="this.overview_device(device)">
   			</div></td>
 		</tr></tbody>
 	</table>
-	[[ this.overview ]]
-
+	
 	<div class="row">
-		<div class="col" v-for="device in this.overview">[[ device ]]</div>
+		<div class="col-3" v-for="device in this.overview">
+			<overview_card v-bind:device=device></overview_card>
+		</div>
 	</div>
 	`,
 	mounted () {
@@ -128,20 +128,115 @@ IndexTable.component('index-table', {
 					})
 				.catch(error => console.log(error));
 		}, */
-		overview_device() {
+		overview_device(device) {
+			var index = this.overview.indexOf(device);
+			if (index !== -1) {
+    				this.overview.splice(index, 1);
+			}
+			else {
+				this.overview.push(device);
+			}
 		},
 	},
 });
 
-IndexTable.component('slider', {
+IndexTable.component('overview_card', {
 	data () { return {
-		model : '',
+		data : [],
+		datas : [],
+		status : 'Trying to connect...',
+		key : [],
+		config : [],
+		editForm : {},
 		}
 	},
-	props : ['value'],
+	props : ['device'],
+	compilerOptions: {
+		delimiters: ['[[', ']]'],
+	},
 	template: `
-		<input class="form-check-input" type="checkbox" value=value v-model=model>
+	<div class="card">
+		<div class="card-header text-light bg-warning">
+			[[ device.fields.name ]] : [[ device.fields.ip ]]
+			<h6>[[ device.fields.description ]]</h6>
+		</div>
+		<ul v-if="device.model == 'main.tctrl'" class="list-group list-group-flush">
+    			<li class="list-group-item">Setpoint : [[ device.fields.setpoint ]]</li>
+    			<li class="list-group-item">Temperature : [[ data.value ]]</li>
+  		</ul>
+  		<ul v-if="device.model == 'main.pdmon'" class="list-group list-group-flush">
+    			<li class="list-group-item">Voltage :
+    				<p v-for="k in keys">[[ k ]]</p>
+    			</li>
+    			<li class="list-group-item">Pressure : </li>
+  		</ul>
+  		<div class="btn-group w-100">
+			<button class="btn btn-success" data-bs-toggle="button" autocomplete="off" v-on:click="start_device()">start</button>
+			<button class="btn btn-danger" v-on:click="stop_device()">stop</button>
+			<button class="btn btn-secondary" v-on:click="get_device()">get</button>
+			<button class="btn btn-primary" onclick="exportTableToCSV('test.csv')">export as CSV</button>
+		</div>
+	</div>
 	`,
+	mounted () {
+		this.init_device();
+	},
+	updated () { // export data every new day automatically
+		if (this.data['value'] && this.data['value']['updated'].slice(11,18) == '14:26:0') {
+			console.log("TIME");
+			Date().toLocaleString(    [], {day: '2-digit', month: '2-digit', year: '4-digit'})
+			const date = new Date();
+			var day = date.getDay() + '_' + date.getMonth() + '_' + date.getFullYear();
+			exportTableToCSV(day + '.csv')
+		}
+		setTimeout(function() {}, 10000);
+	},
+	methods: {
+		init_device() { // initialize device and create config for further axios requests
+			payload = { model : this.device.model, pk : this.device.pk };
+			config = {	method : 'POST',
+					url : '/device/',
+					xsrfCookieName: 'csrftoken',
+					xsrfHeaderName: 'X-CSRFTOKEN',
+					data : ['STATUS', payload] };
+			this.config = config;
+			axios(config)
+				.then(response => {
+					this.data = response.data;
+					this.status = response.data['message'];
+					
+					if ( response.data['keys'] ) {
+						this.key = response.data['keys'];
+					}
+				})
+				.catch(error => {
+					this.status = error;
+					console.log(error);
+				});
+		},
+		start_device() { // start fetching data every dt = sleeptime
+			this.timer = setInterval(()=>{this.get_device()}, 
+					1000*this.device.fields.sleeptime);
+		},
+		stop_device() { // stop fetching data
+			clearInterval(this.timer);
+		},
+		get_device() { // fetch a single set of data directly from arduino (axios)
+			config = this.config;
+			console.log("Letsgo");
+			config['data'][0] = 'DATA';
+			axios(config)
+				.then(response => {
+					this.data = response.data;
+					this.datas.unshift(response.data);
+					this.status = response.data['message'];
+				})
+				.catch(error => {
+					this.status = error;
+					console.log(error);
+				});
+		},
+	},
 });
 
 /* At last, mount the index-app */
