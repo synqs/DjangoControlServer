@@ -3,7 +3,7 @@ This is a minimalistic control server for small lab devices.
 
 ## goals
 - [ ] implement a standardized interface to access lab devices (remote control)
-- [ ] have the possiblilty to log the provided data for individual and/or a selected amount of devices at the same time
+- [x] have the possiblilty to log the provided data for individual and/or a selected amount of devices at the same time
 - [ ] the server should be secure
 
 ## road map/ideas
@@ -12,8 +12,8 @@ This is a minimalistic control server for small lab devices.
 	- [x] t_control
 	- [x] pd_monitor
 	- [ ] rp_control
-- [ ] visualization with e.g. plotly
-- [ ] exporting and saving data as csv
+- [x] visualization with e.g. plotly
+- [x] exporting and saving data as csv
 - [ ] editable home screen for monitoring several devices at the same time
 
 ## how to 
@@ -25,6 +25,8 @@ This is a minimalistic control server for small lab devices.
 	- Note: If you're in the KIP, you might want to add the option `--proxy http://proxy.kip.uni-heidelberg.de:8080` right after `pip`
 3. Create a superuser account by passing `python manage.py createsuperuser` to the console. In case, you already have an account, skip this step.
 4. Start the server with `python manage.py runserver` and type the address `localhost:8000/admin` into you webbrowser to sign in with your account.
-	- Here, you can now register or delete your lab devices. Currently supported types are temperature PID controllers and voltage monitors (for e.g. PD monitoring). The supported hardware is currently the Arduino Yún. 
+	- Here, you can now register or delete your lab devices. Currently supported types are temperature PID controllers and voltage monitors (for e.g. PD monitoring). The supported hardware is currently the Arduino Yún.
+5. To access the index of your devices, type in `localhost:8000/index`.
+	- On this page, you see the lab devices registered by your account. The description as well as the IP is shown. For more details, click on the name of the respective arduino and be redirected to the detail page... 
 
 For more information refer to the [Django documentation](https://docs.djangoproject.com/en/3.2/) webpage 

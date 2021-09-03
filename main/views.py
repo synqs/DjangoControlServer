@@ -43,7 +43,6 @@ def device(request):
 	r_dict = json.loads(request.body.decode())
 	command = r_dict[0]
 	response = {}
-	print(r_dict)
 
 	if r_dict[1]['model'] == 'main.pdmon' : typ = PDmon
 	else : typ = Tctrl

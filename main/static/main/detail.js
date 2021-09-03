@@ -67,13 +67,9 @@ DetailTable.component('detail-table', {
 		<div class="col"><input v-model="this.editForm['sleeptime']" class="form-control" placeholder="sleeptime"></div>
 		<div class="col"><button class="btn btn-info w-100" v-on:click="edit_device()">submit</button></div>
 	</div>
-  	
-  	<!-- div class="col" v-for="i in Array(6).keys()">
-  			<input type="checkbox" class="btn-check" id="i" v-on:click="this.conversion(i)"> 
-  			<label class="btn btn-outline-secondary" for="i">A[[ i ]]</label>
-  	</div -->
   		
   	<div v-if="this.device.model == 'main.pdmon'" class="row mb-3">
+  		<div class="col-2"><p style="font-size:12px;">Display voltage (A) or conversion to pressure (P)</p></div>
   		<div class="col" v-for="i in Array(6).keys()"><div class="form-check form-switch text-center text-align-middle">
   			<input class="form-check-input" type="checkbox" v-on:click="this.conversion(i)"> A[[ i ]]
   		</div></div>
@@ -94,7 +90,8 @@ DetailTable.component('detail-table', {
 		this.init_device();
 	},
 	updated () { // export data every new day automatically
-		if (this.data['value'] && this.data['value']['updated'].slice(11,18) == '14:26:0') {
+		console.log(this.data['value']['updated'].slice(11,18))
+		if (this.data['value'] && this.data['value']['updated'].slice(11,18) == '12:11:0') {
 			console.log("TIME");
 			Date().toLocaleString(    [], {day: '2-digit', month: '2-digit', year: '4-digit'})
 			const date = new Date();
