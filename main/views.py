@@ -88,8 +88,9 @@ def device(request):
 			elif command == 'EDIT':
 				params = r_dict[1]['params'];
 				for p in params:
-					setattr(device, p, params[p])
-					device.set(p)
+					print(p)
+					# setattr(device, p, params[p])
+					device.set(p, params[p])
 	    				
 				device.save()
 				response['keys'] = device.keys()
@@ -97,7 +98,7 @@ def device(request):
 			else:
 				response['message'] = 'Invalid operation.'
 	
-	print(response)
+	# print(response)
 	return HttpResponse(json.dumps(response))
 
 def setSetpoint(request):

@@ -1,6 +1,6 @@
 from django.db import models
 import requests
-from django.shortcuts import render
+from django.core.validators import MaxValueValidator
 
 # Create your models here.
 class PDmon(models.Model):
@@ -28,9 +28,10 @@ class PDmon(models.Model):
 			keys.append("A" + str(i))
 		return keys
 	
-	def set(self, param):
+	def set(self, key, param):
+		setattr(self, key, param)
 		try:
-			set_str = 'arduino/write/' + param + '/' + getattr(self, param) + '/';
+			set_str = 'arduino/write/' + key + '/' + getattr(self, key) + '/';
 			addr = self.http_str() + set_str;
 			r = requests.get(addr) # , timeout = self.timeout,proxies=proxies);
 			return r.ok;
@@ -50,7 +51,8 @@ class Tctrl(models.Model):
 	# parameters/values for tctrl
 	sleeptime = models.FloatField(default=5)			# interval after which to pull the device again
 	
-	setpoint = models.IntegerField(blank=True, default=25)
+	setpointmax = models.IntegerField(default=100, validators=[MaxValueValidator(100)])
+	setpoint = models.IntegerField(blank=True, default=20, validators=[MaxValueValidator(100)])
 	P = models.FloatField(blank=True, default=1)
 	I = models.FloatField(blank=True, default=100)
 	D =  models.FloatField(blank=True, default=0)
@@ -66,15 +68,16 @@ class Tctrl(models.Model):
 		keys = ['updated', 'setpoint', 'T', 'error', 'output', 'P', 'I', 'D']
 		return keys
 
-	def set(self, param):
+	def set(self, key, param):
+		setattr(self, key, param)
 		try:
-			set_str = 'arduino/write/' + param + '/' + getattr(self, param) + '/';
+			set_str = 'arduino/write/' + key + '/' + getattr(self, key) + '/';
 			addr = self.http_str() + set_str;
 			r = requests.get(addr) # , timeout = self.timeout,proxies=proxies);
 			return r.ok;
 		except ConnectionError:
 			return False
-			
+
 	def limits(self):
 		limits = [{ 'T' : self.dTmax }]
 		return limits

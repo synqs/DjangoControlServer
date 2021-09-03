@@ -156,20 +156,14 @@ IndexTable.component('overview_card', {
 	},
 	template: `
 	<div class="card">
-		<div class="card-header text-light bg-warning">
+		<div class="card-header bg-primary text-light">
 			[[ device.fields.name ]] : [[ device.fields.ip ]]
 			<h6>[[ device.fields.description ]]</h6>
 		</div>
-		<ul v-if="device.model == 'main.tctrl'" class="list-group list-group-flush">
-    			<li class="list-group-item">Setpoint : [[ device.fields.setpoint ]]</li>
-    			<li class="list-group-item">Temperature : [[ data.value ]]</li>
-  		</ul>
-  		<ul v-if="device.model == 'main.pdmon'" class="list-group list-group-flush">
-    			<li class="list-group-item">Voltage :
-    				<p v-for="k in keys">[[ k ]]</p>
-    			</li>
-    			<li class="list-group-item">Pressure : </li>
-  		</ul>
+    		<table class="table my-2" v-if="data.value">
+				<tr class="bg-dark text-light"><th v-for="k in key.slice(1)">[[ k ]]</th></tr>
+				<tr><td v-for="k in key.slice(1)">[[ data['value'][k] ]]</td></tr>
+		</table>
   		<div class="btn-group w-100">
 			<button class="btn btn-success" data-bs-toggle="button" autocomplete="off" v-on:click="start_device()">start</button>
 			<button class="btn btn-danger" v-on:click="stop_device()">stop</button>
@@ -188,8 +182,8 @@ IndexTable.component('overview_card', {
 			const date = new Date();
 			var day = date.getDay() + '_' + date.getMonth() + '_' + date.getFullYear();
 			exportTableToCSV(day + '.csv')
+			setTimeout(function() { console.log('WAIT'); }, 10000);
 		}
-		setTimeout(function() {}, 10000);
 	},
 	methods: {
 		init_device() { // initialize device and create config for further axios requests
@@ -223,7 +217,6 @@ IndexTable.component('overview_card', {
 		},
 		get_device() { // fetch a single set of data directly from arduino (axios)
 			config = this.config;
-			console.log("Letsgo");
 			config['data'][0] = 'DATA';
 			axios(config)
 				.then(response => {

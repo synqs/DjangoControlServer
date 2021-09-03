@@ -79,26 +79,28 @@ DetailTable.component('detail-table', {
   	
   	<div id="init_plot" style="width:1600px;height:650px;"></div>
   	
-  	<div class="table-responsive" style="height: 350px;"><table class="table table-striped mh-100">
-		<thead class="table-dark"><tr>
-			<th v-for="k in key">[[ k ]]</th>
-		</tr></thead>
-		<tbody><tr v-for="data in datas"><td v-for="k in key">[[ data['value'][k] ]]</td></tr></tbody>
+  	<div class="table-responsive" style="height: 200px;"><table class="table table-striped mh-100">
+		<thead class="sticky-top">
+			<tr class="bg-dark text-light"><th v-for="k in key">[[ k ]]</th></tr>
+			<tr class="bg-info" v-if="data['value']"><td v-for="k in key">[[ data['value'][k] ]]</td></tr>
+		</thead>
+		<tbody>
+			<tr v-for="d in datas.slice(1)"><td v-for="k in key">[[ d['value'][k] ]]</td></tr>
+		</tbody>
 	</table></div>
 	`,
 	mounted () {
 		this.init_device();
 	},
 	updated () { // export data every new day automatically
-		console.log(this.data['value']['updated'].slice(11,18))
-		if (this.data['value'] && this.data['value']['updated'].slice(11,18) == '12:11:0') {
+		if (this.data['value'] && this.data['value']['updated'].slice(0,7) == '15:30:0') {
 			console.log("TIME");
-			Date().toLocaleString(    [], {day: '2-digit', month: '2-digit', year: '4-digit'})
+			Date().toLocaleString([], {day: '2-digit', month: '2-digit', year: '4-digit'})
 			const date = new Date();
 			var day = date.getDay() + '_' + date.getMonth() + '_' + date.getFullYear();
-			exportTableToCSV(day + '.csv')
+			exportTableToCSV(day + '-' + this.data['value']['updated'] + '.csv')
+			setTimeout(function(){ console.log("WAIT");}, 10000);
 		}
-		setTimeout(function() {}, 10000);
 	},
 	methods: {
 		convert_voltage(v) { // conversion formular to obtain preassure
