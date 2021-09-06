@@ -93,12 +93,12 @@ DetailTable.component('detail-table', {
 		this.init_device();
 	},
 	updated () { // export data every new day automatically
-		if (this.data['value'] && this.data['value']['updated'].slice(0,7) == '15:30:0') {
+		if (this.data['value'] && this.data['value']['updated'].slice(0,7) == '14:54:0') {
 			console.log("TIME");
 			Date().toLocaleString([], {day: '2-digit', month: '2-digit', year: '4-digit'})
 			const date = new Date();
 			var day = date.getDay() + '_' + date.getMonth() + '_' + date.getFullYear();
-			exportTableToCSV(day + '-' + this.data['value']['updated'] + '.csv')
+			exportTableToCSV(this.device.fields.name + '-' + day + '-' + this.data['value']['updated'] + '.csv')
 			setTimeout(function(){ console.log("WAIT");}, 10000);
 		}
 	},
