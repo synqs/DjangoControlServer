@@ -30,7 +30,7 @@ DetailTable.component('detail-table', {
 		data : [],
 		datas : [],
 		status : 'Trying to connect...',
-		key : [],
+		key : {},
 		config : [],
 		editForm : {},
 		}
@@ -70,19 +70,31 @@ DetailTable.component('detail-table', {
   		
   	<div v-if="this.device.model == 'main.pdmon'" class="row mb-3">
   		<div class="col-2"><p style="font-size:12px;">Display voltage (A) or conversion to pressure (P)</p></div>
-  		<div class="col" v-for="i in Array(6).keys()"><div class="form-check form-switch text-center text-align-middle">
-  			<input class="form-check-input" type="checkbox" v-on:click="this.conversion(i)"> A[[ i ]]
-  		</div></div>
+  		<!-- div class="col" v-for="i in Array(this.key.length).keys()">
+  			<input type="checkbox" v-model="this.key[i+1]" true-value="on" false-value="off" checked> [[ this.key[i] ]]
+  		</div-->
+  		<div class="col"><input type="checkbox" v-model="this.key" value="A0" checked> A0</div>
+  		<div class="col"><input type="checkbox" v-model="this.key" value="A1" checked> A1</div>
+  		<div class="col"><input type="checkbox" v-model="this.key" value="A2" checked> A2</div>
+  		<div class="col"><input type="checkbox" v-model="this.key" value="A3" checked> A3</div>
+  		<div class="col"><input type="checkbox" v-model="this.key" value="A4" checked> A4</div>
+  		<div class="col"><input type="checkbox" v-model="this.key" value="A5" checked> A5</div>
   		<div class="col-3"><input v-model="this.editForm['sleeptime']" class="form-control" placeholder="sleeptime"></div>
   		<div class="col-3"><button class="btn btn-info w-100" v-on:click="edit_device()">submit</button></div>
   	</div>
+  	
+  	<!-- div class="row"><div class="col" v-for="i in Array(this.key.length).keys()">
+  		<input type="checkbox" v-model="this.key[i+1]" checked> [[ this.key[i] ]]
+  	</div></div -->
+  	
+  	
   	
   	<div id="init_plot" style="width:1600px;height:650px;"></div>
   	
   	<div class="table-responsive" style="height: 200px;"><table class="table table-striped mh-100">
 		<thead class="sticky-top">
-			<tr class="bg-dark text-light"><th v-for="k in key">[[ k ]]</th></tr>
-			<tr class="bg-info" v-if="data['value']"><td v-for="k in key">[[ data['value'][k] ]]</td></tr>
+			<tr class="bg-dark text-light"><th v-for="k in this.key">[[ k ]]</th></tr>
+			<tr class="bg-info" v-if="data['value']"><td v-for="k in this.key">[[ data['value'][k] ]]</td></tr>
 		</thead>
 		<tbody>
 			<tr v-for="d in datas.slice(1)"><td v-for="k in key">[[ d['value'][k] ]]</td></tr>
@@ -93,7 +105,7 @@ DetailTable.component('detail-table', {
 		this.init_device();
 	},
 	updated () { // export data every new day automatically
-		if (this.data['value'] && this.data['value']['updated'].slice(0,7) == '14:54:0') {
+		if (this.data['value'] && this.data['value']['updated'].slice(0,7) == '10:22:0') {
 			console.log("TIME");
 			Date().toLocaleString([], {day: '2-digit', month: '2-digit', year: '4-digit'})
 			const date = new Date();
@@ -147,7 +159,9 @@ DetailTable.component('detail-table', {
 					this.status = response.data['message'];
 					
 					if (response.data['value']) {
-						this.update_plot(response.data['value'], this.key);
+						console.log(response.data['value']);
+						console.log(Object.keys(response.data['value']));
+						this.update_plot(response.data['value']);
 					};
 				})
 				.catch(error => {
@@ -197,12 +211,12 @@ DetailTable.component('detail-table', {
 			
 			Plotly.newPlot(INIT_PLOT, init_data, init_layout);
 		},
-		update_plot(update_data, update_keys) {
+		update_plot(update_data) {
 			var update_x = []; var update_y = []; var traces = [];
 			
-			for ( var u = 0; u < update_keys.length - 1; u++) {
+			for ( var u = 0; u < this.key.length - 1; u++) {
 				update_x[u] = [update_data['updated']];
-				update_y[u] = [update_data[update_keys[u+1]]]; 
+				update_y[u] = [update_data[this.key[u+1]]]; 
 				traces.push(u);
 			};
 			
@@ -218,8 +232,24 @@ DetailTable.component('detail-table', {
 				this.key[newindex] = 'A' + channel;
 			}
 		},
+		keylist(channel) {
+			var index = this.key.indexOf('A'+channel);
+			if (index !== -1) {
+    				this.key.splice(index, 1);
+			}
+			else {
+				this.key.splice(channel+1, 0, 'A' + channel);
+			}
+		},
 	},
 })
+
+DetailTable.component('checkboxbind', {
+	props : ['mod','val'],
+	template: `
+		<input type="checkbox" v-model="this.mod" value="this.val" checked> [[ this.val ]]
+	`,
+});
 
 /* At last, mount the detail-app */
 DetailTable.mount('#devicedetail');

@@ -70,6 +70,9 @@ def device(request):
 
 		else:
 			if command == 'STATUS':
+				response = r.json()
+				
+				#response['keys'] = list(response['value'].keys())
 				response['keys'] = device.keys()
 				response['message'] = 'Device ready.'
 
@@ -88,12 +91,9 @@ def device(request):
 			elif command == 'EDIT':
 				params = r_dict[1]['params'];
 				for p in params:
-					print(p)
-					# setattr(device, p, params[p])
 					device.set(p, params[p])
 	    				
 				device.save()
-				response['keys'] = device.keys()
 				response['message'] = 'Parameters updated successfully.'
 			else:
 				response['message'] = 'Invalid operation.'
