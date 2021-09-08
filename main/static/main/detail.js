@@ -30,7 +30,7 @@ DetailTable.component('detail-table', {
 		data : [],
 		datas : [],
 		status : 'Trying to connect...',
-		key : {},
+		key : [],
 		config : [],
 		editForm : {},
 		}
@@ -84,10 +84,8 @@ DetailTable.component('detail-table', {
   	</div>
   	
   	<!-- div class="row"><div class="col" v-for="i in Array(this.key.length).keys()">
-  		<input type="checkbox" v-model="this.key[i+1]" checked> [[ this.key[i] ]]
+  		<input type="checkbox" v-model="this.key" value="this.key[i+1]" checked> [[ this.key[i+1] ]]
   	</div></div -->
-  	
-  	
   	
   	<div id="init_plot" style="width:1600px;height:650px;"></div>
   	
@@ -161,7 +159,7 @@ DetailTable.component('detail-table', {
 					if (response.data['value']) {
 						console.log(response.data['value']);
 						console.log(Object.keys(response.data['value']));
-						this.update_plot(response.data['value']);
+						this.update_plot(response.data['value'], this.key);
 					};
 				})
 				.catch(error => {
@@ -177,7 +175,6 @@ DetailTable.component('detail-table', {
 				.then(response => {
 					console.log(response.data);
 					this.status = response.data['message'];
-					this.key = response.data['keys'];
 					})
 				.catch(error => console.log(error));
 		},
@@ -211,7 +208,7 @@ DetailTable.component('detail-table', {
 			
 			Plotly.newPlot(INIT_PLOT, init_data, init_layout);
 		},
-		update_plot(update_data) {
+		update_plot(update_data, update_key) {
 			var update_x = []; var update_y = []; var traces = [];
 			
 			for ( var u = 0; u < this.key.length - 1; u++) {
