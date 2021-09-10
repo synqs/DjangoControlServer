@@ -8,6 +8,8 @@ Process date; // process used to get the date
 /* Define global objects */
 int pins[6] = {A0, A1, A2, A3, A4, A5}; // analog reading of pins
 float values[6] = {0, 0, 0, 0, 0, 0}; // running average values
+float R1 = 47000.0;
+float R2 = 33000.0;
 
 /* Setup the arduino */
 void setup() {
@@ -22,6 +24,11 @@ void loop() {
     values[i] = analogRead(pins[i])*5.000/1023.0;
     dtostrf(values[i], sizeof(v_output), 3, v_output); // read and convert value
     Bridge.put("A" + String(i), v_output); // store the result
+
+    /* char v12_output[4];
+    values[i] = analogRead(pins[i])*5.000/1023.0*((R1 + R2)/R2);
+    dtostrf(values[i], sizeof(v12_output), 3, v12_output); // read and convert value
+    Bridge.put("P" + String(i), v12_output); // store the result */
   }
 
   // get the current time

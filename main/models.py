@@ -10,7 +10,6 @@ class PDmon(models.Model):
 	ip = models.CharField(max_length=20)				# device ip
 	
 	# parameters/values for pdmon
-	channels = models.CharField(max_length=6, default='012345') 	# corresponds to the analog pins A0, A1...
 	dVmax = models.FloatField(blank=True, default=0.5)
 
 	def __str__(self):
@@ -20,10 +19,14 @@ class PDmon(models.Model):
 		return 'http://' + self.ip + '/'
 
 	def keys(self):
-		keys = {'updated':'true'}
+		# keys = ['updated']
+		keys = {'updated': True }
 
-		for i in self.channels:
-			keys["A" + str(i)] = 'true';
+		for i in range(6):
+			# keys.append('true')
+			# keys.append("A" + str(i))
+			keys["A" + str(i)] = True
+			# keys["P" + str(i)] = 'false';
 		return keys
 	
 	def set(self, key, param):
