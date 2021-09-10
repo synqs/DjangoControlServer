@@ -30,9 +30,12 @@ DetailTable.component('detail-table', {
 		data : [],
 		datas : [],
 		status : 'Trying to connect...',
-		key : [],
+		time : {'sleep' : '5', 'save' : '00:00:00'},
+		key : {},
+		conversion : [],
 		config : [],
 		editForm : {},
+		editTime : {},
 		}
 	},
 	compilerOptions: {
@@ -64,38 +67,37 @@ DetailTable.component('detail-table', {
 		<div class="col"><input v-model="this.editForm['P']" class="form-control" placeholder="P"></div>
 		<div class="col"><input v-model="this.editForm['I']" class="form-control" placeholder="I"></div>
 		<div class="col"><input v-model="this.editForm['D']" class="form-control" placeholder="D"></div>
-		<div class="col"><input v-model="this.editForm['sleeptime']" class="form-control" placeholder="sleeptime"></div>
+		<div class="col-2"><input v-model="this.editForm['save']" class="form-control" placeholder="savetime in 'hh:mm:ss'"/></div>
+  		<div class="col-2"><input v-model="this.editForm['sleep']" class="form-control" placeholder="sleeptime in s"></div>
 		<div class="col"><button class="btn btn-info w-100" v-on:click="edit_device()">submit</button></div>
 	</div>
   		
   	<div v-if="this.device.model == 'main.pdmon'" class="row mb-3">
-  		<div class="col-2"><p style="font-size:12px;">Display voltage (A) or conversion to pressure (P)</p></div>
-  		<!-- div class="col" v-for="i in Array(this.key.length).keys()">
-  			<input type="checkbox" v-model="this.key[i+1]" true-value="on" false-value="off" checked> [[ this.key[i] ]]
-  		</div-->
-  		<div class="col"><input type="checkbox" v-model="this.key" value="A0" checked> A0</div>
-  		<div class="col"><input type="checkbox" v-model="this.key" value="A1" checked> A1</div>
-  		<div class="col"><input type="checkbox" v-model="this.key" value="A2" checked> A2</div>
-  		<div class="col"><input type="checkbox" v-model="this.key" value="A3" checked> A3</div>
-  		<div class="col"><input type="checkbox" v-model="this.key" value="A4" checked> A4</div>
-  		<div class="col"><input type="checkbox" v-model="this.key" value="A5" checked> A5</div>
-  		<div class="col-3"><input v-model="this.editForm['sleeptime']" class="form-control" placeholder="sleeptime"></div>
-  		<div class="col-3"><button class="btn btn-info w-100" v-on:click="edit_device()">submit</button></div>
+  		<div class="col" v-for="k in Object.keys(this.key).splice(1)"><div class="form-check form-switch text-center align-middle my-2">
+  			<input class="form-check-input" type="checkbox" v-on:click="this.conversion_12(k)">[[ k ]]
+  		</div></div>
+  		<div class="col-2"><input v-model="this.editForm['save']" class="form-control" placeholder="savetime in 'hh:mm:ss'"/></div>
+  		<div class="col-2"><input v-model="this.editForm['sleep']" class="form-control" placeholder="sleeptime in s"></div>
+		<div class="col-2"><button class="btn btn-info w-100" v-on:click="edit_device()">submit</button></div>
   	</div>
   	
-  	<!-- div class="row"><div class="col" v-for="i in Array(this.key.length).keys()">
-  		<input type="checkbox" v-model="this.key" value="this.key[i+1]" checked> [[ this.key[i+1] ]]
-  	</div></div -->
+  	<div class="row">
+  		<div class="col" v-for="k in Object.keys(this.key).splice(1)">
+  			<input type="checkbox" v-model="this.key[k]" value="this.key[k]"> [[ k ]] : [[ this.key[k] ]]
+  		</div>
+  	</div>
+  	
+  	[[ this.time ]]
   	
   	<div id="init_plot" style="width:1600px;height:650px;"></div>
   	
   	<div class="table-responsive" style="height: 200px;"><table class="table table-striped mh-100">
 		<thead class="sticky-top">
-			<tr class="bg-dark text-light"><th v-for="k in this.key">[[ k ]]</th></tr>
-			<tr class="bg-info" v-if="data['value']"><td v-for="k in this.key">[[ data['value'][k] ]]</td></tr>
+			<tr class="bg-dark text-light"><th v-for="k in Object.keys(this.key)"><div v-if="this.key[k]">[[ k ]]</div></th></tr>
+			<tr class="bg-info" v-if="data['value']"><td v-for="k in Object.keys(this.key)"><div v-if="this.key[k]">[[ data['value'][k] ]]</div></td></tr>
 		</thead>
 		<tbody>
-			<tr v-for="d in datas.slice(1)"><td v-for="k in key">[[ d['value'][k] ]]</td></tr>
+			<tr v-for="d in datas.slice(1)"><td v-for="k in Object.keys(this.key)">[[ d['value'][k] ]]</td></tr>
 		</tbody>
 	</table></div>
 	`,
@@ -103,20 +105,17 @@ DetailTable.component('detail-table', {
 		this.init_device();
 	},
 	updated () { // export data every new day automatically
-		if (this.data['value'] && this.data['value']['updated'].slice(0,7) == '10:22:0') {
+		if (this.data['value'] && this.data['value']['updated'].slice(0,7) == this.time['sleep'].substring(0,7)) {
 			console.log("TIME");
 			Date().toLocaleString([], {day: '2-digit', month: '2-digit', year: '4-digit'})
 			const date = new Date();
 			var day = date.getDay() + '_' + date.getMonth() + '_' + date.getFullYear();
 			exportTableToCSV(this.device.fields.name + '-' + day + '-' + this.data['value']['updated'] + '.csv')
-			setTimeout(function(){ console.log("WAIT");}, 10000);
+			setTimeout(function(){ console.log("WAIT"); }, 10000);
+			delete this.datas;
 		}
 	},
 	methods: {
-		convert_voltage(v) { // conversion formular to obtain preassure
-			const p = 10**((v-7.75)/0.75) * 10000000;
-			return p
-		},
 		init_device() { // initialize device and create config for further axios requests
 			payload = { model : this.device.model, pk : this.device.pk };
 			config = {	method : 'POST',
@@ -141,8 +140,7 @@ DetailTable.component('detail-table', {
 				});
 		},
 		start_device() { // start fetching data every dt = sleeptime
-			this.timer = setInterval(()=>{this.get_device()}, 
-					1000*this.device.fields.sleeptime);
+			this.timer = setInterval(()=>{this.get_device()}, 1000*this.time['sleep']);
 		},
 		stop_device() { // stop fetching data
 			clearInterval(this.timer);
@@ -157,9 +155,7 @@ DetailTable.component('detail-table', {
 					this.status = response.data['message'];
 					
 					if (response.data['value']) {
-						console.log(response.data['value']);
-						console.log(Object.keys(response.data['value']));
-						this.update_plot(response.data['value'], this.key);
+						this.update_plot(response.data['value']);
 					};
 				})
 				.catch(error => {
@@ -167,7 +163,16 @@ DetailTable.component('detail-table', {
 					console.log(error);
 				});
 		},
-		edit_device(arr) {
+		edit_device() {
+			if ( 'save' in this.editForm ) {
+				this.time['save'] = this.editForm['save'];
+				delete this.editForm['save'];
+			}
+			else if ( 'sleep' in this.editForm ) {
+				this.time['sleep'] = this.editForm['sleep'];
+				delete this.editForm['sleep'];
+			};
+			
 			config = this.config;
 			config['data'][0] = 'EDIT';
 			config['data'][1]['params'] = this.editForm;
@@ -194,11 +199,11 @@ DetailTable.component('detail-table', {
 		init_plot(init_keys) {
 			INIT_PLOT = document.getElementById('init_plot');
 			var init_data = [];
-			for ( var u = 0; u < init_keys.length - 1; u++) {
+			for ( k in Object.keys(init_keys).splice(1) ) {
 				var t = {
 					x: [],
 					y: [],
-					name: init_keys[u+1],
+					name: Object.keys(init_keys).splice(1)[k],
 					mode: 'lines+markers',
 					type: 'scatter'
 				};
@@ -208,18 +213,21 @@ DetailTable.component('detail-table', {
 			
 			Plotly.newPlot(INIT_PLOT, init_data, init_layout);
 		},
-		update_plot(update_data, update_key) {
+		update_plot(update_data) {
 			var update_x = []; var update_y = []; var traces = [];
 			
-			for ( var u = 0; u < this.key.length - 1; u++) {
-				update_x[u] = [update_data['updated']];
-				update_y[u] = [update_data[this.key[u+1]]]; 
-				traces.push(u);
+			for ( k in Object.keys(update_data).splice(1) ) {
+				//if ( Object.values(this.key).splice(1)[k] ) {
+					update_x[k] = [update_data['updated']];
+					update_y[k] = [update_data[Object.keys(this.key).splice(1)[k]]]; 
+					traces.push(parseInt(k));
+				//};
+				// traces.push(parseInt(k));
 			};
 			
 			Plotly.extendTraces('init_plot', {x:update_x,y:update_y,},traces); 
 		},
-		conversion(channel) {
+		conversion_p(channel) {
 			var index = this.key.indexOf('A'+channel);
 			if (index !== -1) {
     				this.key[index] = 'P' + channel;
@@ -229,13 +237,17 @@ DetailTable.component('detail-table', {
 				this.key[newindex] = 'A' + channel;
 			}
 		},
-		keylist(channel) {
-			var index = this.key.indexOf('A'+channel);
+		conversion_12(channel) {
+			var R1 = 47000.0; var R2 = 33000.0;
+			var index = this.conversion.indexOf(channel);
+			
 			if (index !== -1) {
-    				this.key.splice(index, 1);
+    				this.conversion.pop(channel);
+    				this.data['value'][channel] = Number( (this.data['value'][channel] * ((R1 + R2)/R2)).toFixed(3));
 			}
 			else {
-				this.key.splice(channel+1, 0, 'A' + channel);
+				this.conversion.push(channel);
+				this.data['value'][channel] = Number( (this.data['value'][channel] / ((R1 + R2)/R2)).toFixed(3));
 			}
 		},
 	},

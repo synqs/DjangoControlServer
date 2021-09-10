@@ -10,8 +10,6 @@ class PDmon(models.Model):
 	ip = models.CharField(max_length=20)				# device ip
 	
 	# parameters/values for pdmon
-	sleeptime = models.FloatField(default=5)			# interval after which to pull the device again
-	
 	channels = models.CharField(max_length=6, default='012345') 	# corresponds to the analog pins A0, A1...
 	dVmax = models.FloatField(blank=True, default=0.5)
 
@@ -22,10 +20,10 @@ class PDmon(models.Model):
 		return 'http://' + self.ip + '/'
 
 	def keys(self):
-		keys = ['updated']
+		keys = {'updated':'true'}
 
 		for i in self.channels:
-			keys.append("A" + str(i))
+			keys["A" + str(i)] = 'true';
 		return keys
 	
 	def set(self, key, param):
@@ -49,8 +47,6 @@ class Tctrl(models.Model):
 	ip = models.CharField(max_length=20, blank=True)		# device ip
 
 	# parameters/values for tctrl
-	sleeptime = models.FloatField(default=5)			# interval after which to pull the device again
-	
 	setpointmax = models.IntegerField(default=100, validators=[MaxValueValidator(100)])
 	setpoint = models.IntegerField(blank=True, default=20, validators=[MaxValueValidator(100)])
 	P = models.FloatField(blank=True, default=1)
@@ -65,7 +61,8 @@ class Tctrl(models.Model):
 		return 'http://' + self.ip + '/'
 
 	def keys(self):
-		keys = ['updated', 'setpoint', 'T', 'error', 'output', 'P', 'I', 'D']
+		keys = {'updated':'true', 'setpoint':'true', 'T':'true', 'error':'true',
+			'output':'true', 'P':'true', 'I':'true', 'D':'true'}
 		return keys
 
 	def set(self, key, param):

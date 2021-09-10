@@ -21,13 +21,12 @@ IndexTable.component('index-table', {
 	
 	<div class="row mb-3">
 		<div class="col"><select v-model="this.addForm['model']" class="form-select">
-			<option>PDmon</option>
-			<option>Tctrl</option>
+			<option value="main.pdmon">PDmon</option>
+			<option value="main.tctrl">Tctrl</option>
 		</select></div>
 		<div class="col"><input v-model="this.addForm['name']" class="form-control" placeholder="name"></div>
 		<div class="col"><input v-model="this.addForm['ip']" class="form-control" placeholder="IP"></div>
 		<div class="col"><input v-model="this.addForm['description']" class="form-control" placeholder="description"></div>
-		<div class="col"><input v-model="this.addForm['sleeptime']" class="form-control" placeholder="sleeptime"></div>
 		<div class="col"><button class="btn btn-info w-100" v-on:click="add_device()">submit</button></div>
 	</div>
 	<table class="table table-striped">
@@ -40,7 +39,7 @@ IndexTable.component('index-table', {
 			<th colspan=2></th>
 			</tr>
 		</thead>
-		<tbody><tr v-for="device in devices" :val="device.fields.name">
+		<tbody><tr v-for="device in devices">
 			<td><a v-bind:href="'/' + device.model + '/' + device.pk + '/'">[[ device.fields.name ]]</a></td>
 			<td>[[ device.fields.description ]]</td>
 			<td>[[ device.fields.ip ]]</td>
