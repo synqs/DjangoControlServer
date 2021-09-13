@@ -26,6 +26,6 @@ This is a minimalistic control server for small lab devices.
 	- On this page, you see the lab devices registered by your account. The description as well as the IP is shown. For more details, click on the name of the respective arduino and be redirected to the detail page... 
 
 
--> The django_activate.bat file can be used to shortcut to the server from the command line. Just put it into your ".../anaconda3/Scripts" folder and edit it according to the location of the git repo and the name of your anaconda environment.
+-> The `django_activate.cmd` file can be used to shortcut to the server from the command line. Just put it into your `.../anaconda3/Scripts` folder and edit it according to the location of the git repo and the name of your anaconda environment.
 
 For more information refer to the [Django documentation](https://docs.djangoproject.com/en/3.2/) webpage 
