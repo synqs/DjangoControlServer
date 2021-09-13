@@ -44,9 +44,16 @@ DetailTable.component('detail-table', {
 	<div class="row mb-3">
 		<div class="col"><div class="card">
 			<div class="card-header text-light bg-dark" style="height : 87.07px;">
-				<h4>[[ device.fields.name ]] : [[ device.fields.description ]]</h4>
-				<h6>IP : [[ device.fields.ip ]]</h6>
-			</div>
+			<div class="row align-center">
+				<div class="col">
+					<h3>[[ device.fields.name ]]:</h3><h3>[[ device.fields.description ]]</h3>
+				</div>
+				<div class="col">
+					<h6>IP : [[ device.fields.ip ]]</h6>
+					<h6>Next CSV Download : [[ this.time['save'] ]]</h6>
+					<h6>Current Sleeptime : [[ this.time['sleep'] ]] s</h6>
+				</div>
+			</div></div>
 		</div></div>
 		<div class="col">
 			<div class="alert alert-info text-center py-1" role="alert">[[ status ]]</div>
@@ -56,6 +63,7 @@ DetailTable.component('detail-table', {
 			<button class="btn btn-danger" v-on:click="stop_device()">stop</button>
 			<button class="btn btn-secondary" v-on:click="get_device()">get</button>
 			<button class="btn btn-primary" v-on:click="this.get_CSV()">export as CSV</button>
+			<button class="btn btn-warning" v-on:click="this.reset()">reset</button>
 			</div>
 		</div>
 	</div>
@@ -65,27 +73,25 @@ DetailTable.component('detail-table', {
 		<div class="col"><input v-model="this.editForm['P']" class="form-control" placeholder="P"></div>
 		<div class="col"><input v-model="this.editForm['I']" class="form-control" placeholder="I"></div>
 		<div class="col"><input v-model="this.editForm['D']" class="form-control" placeholder="D"></div>
-		<div class="col-2"><input v-model="this.editForm['save']" class="form-control" placeholder="savetime in 'hh:mm:ss'"/></div>
-  		<div class="col-2"><input v-model="this.editForm['sleep']" class="form-control" placeholder="sleeptime in s"></div>
-		<div class="col"><button class="btn btn-info w-100" v-on:click="edit_device()">submit</button></div>
 	</div>
-  		
-  	<div v-if="this.device.model == 'main.pdmon'" class="row mb-3">
-  		<div class="col" v-for="k in Object.keys(this.key).splice(1)"><div class="form-check form-switch text-center align-middle my-2">
+	
+	<div v-if="this.device.model == 'main.pdmon'" class="row mb-3">
+		<div class="col-2">Convert to measure 0-12V :</div>
+		<div class="col" v-for="k in Object.keys(this.key).splice(1)">
+  			<div class="form-check form-switch">
   			<input v-model="this.key[k]" class="form-check-input" type="checkbox" true-value="convert" false-value=true>[[ k ]]
-  		</div></div>
+  			</div>
+  		</div>
+  	</div>
+  	
+  	<div class="row mb-3">
+  		<div class="col" v-for="k in Object.keys(this.key).splice(1)">
+  			<input type="checkbox" v-model="this.key[k]" value="this.key[k]"> [[ k ]]
+  		</div>
   		<div class="col-2"><input v-model="this.editForm['save']" class="form-control" placeholder="savetime in 'hh:mm:ss'"/></div>
   		<div class="col-2"><input v-model="this.editForm['sleep']" class="form-control" placeholder="sleeptime in s"></div>
 		<div class="col-2"><button class="btn btn-info w-100" v-on:click="edit_device()">submit</button></div>
   	</div>
-  	
-  	<div class="row">
-  		<div class="col" v-for="k in Object.keys(this.key).splice(1)">
-  			<input type="checkbox" v-model="this.key[k]" value="this.key[k]"> [[ k ]] : [[ this.key[k] ]]
-  		</div>
-  	</div>
-  	
-  	[[ this.time ]]
   	
   	<div id="init_plot" style="width:1600px;height:650px;"></div>
   	
@@ -103,11 +109,18 @@ DetailTable.component('detail-table', {
 		this.init_device();
 	},
 	updated () { // export data every new day automatically
-		if (this.data['updated'].slice(0,7) == this.time['save'].slice(0,7)) {
+		//const date = new Date();
+		//var now = date.getHours() + ':' +  date.getMinutes() + ':' + date.getSeconds();
+		var now = this.data['updated'].slice(11,19);
+		var save = this.time['save'].slice(0,7);
+		//console.log(parseInt(now.slice(-1)) + '--' + parseInt(this.time['sleep']));
+		if (now.slice(0,7) == save && parseInt(now.slice(-1)) < parseInt(this.time['sleep'])) {
+			console.log('time');
 			this.get_CSV();
-			setTimeout(function(){ console.log("WAIT"); }, 10000);
+			//setTimeout(function(){ console.log("WAIT"); }, 10000); 
 			delete this.datas;
-			//Plotly.deleteTraces('init_plot', [0,1,2,3,4,5]);
+			Plotly.deleteTraces('init_plot', [0,1,2,3,4,5]);
+			this.init_plot(Object.keys(this.key).filter(key => !!this.key[key]));
 		}
 	},
 	methods: {
@@ -178,30 +191,18 @@ DetailTable.component('detail-table', {
 					})
 				.catch(error => console.log(error));
 		},
-		remove_device() {
-			config = this.config;
-			config['data'][0] = 'DELETE';
-			axios(config)
-				.then(response => {
-					this.status = response.data['message'];
-					})
-				.catch(error => {
-					this.status = error;
-					console.log(error);
-				});
-		},
 		init_plot(init_keys) {
 			INIT_PLOT = document.getElementById('init_plot');
 			var init_data = [];
 			for ( k in Object.keys(init_keys).splice(1) ) {
-				var t = {
+				var k = {
 					x: [],
 					y: [],
 					name: Object.keys(init_keys).splice(1)[k],
 					mode: 'lines+markers',
 					type: 'scatter'
 				};
-				init_data.push(t);
+				init_data.push(k);
 			};
 			var init_layout = {};
 			
@@ -226,6 +227,7 @@ DetailTable.component('detail-table', {
 			this.data[channel] = Number(this.data[channel] * ((R1 + R2)/R2)).toFixed(3);
 		},
 		get_CSV() {
+			console.log('titrl');
 			const date = new Date();
 			var day = date.getDay() + '_' + date.getMonth() + '_' + date.getFullYear();
 			var csv = [];
@@ -240,6 +242,11 @@ DetailTable.component('detail-table', {
 			}
 			var name = this.device.fields.name + '-' + day + '-' + this.data['updated'] + '.csv';
 			downloadCSV(csv.join("\n"), name); // Download CSV file
+		},
+		reset() {
+			delete this.datas;
+			Plotly.deleteTraces('init_plot', [0,1,2,3,4,5]);
+			this.init_plot(Object.keys(this.key).filter(key => !!this.key[key]));
 		},
 	},
 })
