@@ -1,13 +1,7 @@
 # DjangoControlServer
 This is a minimalistic control server for small lab devices.
 
-## goals
-- [ ] implement a standardized interface to access lab devices (remote control)
-- [x] have the possiblilty to log the provided data for individual and/or a selected amount of devices at the same time
-- [ ] the server should be secure
-
 ## road map/ideas
-- [ ] add a modified user class (with account creation etc.)
 - device classes:
 	- [x] t_control
 	- [x] pd_monitor
@@ -15,6 +9,8 @@ This is a minimalistic control server for small lab devices.
 - [x] visualization with e.g. plotly
 - [x] exporting and saving data as csv
 - [ ] editable home screen for monitoring several devices at the same time
+- [ ] more warnings when editing/deleting stuff
+- [ ] maximum values/valid inputs for parameters
 
 ## how to 
 1. Download the github repo on your local computer.
@@ -28,5 +24,8 @@ This is a minimalistic control server for small lab devices.
 	- Here, you can now register or delete your lab devices. Currently supported types are temperature PID controllers and voltage monitors (for e.g. PD monitoring). The supported hardware is currently the Arduino Yún.
 5. To access the index of your devices, type in `localhost:8000/index`.
 	- On this page, you see the lab devices registered by your account. The description as well as the IP is shown. For more details, click on the name of the respective arduino and be redirected to the detail page... 
+
+
+-> The django_activate.bat file can be used to shortcut to the server from the command line. Just put it into your ".../anaconda3/Scripts" folder and edit it according to the location of the git repo and the name of your anaconda environment.
 
 For more information refer to the [Django documentation](https://docs.djangoproject.com/en/3.2/) webpage 
