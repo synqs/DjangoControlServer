@@ -29,8 +29,7 @@ DetailTable.component('detail-table', {
 	data() { return {
 		data : [],
 		datas : [],
-		status : 'Trying to connect...',
-		time : {'sleep' : '5', 'save' : '00:00:00'},
+		setup : {'status' : 'Trying to connect...', 'sleep' : '5', 'save' : '00:00:00', 'name' : 'test'},
 		key : {},
 		config : [],
 		editForm : {},
@@ -45,18 +44,19 @@ DetailTable.component('detail-table', {
 		<div class="col"><div class="card">
 			<div class="card-header text-light bg-dark" style="height : 87.07px;">
 			<div class="row align-center">
-				<div class="col">
-					<h3>[[ device.fields.name ]]:</h3><h3>[[ device.fields.description ]]</h3>
+				<div class="col-7">
+					<h3>[[ device.fields.name ]]:[[ device.fields.ip ]]</h3>
+					<h5>[[ device.fields.description ]]</h5>
 				</div>
-				<div class="col">
-					<h6>IP : [[ device.fields.ip ]]</h6>
-					<h6>Next CSV Download : [[ this.time['save'] ]]</h6>
-					<h6>Current Sleeptime : [[ this.time['sleep'] ]] s</h6>
+				<div class="col-5">
+					<h6>CSV name : [[ this.setup['name'] ]]</h6>
+					<h6>Next CSV Download : [[ this.setup['save'] ]]</h6>
+					<h6>Current Sleeptime : [[ this.setup['sleep'] ]] s</h6>
 				</div>
 			</div></div>
 		</div></div>
 		<div class="col">
-			<div class="alert alert-info text-center py-1" role="alert">[[ status ]]</div>
+			<div class="alert alert-info text-center py-1" role="alert">[[ this.setup['status'] ]]</div>
 			
 			<div class="btn-group w-100">
 			<button class="btn btn-success" data-bs-toggle="button" autocomplete="off" v-on:click="start_device()">start</button>
@@ -86,22 +86,31 @@ DetailTable.component('detail-table', {
   	
   	<div class="row mb-3">
   		<div class="col" v-for="k in Object.keys(this.key).splice(1)">
-  			<input type="checkbox" v-model="this.key[k]" value="this.key[k]"> [[ k ]]
+  			<input type="checkbox" v-model="this.key[k]" value="this.key[k]"> [[ k ]] : [[ this.key[k] ]]
   		</div>
+  		<div class="col-2"><input v-model="this.editForm['name']" class="form-control" placeholder="name for CSV"/></div>
   		<div class="col-2"><input v-model="this.editForm['save']" class="form-control" placeholder="savetime in 'hh:mm:ss'"/></div>
   		<div class="col-2"><input v-model="this.editForm['sleep']" class="form-control" placeholder="sleeptime in s"></div>
 		<div class="col-2"><button class="btn btn-info w-100" v-on:click="edit_device()">submit</button></div>
   	</div>
+  	
+  	[[ this.editForm ]]
   	
   	<div id="init_plot" style="width:1600px;height:650px;"></div>
   	
   	<div class="table-responsive" style="height: 200px;"><table class="table table-striped mh-100">
 		<thead class="sticky-top">
 			<tr class="bg-dark text-light"><th v-for="k in Object.keys(this.key).filter(key => !!this.key[key])">[[ k ]]</th></tr>
-			<tr class="bg-info"><td v-for="k in Object.keys(this.key).filter(key => !!this.key[key])">[[ data[k] ]]</td></tr>
+			<tr class="bg-info"><td v-for="k in Object.keys(this.key).filter(key => !!this.key[key])">
+				<div v-if="this.key[k] == 'convert'">[[ this.conversion(k, this.data[k]) ]]</div>
+				<div v-else>[[ this.data[k] ]]</div>
+			</td></tr>
 		</thead>
 		<tbody>
-			<tr v-for="d in datas.slice(1)"><td v-for="k in Object.keys(this.key).filter(key => !!this.key[key])">[[ d[k] ]]</td></tr>
+			<tr v-for="d in datas.slice(1)"><td v-for="k in Object.keys(this.key).filter(key => !!this.key[key])">
+				<div v-if="this.key[k] == 'convert'">[[ this.conversion(k, d[k]) ]]</div>
+				<div v-else>[[ d[k] ]]</div>
+			</td></tr>
 		</tbody>
 	</table></div>
 	`,
@@ -112,9 +121,9 @@ DetailTable.component('detail-table', {
 		//const date = new Date();
 		//var now = date.getHours() + ':' +  date.getMinutes() + ':' + date.getSeconds();
 		var now = this.data['updated'].slice(11,19);
-		var save = this.time['save'].slice(0,7);
-		//console.log(parseInt(now.slice(-1)) + '--' + parseInt(this.time['sleep']));
-		if (now.slice(0,7) == save && parseInt(now.slice(-1)) < parseInt(this.time['sleep'])) {
+		var save = this.setup['save'].slice(0,7);
+		//console.log(parseInt(now.slice(-1)) + '--' + parseInt(this.setup['sleep']));
+		if (now.slice(0,7) == save && parseInt(now.slice(-1)) < parseInt(this.setup['sleep'])) {
 			console.log('time');
 			this.get_CSV();
 			//setTimeout(function(){ console.log("WAIT"); }, 10000); 
@@ -135,19 +144,20 @@ DetailTable.component('detail-table', {
 			axios(config)
 				.then(response => {
 					this.data = response.data['value'];
-					this.status = response.data['message'];
+					this.setup['status'] = response.data['message'];
+					this.setup['name'] = this.device.fields.name + '_' + this.data['updated'].slice(0,10);
 					this.key = response.data['keys'];
 					
 					this.init_plot(response.data['keys']);
 				})
 				.catch(error => {
-					this.status = error;
+					this.setup['status'] = error;
 					console.log(error);
 				});
 		},
 		start_device() { // start fetching data every dt = sleeptime
 			this.switch = true;
-			this.timer = setInterval(()=>{this.get_device()}, 1000*this.time['sleep']);
+			this.timer = setInterval(()=>{this.get_device()}, 1000*this.setup['sleep']);
 		},
 		stop_device() { // stop fetching data
 			clearInterval(this.timer);
@@ -159,27 +169,31 @@ DetailTable.component('detail-table', {
 				.then(response => {
 					this.data = response.data['value'];
 					this.datas.unshift(response.data['value']);
-					this.status = response.data['message'];
+					this.setup['status'] = response.data['message'];
 
 					this.update_plot(response.data['value']);
 				})
 				.catch(error => {
-					this.status = error;
+					this.setup['status'] = error;
 					console.log(error);
 				});
 		},
 		edit_device() {
 			if ( 'save' in this.editForm ) {
-				this.time['save'] = this.editForm['save'];
+				this.setup['save'] = this.editForm['save'];
 				delete this.editForm['save'];
 			}
 			else if ( 'sleep' in this.editForm ) {
-				this.time['sleep'] = this.editForm['sleep'];
+				this.setup['sleep'] = this.editForm['sleep'];
 				if ( this.switch ) {
 					clearInterval(this.timer);
 					this.timer = setInterval(()=>{this.get_device()}, 1000*this.editForm['sleep']);
 				};
 				delete this.editForm['sleep'];
+			}
+			else if ( 'name' in this.editForm ) {
+				this.setup['name'] = this.editForm['name'];
+				delete this.editForm['name'];
 			};
 			
 			config = this.config;
@@ -187,7 +201,7 @@ DetailTable.component('detail-table', {
 			config['data'][1]['params'] = this.editForm;
 			axios(config)
 				.then(response => {
-					this.status = response.data['message'];
+					this.setup['status'] = response.data['message'];
 					})
 				.catch(error => console.log(error));
 		},
@@ -222,9 +236,12 @@ DetailTable.component('detail-table', {
 			
 			Plotly.extendTraces('init_plot', {x:update_x,y:update_y,},traces); 
 		},
-		conversion(channel) {
-			var R1 = 47000; var R2 = 33000
-			this.data[channel] = Number(this.data[channel] * ((R1 + R2)/R2)).toFixed(3);
+		conversion(channel, val) {
+			var R1 = 47; var R2 = 33
+			if( this.key[channel] == 'convert' ) {
+				return Number(val * ((R1 + R2)/R2)).toFixed(3);
+				//this.datas[channel] = Number(this.datas[channel] * ((R1 + R2)/R2)).toFixed(3);
+			};
 		},
 		get_CSV() {
 			console.log('titrl');
@@ -240,7 +257,7 @@ DetailTable.component('detail-table', {
 				}
 				csv.push(row.join(","));
 			}
-			var name = this.device.fields.name + '-' + day + '-' + this.data['updated'] + '.csv';
+			var name = this.device.fields.name + '-' + day + '.csv';
 			downloadCSV(csv.join("\n"), name); // Download CSV file
 		},
 		reset() {

@@ -34,7 +34,7 @@ void loop() {
   // get the current time
   if (!date.running()) { // check whether the process isn't running
     date.begin("date");
-    date.addParameter("+%d.%m.%Y %H:%M:%S");
+    date.addParameter("+%d/%m/%Y %H:%M:%S");
     date.run();
   }
   while (date.available() > 0) { // read the time given by the linux kernel

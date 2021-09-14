@@ -90,6 +90,7 @@ def device(request):
 		
 			elif command == 'EDIT':
 				params = r_dict[1]['params'];
+				print(params)
 				for p in params:
 					device.set(p, params[p])
 	    				
