@@ -90,7 +90,7 @@ DetailTable.component('detail-table', {
 		<div class="col-3 text-center">laser lock : <input class="w-50" v-model="this.setup['lock']" placeholder="channel (e.g. A3)"></div>
   	</div>
 	
-	[[ this.setup['lock'] ]]
+	[[ this.setup['convert'] ]]
 	
   	<div id="init_plot" style="width:1600px;height:650px;"></div>
   	
@@ -158,7 +158,7 @@ DetailTable.component('detail-table', {
 			config['data'][0] = 'DATA';
 			axios(config)
 				.then(response => {
-					for ( k in Object.keys(this.setup['convert']) ) {
+					for ( k in Object.keys(this.setup['convert']).filter(i => this.setup['convert'][i]) ) {
 						ch = Object.keys(this.setup['convert'])[k];
 						response.data['value'][ch] = this.conversion(response.data['value'][ch]);
 					}
