@@ -43,8 +43,7 @@ DetailTable.component('detail-table', {
 	template: `
 	<div class="row mb-3 align-middle">
 		<div class="col"><div class="card">
-			<div class="card-header text-light bg-dark">
-			<div class="row align-center">
+			<div class="card-header text-light bg-dark"><div class="row align-center">
 				<div class="col-7">
 					<h3>[[ device.fields.name ]]:[[ device.fields.ip ]]</h3>
 					<h5>[[ device.fields.description ]]</h5>
@@ -262,21 +261,21 @@ DetailTable.component('detail-table', {
 			};
 		},
 		get_CSV() {
-			console.log('titrl');
-			const date = new Date();
-			var day = date.getDay() + '_' + date.getMonth() + '_' + date.getFullYear();
-			var csv = [];
-			var rows = document.querySelectorAll("table tr");
+			var name = this.setup['name'] + '.csv';
+			
+			var array = typeof this.datas != 'object' ? JSON.parse(this.datas) : this.datas;
+			var str = Object.keys(this.data).toString() + '\r\n';
 
-			for (var i = 0; i < rows.length; i++) {
-				var row = [], cols = rows[i].querySelectorAll("td, th");
-				for (var j = 0; j < cols.length; j++) {
-					row.push(cols[j].innerText);
+			for (var i = 0; i < array.length; i++) {
+				var line = '';
+				for (var index in array[i]) {
+					if (line != '') line += ','
+					line += array[i][index];
 				}
-				csv.push(row.join(","));
+				str += line + '\r\n';
 			}
-			var name = this.device.fields.name + '-' + day + '.csv';
-			downloadCSV(csv.join("\n"), name); // Download CSV file
+			
+			downloadCSV(str, name); // Download CSV file
 		},
 		reset() {
 			this.datas = [];

@@ -5,7 +5,7 @@ IndexTable.component('index-table', {
 		status : { global : "Connecting to devices..." },
 		config : {},
 		addForm : {},
-		overview : [],
+		overview : {},
 		}
 	},
 	compilerOptions: {
@@ -16,7 +16,7 @@ IndexTable.component('index-table', {
 	
 	<div class="alert alert-info alert-dismissible fade show" role="alert">
 		[[ this.status['global'] ]]
-		<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+		<!-- button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button -->
 	</div>
 	
 	<div class="row mb-3">
@@ -29,6 +29,7 @@ IndexTable.component('index-table', {
 		<div class="col"><input v-model="this.addForm['description']" class="form-control" placeholder="description"></div>
 		<div class="col"><button class="btn btn-info w-100" v-on:click="add_device()">submit</button></div>
 	</div>
+	
 	<table class="table table-striped">
 		<thead class="table-dark">
 			<tr>
@@ -39,21 +40,21 @@ IndexTable.component('index-table', {
 			<th colspan=2></th>
 			</tr>
 		</thead>
-		<tbody><tr v-for="device in devices">
+		<tbody><tr v-for="device in this.devices">
 			<td><a v-bind:href="'/' + device.model + '/' + device.pk + '/'">[[ device.fields.name ]]</a></td>
 			<td>[[ device.fields.description ]]</td>
 			<td>[[ device.fields.ip ]]</td>
 			<td>[[ this.status[device.fields.name] ]]</td>
 			<td><button class="btn btn-warning" v-on:click="remove_device(device)">Remove</button></td>
-			<td><div class="form-check form-switch text-center text-align-middle">
-  				<input class="form-check-input" type="checkbox" v-on:click="this.overview_device(device)">
+			<td><div class="form-check form-switch">
+  				<input class="form-check-input" type="checkbox" v-model="this.overview[this.devices.indexOf(device)]">
   			</div></td>
 		</tr></tbody>
 	</table>
 	
 	<div class="row">
-		<div class="col-3" v-for="device in this.overview">
-			<overview_card v-bind:device=device></overview_card>
+		<div class="col-4" v-for="index in Object.keys(this.overview).filter(dev => this.overview[dev])">
+			<overview_card v-bind:device="this.devices[index]"></overview_card>
 		</div>
 	</div>
 	`,
@@ -143,10 +144,10 @@ IndexTable.component('overview_card', {
 	data () { return {
 		data : [],
 		datas : [],
-		status : 'Trying to connect...',
-		key : [],
+		setup : {	'status' : 'Trying to connect...', 'sleep' : '5', 'save' : '00:00:00', 'name' : 'test',
+					'convert' : {}, 'lock' : ''},
+		key : {},
 		config : [],
-		editForm : {},
 		}
 	},
 	props : ['device'],
@@ -155,19 +156,25 @@ IndexTable.component('overview_card', {
 	},
 	template: `
 	<div class="card">
-		<div class="card-header bg-primary text-light">
-			[[ device.fields.name ]] : [[ device.fields.ip ]]
-			<h6>[[ device.fields.description ]]</h6>
-		</div>
-    		<table class="table my-2" v-if="data.value">
-				<tr class="bg-dark text-light"><th v-for="k in key.slice(1)">[[ k ]]</th></tr>
-				<tr><td v-for="k in key.slice(1)">[[ data['value'][k] ]]</td></tr>
+		<div class="card-header bg-info text-light"><div class="row align-center">
+				<div class="col-5">
+					<h5>[[ device.fields.name ]]:</h5><h5>[[ device.fields.ip ]]</h5>
+				</div>
+				<div class="col-7">
+					<h6>CSV name : <input class="w-50" v-model="this.setup['name']" placeholder="name for CSV"/>.csv</h6>
+					<h6>Next CSV Download : <input class="w-25" v-model="this.setup['save']" placeholder="savetime in 'hh:mm:ss'"/> today</h6>
+					<h6>Current Sleeptime : <input class="w-25" v-model="this.setup['sleep']" placeholder="sleeptime in s"> s</h6>
+				</div>
+		</div></div>
+    		<table class="table my-0">
+				<tr class="bg-dark text-light"><th v-for="k in Object.keys(this.key)">[[ k ]]</th></tr>
+				<tr><td v-for="k in Object.keys(this.key)">[[ data[k] ]]</td></tr>
 		</table>
   		<div class="btn-group w-100">
 			<button class="btn btn-success" data-bs-toggle="button" autocomplete="off" v-on:click="start_device()">start</button>
 			<button class="btn btn-danger" v-on:click="stop_device()">stop</button>
 			<button class="btn btn-secondary" v-on:click="get_device()">get</button>
-			<button class="btn btn-primary" onclick="exportTableToCSV('test.csv')">export as CSV</button>
+			<button class="btn btn-primary" v-on:click="this.get_CSV()">export as CSV</button>
 		</div>
 	</div>
 	`,
@@ -175,14 +182,14 @@ IndexTable.component('overview_card', {
 		this.init_device();
 	},
 	updated () { // export data every new day automatically
-		if (this.data['value'] && this.data['value']['updated'].slice(11,18) == '14:26:0') {
-			console.log("TIME");
-			Date().toLocaleString(    [], {day: '2-digit', month: '2-digit', year: '4-digit'})
-			const date = new Date();
-			var day = date.getDay() + '_' + date.getMonth() + '_' + date.getFullYear();
-			exportTableToCSV(day + '.csv')
-			setTimeout(function() { console.log('WAIT'); }, 10000);
+		var now = this.data['updated'].slice(11,19);
+		var save = this.setup['save'].slice(0,7);
+		if (now.slice(0,7) == save && parseInt(now.slice(-1)) < parseInt(this.setup['sleep'])) {
+			this.get_CSV();
+			this.datas = [];
 		}
+		
+		this.is_locked();
 	},
 	methods: {
 		init_device() { // initialize device and create config for further axios requests
@@ -195,21 +202,19 @@ IndexTable.component('overview_card', {
 			this.config = config;
 			axios(config)
 				.then(response => {
-					this.data = response.data;
-					this.status = response.data['message'];
-					
-					if ( response.data['keys'] ) {
-						this.key = response.data['keys'];
-					}
+					this.data = response.data['value'];
+					this.setup['status'] = response.data['message'];
+					this.setup['name'] = this.device.fields.name + '_' + this.data['updated'].slice(0,10);
+					this.key = response.data['keys'];
 				})
 				.catch(error => {
-					this.status = error;
+					this.setup['status'] = error;
 					console.log(error);
 				});
 		},
 		start_device() { // start fetching data every dt = sleeptime
-			this.timer = setInterval(()=>{this.get_device()}, 
-					1000*this.device.fields.sleeptime);
+			this.switch = true;
+			this.timer = setInterval(()=>{this.get_device()}, 1000*this.setup['sleep']);
 		},
 		stop_device() { // stop fetching data
 			clearInterval(this.timer);
@@ -219,17 +224,84 @@ IndexTable.component('overview_card', {
 			config['data'][0] = 'DATA';
 			axios(config)
 				.then(response => {
-					this.data = response.data;
-					this.datas.unshift(response.data);
-					this.status = response.data['message'];
+					for ( k in Object.keys(this.setup['convert']) ) {
+						ch = Object.keys(this.setup['convert'])[k];
+						response.data['value'][ch] = this.conversion(response.data['value'][ch]);
+					}
+					
+					this.data = response.data['value'];
+					this.datas.unshift(response.data['value']);
+					this.setup['status'] = response.data['message'];
+
 				})
 				.catch(error => {
-					this.status = error;
+					this.setup['status'] = error;
 					console.log(error);
 				});
 		},
+		is_locked() {
+			if ( this.setup['lock'] in this.key ) {
+				ch = this.setup['lock'];
+				console.log('yes');
+				if ( this.data[ch] < 2.8 || 4.8 < this.data[ch] ) {
+					this.setup['status'] = "Laser is not locked !!!";
+					
+					Email.send({
+							SecureToken : "950c40cc-2103-4fb0-a64c-2c732ae8fb81",
+							//Host: "smtp.gmail.com",
+							//Username : "naka.labpc@gmail.com",
+							//Password : "nakaramen",
+							To: 'klara101klaro@gmail.com',
+							From: "naka.labpc@gmail.com",
+							Subject: "NAKA",
+							Body: "Laser is not locked !!!",})
+						.then(function (message) {
+							alert("mail sent successfully")
+						});
+				};
+			};
+		},
+		conversion(val) {
+			var R1 = 47; var R2 = 33;
+			return Number(val * ((R1 + R2)/R2)).toFixed(3);
+		},
+		get_CSV() {
+			var name = this.setup['name'] + '.csv';
+			
+			var array = typeof this.datas != 'object' ? JSON.parse(this.datas) : this.datas;
+			var str = Object.keys(this.data).toString() + '\r\n';
+
+			for (var i = 0; i < array.length; i++) {
+				var line = '';
+				for (var index in array[i]) {
+					if (line != '') line += ','
+					line += array[i][index];
+				}
+
+				str += line + '\r\n';
+			}
+			console.log(str);
+			
+			downloadCSV(str, name); // Download CSV file
+		},
 	},
 });
+
+/* These are functions for translating the html data to csv and downloading the log */
+function downloadCSV(csv, filename) {
+	var csvFile;
+	var downloadLink;
+	csvFile = new Blob([csv], {type: "text/csv"}); // CSV file
+
+	downloadLink = document.createElement("a"); // Download link
+	downloadLink.download = filename; // File name
+	downloadLink.href = window.URL.createObjectURL(csvFile); // Create a link to the file
+	downloadLink.style.display = "none"; // Hide download link
+
+	document.body.appendChild(downloadLink); // Add the link to DOM
+
+	downloadLink.click(); // Click download link
+}
 
 /* At last, mount the index-app */
 IndexTable.mount('#index');
