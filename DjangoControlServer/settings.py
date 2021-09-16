@@ -51,6 +51,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+BASE_URL="http://host/"
 ROOT_URLCONF = 'DjangoControlServer.urls'
 
 TEMPLATES = [

@@ -41,7 +41,10 @@ IndexTable.component('index-table', {
 			</tr>
 		</thead>
 		<tbody><tr v-for="device in this.devices">
-			<td><a v-bind:href="'/' + device.model + '/' + device.pk + '/'">[[ device.fields.name ]]</a></td>
+			<td>
+				<a v-bind:href="'/' + device.model + '/' + device.pk + '/'">[[ device.fields.name ]]</a>
+				<!-- button class="btn btn-warning" v-on:click="detail_device(device)">Detail</button -->
+			</td>
 			<td>[[ device.fields.description ]]</td>
 			<td>[[ device.fields.ip ]]</td>
 			<td>[[ this.status[device.fields.name] ]]</td>
@@ -59,14 +62,11 @@ IndexTable.component('index-table', {
 	</div>
 	`,
 	mounted () {
-		this.init_index();
+		for (dev in this.devices) {
+				this.init_device(this.devices[dev]);
+		};
 	},
 	methods: {
-		init_index() {
-			for (dev in this.devices) {
-				this.init_device(this.devices[dev]);
-			};
-		},
 		add_device() {
 			console.log(this.addForm); console.log(typeof(this.addForm));
 			config = this.config;
@@ -81,6 +81,7 @@ IndexTable.component('index-table', {
 					this.status['global'] = error;
 					console.log(error);
 				});
+		location.reload(true);
 		},
 		init_device(device) {
 			payload = { 'model' : device['model'], 'pk' : device['pk'] };
@@ -101,9 +102,11 @@ IndexTable.component('index-table', {
 					console.log(error);
 				});
 		},
-		remove_device() {
+		remove_device(device) {
+			payload = { 'model' : device['model'], 'pk' : device['pk'] };
 			config = this.config;
 			config['data'][0] = 'DELETE';
+			config['data'][1] = payload;
 			console.log(config)
 			axios(config)
 				.then(response => {
@@ -114,20 +117,24 @@ IndexTable.component('index-table', {
 					this.status['global'] = error;
 					console.log(error);
 				});
+			location.reload(true);
 		},
-		/* currently not in use
-		detail_device() {
+		// currently not in use
+		detail_device(device) {
+			location.href = '/main/detail.html';
 			//window.location.replace('/device/');
-			
+			payload = { 'model' : device['model'], 'pk' : device['pk'] };
 			config = this.config;
 			config['data'][0] = 'DETAIL';
-			axios(config)
+			config['data'][1] = payload;
+			console.log(config)
+			axios(config) 
 				.then(response => {
 					console.log(response); 
 					//this.detail = response.data; 
 					})
-				.catch(error => console.log(error));
-		}, */
+				.catch(error => console.log(error)); 
+		},
 		overview_device(device) {
 			var index = this.overview.indexOf(device);
 			if (index !== -1) {

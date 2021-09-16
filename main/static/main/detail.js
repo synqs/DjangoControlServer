@@ -34,6 +34,7 @@ DetailTable.component('detail-table', {
 		key : {},
 		config : [],
 		editForm : {},
+		alert : true,
 		}
 	},
 	compilerOptions: {
@@ -90,7 +91,7 @@ DetailTable.component('detail-table', {
 		<div class="col-3 text-center">laser lock : <input class="w-50" v-model="this.setup['lock']" placeholder="channel (e.g. A3)"></div>
   	</div>
 	
-	[[ this.setup['convert'] ]]
+	<button class="btn btn-info w-100" v-on:click="this.talk_to_me()">talk to me!</button>
 	
   	<div id="init_plot" style="width:1600px;height:650px;"></div>
   	
@@ -175,25 +176,6 @@ DetailTable.component('detail-table', {
 				});
 		},
 		edit_device() {
-			/*
-			if ( 'save' in this.editForm ) {
-				this.setup['save'] = this.editForm['save'];
-				delete this.editForm['save'];
-			}
-			else if ( 'sleep' in this.editForm ) {
-				this.setup['sleep'] = this.editForm['sleep'];
-				if ( this.switch ) {
-					clearInterval(this.timer);
-					this.timer = setInterval(()=>{this.get_device()}, 1000*this.editForm['sleep']);
-				};
-				delete this.editForm['sleep'];
-			}
-			else if ( 'name' in this.editForm ) {
-				this.setup['name'] = this.editForm['name'];
-				delete this.editForm['name'];
-			};
-			*/
-			
 			config = this.config;
 			config['data'][0] = 'EDIT';
 			config['data'][1]['params'] = this.editForm;
@@ -217,19 +199,15 @@ DetailTable.component('detail-table', {
 				init_data.push(k);
 			};
 			var init_layout = {};
-			
 			Plotly.newPlot(INIT_PLOT, init_data, init_layout);
 		},
 		update_plot(update_data) {
 			var update_x = []; var update_y = []; var traces = [];
 			
 			for ( k in Object.keys(update_data).splice(1) ) {
-				//if ( Object.values(this.key).splice(1)[k] ) {
 					update_x[k] = [update_data['updated']];
 					update_y[k] = [update_data[Object.keys(this.key).splice(1)[k]]]; 
 					traces.push(parseInt(k));
-				//};
-				// traces.push(parseInt(k));
 			};
 			
 			Plotly.extendTraces('init_plot', {x:update_x,y:update_y,},traces); 
@@ -241,22 +219,11 @@ DetailTable.component('detail-table', {
 		is_locked() {
 			if ( this.setup['lock'] in this.key ) {
 				ch = this.setup['lock'];
-				console.log('yes');
-				if ( this.data[ch] < 2.8 || 4.8 < this.data[ch] ) {
+				if ( (this.data[ch] < 2.8 || 4.8 < this.data[ch]) && this.alert ) {
+					this.alert = !this.alert;
 					this.setup['status'] = "Laser is not locked !!!";
 					
-					Email.send({
-							SecureToken : "950c40cc-2103-4fb0-a64c-2c732ae8fb81",
-							//Host: "smtp.gmail.com",
-							//Username : "naka.labpc@gmail.com",
-							//Password : "nakaramen",
-							To: 'klara101klaro@gmail.com',
-							From: "naka.labpc@gmail.com",
-							Subject: "NAKA",
-							Body: "Laser is not locked !!!",})
-						.then(function (message) {
-							alert("mail sent successfully")
-						});
+					this.talk_to_me();
 				};
 			};
 		},
@@ -279,9 +246,47 @@ DetailTable.component('detail-table', {
 		},
 		reset() {
 			this.datas = [];
-			console.log(this.datas);
 			Plotly.deleteTraces('init_plot', [0,1,2,3,4,5]);
 			this.init_plot(Object.keys(this.key));
+		},
+		talk_to_me() {
+			config = {	method : 'POST',
+						url : '/alert/',
+						xsrfCookieName : 'csrftoken',
+						xsrfHeaderName : 'X-CSRFTOKEN',
+			};
+					
+			axios(config)
+				.then(response => {
+					console.log(this.response);
+					this.setup['status'] = response.data['message'];
+					})
+				.catch(error => {
+					console.log(error);
+					this.setup['status'] = error;
+				});
+				
+			/*let params = {
+				token: 'xoxb-151435687653-2406815256001-UqYnJ2LX3tg0aiNlWAtfifE7',
+				channel: '#naka_laserlock', 
+				text: ':wave: Hello, welcome to the channel!',
+			};
+			
+			const qs = Object.keys(params)
+							.map(key => `${key}=${params[key]}`)
+							.join('&');
+							
+			config = {	method : 'POST',
+						url : 'https://hooks.slack.com/services/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',
+						//xsrfCookieName : 'csrftoken',
+						//xsrfHeaderName : 'X-CSRFTOKEN',
+						//headers : { 'Content-Type' : 'application/json' },
+						//responseType : 'text',
+						data : { "text" : "hello" },
+					};
+			axios.post('https://slack.com/api/chat.postMessage', `${qs}`)
+				.then(response => {console.log(this.response);})
+				.catch(error => {console.log(error);console.log(this.response);}); */
 		},
 	},
 })
@@ -304,6 +309,3 @@ function downloadCSV(csv, filename) {
 
 	downloadLink.click(); // Click download link
 }
-
-Math.random().toString().substr(2, 5);
-//document.getElementById("cors") = token;*/
