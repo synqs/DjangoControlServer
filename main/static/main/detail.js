@@ -35,6 +35,7 @@ DetailTable.component('detail-table', {
 		config : [],
 		editForm : {},
 		alert : true,
+		init : true,
 		}
 	},
 	compilerOptions: {
@@ -52,7 +53,7 @@ DetailTable.component('detail-table', {
 				<div class="col-5">
 					<h6>CSV name : <input v-model="this.setup['name']" placeholder="name for CSV"/>.csv</h6>
 					<h6>Next CSV Download : <input class="w-25" v-model="this.setup['save']" placeholder="savetime in 'hh:mm:ss'"/> today</h6>
-					<h6>Current Sleeptime : <input class="w-25" v-model="this.setup['sleep']" placeholder="sleeptime in s"> s</h6>
+					<h6>Current Sleeptime : <input class="w-25" v-model="this.setup['sleep']" placeholder="sleeptime in s" v-on:blur="this.stop_device(), this.start_device()"> s</h6>
 				</div>
 			</div></div>
 		</div></div>
@@ -91,7 +92,7 @@ DetailTable.component('detail-table', {
 		<div class="col-3 text-center">laser lock : <input class="w-50" v-model="this.setup['lock']" placeholder="channel (e.g. A3)"></div>
   	</div>
 	
-	<button class="btn btn-info w-100" v-on:click="this.talk_to_me()">talk to me!</button>
+	<button class="btn btn-info w-100" v-on:click="this.slackbot('TALK')">talk to me!</button>
 	
   	<div id="init_plot" style="width:1600px;height:650px;"></div>
   	
@@ -110,7 +111,7 @@ DetailTable.component('detail-table', {
 	</table></div>
 	`,
 	mounted () {
-		this.init_device();
+		this.get_device();
 	},
 	updated () { // export data every new day automatically
 		var now = this.data['updated'].slice(11,19);
@@ -125,28 +126,6 @@ DetailTable.component('detail-table', {
 		this.is_locked();
 	},
 	methods: {
-		init_device() { // initialize device and create config for further axios requests
-			payload = { model : this.device.model, pk : this.device.pk };
-			config = {	method : 'POST',
-					url : '/device/',
-					xsrfCookieName: 'csrftoken',
-					xsrfHeaderName: 'X-CSRFTOKEN',
-					data : ['STATUS', payload] };
-			this.config = config;
-			axios(config)
-				.then(response => {
-					this.data = response.data['value'];
-					this.setup['status'] = response.data['message'];
-					this.setup['name'] = this.device.fields.name + '_' + this.data['updated'].slice(0,10);
-					this.key = response.data['keys'];
-					
-					this.init_plot(response.data['keys']);
-				})
-				.catch(error => {
-					this.setup['status'] = error;
-					console.log(error);
-				});
-		},
 		start_device() { // start fetching data every dt = sleeptime
 			this.switch = true;
 			this.timer = setInterval(()=>{this.get_device()}, 1000*this.setup['sleep']);
@@ -154,20 +133,29 @@ DetailTable.component('detail-table', {
 		stop_device() { // stop fetching data
 			clearInterval(this.timer);
 		},
-		get_device() { // fetch a single set of data directly from arduino (axios)
-			config = this.config;
-			config['data'][0] = 'DATA';
+		get_device() { // fetch a single set of data from arduino (with python in views.py)
+			payload = { 'model' : this.device['model'], 'pk' : this.device['pk'] };
+			config = {	method : 'POST',
+					url : '/' + this.device['model'] + '/' + this.device.fields['name'] + '/',
+					xsrfCookieName: 'csrftoken',
+					xsrfHeaderName: 'X-CSRFTOKEN',
+					data : { command :'STATUS', device : payload, }
+			};
 			axios(config)
 				.then(response => {
-					for ( k in Object.keys(this.setup['convert']).filter(i => this.setup['convert'][i]) ) {
+					if ( this.init ) { 
+						this.key = response.data['keys']; 
+						this.init_plot(response.data['keys']);
+						this.setup['name'] = this.device.fields.name + '_' + response.data['value']['updated'].slice(0,10);
+						this.init = !this.init;
+					}
+					for ( k in Object.keys(this.setup['convert']) ) {
 						ch = Object.keys(this.setup['convert'])[k];
 						response.data['value'][ch] = this.conversion(response.data['value'][ch]);
 					}
-					
 					this.data = response.data['value'];
 					this.datas.unshift(response.data['value']);
 					this.setup['status'] = response.data['message'];
-
 					this.update_plot(response.data['value']);
 				})
 				.catch(error => {
@@ -177,12 +165,10 @@ DetailTable.component('detail-table', {
 		},
 		edit_device() {
 			config = this.config;
-			config['data'][0] = 'EDIT';
-			config['data'][1]['params'] = this.editForm;
+			config['data']['command'] = 'EDIT';
+			config['data']['params'] = this.editForm;
 			axios(config)
-				.then(response => {
-					this.setup['status'] = response.data['message'];
-					})
+				.then(response => {this.setup['status'] = response.data['message'];})
 				.catch(error => console.log(error));
 		},
 		init_plot(init_keys) {
@@ -222,8 +208,8 @@ DetailTable.component('detail-table', {
 				if ( (this.data[ch] < 2.8 || 4.8 < this.data[ch]) && this.alert ) {
 					this.alert = !this.alert;
 					this.setup['status'] = "Laser is not locked !!!";
-					
-					this.talk_to_me();
+					alert("Laser out of lock!");
+					this.slackbot('ALERT');
 				};
 			};
 		},
@@ -249,11 +235,13 @@ DetailTable.component('detail-table', {
 			Plotly.deleteTraces('init_plot', [0,1,2,3,4,5]);
 			this.init_plot(Object.keys(this.key));
 		},
-		talk_to_me() {
+		slackbot(command) {
 			config = {	method : 'POST',
-						url : '/alert/',
+						url : '/slackbot/',
 						xsrfCookieName : 'csrftoken',
 						xsrfHeaderName : 'X-CSRFTOKEN',
+						data : { 	device : this.device['model'] + '/' + this.device.fields['name'] + '/',
+									command : command , message : 'Hello.', },
 			};
 					
 			axios(config)
@@ -265,34 +253,9 @@ DetailTable.component('detail-table', {
 					console.log(error);
 					this.setup['status'] = error;
 				});
-				
-			/*let params = {
-				token: 'xoxb-151435687653-2406815256001-UqYnJ2LX3tg0aiNlWAtfifE7',
-				channel: '#naka_laserlock', 
-				text: ':wave: Hello, welcome to the channel!',
-			};
-			
-			const qs = Object.keys(params)
-							.map(key => `${key}=${params[key]}`)
-							.join('&');
-							
-			config = {	method : 'POST',
-						url : 'https://hooks.slack.com/services/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',
-						//xsrfCookieName : 'csrftoken',
-						//xsrfHeaderName : 'X-CSRFTOKEN',
-						//headers : { 'Content-Type' : 'application/json' },
-						//responseType : 'text',
-						data : { "text" : "hello" },
-					};
-			axios.post('https://slack.com/api/chat.postMessage', `${qs}`)
-				.then(response => {console.log(this.response);})
-				.catch(error => {console.log(error);console.log(this.response);}); */
 		},
 	},
-})
-
-/* At last, mount the detail-app */
-DetailTable.mount('#devicedetail');
+});
 
 /* These are functions for translating the html data to csv and downloading the log */
 function downloadCSV(csv, filename) {
@@ -308,4 +271,24 @@ function downloadCSV(csv, filename) {
 	document.body.appendChild(downloadLink); // Add the link to DOM
 
 	downloadLink.click(); // Click download link
-}
+};
+
+function get_CCSV(arr) {
+	var name = this.setup['name'] + '.csv';
+	
+	var array = typeof arr != 'object' ? JSON.parse(arr) : arr;
+	var str = Object.keys(arr[0]).toString() + '\r\n';
+
+	for (var i = 0; i < array.length; i++) {
+		var line = '';
+		for (var index in array[i]) {
+			if (line != '') line += ','
+				line += array[i][index];
+		}
+		str += line + '\r\n';
+	}	
+	downloadCSV(str, name); // Download CSV file
+};
+
+/* At last, mount the detail-app */
+DetailTable.mount('#devicedetail');

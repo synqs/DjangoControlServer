@@ -5,9 +5,9 @@ from django.core.validators import MaxValueValidator
 # Create your models here.
 class PDmon(models.Model):
 	id = models.BigAutoField(primary_key=True)
-	name = models.CharField(max_length=20, unique=True)		# should match DNS name eg. nakayun1
+	name = models.CharField(max_length=20, unique=True)			# should match DNS name eg. nakayun1
 	description = models.CharField(max_length=100, blank=True)	# add. description eg. 2D-MOT path
-	ip = models.CharField(max_length=20)				# device ip
+	ip = models.CharField(max_length=20)						# device ip
 	
 	# parameters/values for pdmon
 	dVmax = models.FloatField(blank=True, default=0.5)
@@ -19,14 +19,9 @@ class PDmon(models.Model):
 		return 'http://' + self.ip + '/'
 
 	def keys(self):
-		# keys = ['updated']
 		keys = {'updated': True }
-
-		for i in range(6):
-			# keys.append('true')
-			# keys.append("A" + str(i))
-			keys["A" + str(i)] = True
-			# keys["P" + str(i)] = 'false';
+		for i in range(6): keys["A" + str(i)] = True
+		
 		return keys
 	
 	def set(self, key, param):
@@ -40,14 +35,14 @@ class PDmon(models.Model):
 			return False
 		
 	def limits(self):
-		limits = [{'V' : self.dVmax }] 
+		limits = {'V' : self.dVmax } 
 		return limits
 
 class Tctrl(models.Model):
 	id = models.BigAutoField(primary_key=True)
-	name = models.CharField(max_length=20, unique=True)		# should match DNS name eg. nakayun1
+	name = models.CharField(max_length=20, unique=True)			# should match DNS name eg. nakayun1
 	description = models.CharField(max_length=100, blank=True)	# add. description eg. 2D-MOT path
-	ip = models.CharField(max_length=20, blank=True)		# device ip
+	ip = models.CharField(max_length=20, blank=True)			# device ip
 
 	# parameters/values for tctrl
 	setpointmax = models.IntegerField(default=100, validators=[MaxValueValidator(100)])
@@ -64,8 +59,8 @@ class Tctrl(models.Model):
 		return 'http://' + self.ip + '/'
 
 	def keys(self):
-		keys = {'updated':'true', 'setpoint':'true', 'T':'true', 'error':'true',
-			'output':'true', 'P':'true', 'I':'true', 'D':'true'}
+		keys = {	'updated':'true', 'setpoint':'true', 'T':'true', 'error':'true',
+					'output':'true', 'P':'true', 'I':'true', 'D':'true'}
 		return keys
 
 	def set(self, key, param):
@@ -79,5 +74,11 @@ class Tctrl(models.Model):
 			return False
 
 	def limits(self):
-		limits = [{ 'T' : self.dTmax }]
+		limits = { 'T' : self.dTmax }
 		return limits
+
+class mokugo(models.Model):
+	id = models.BigAutoField(primary_key=True)
+	name = models.CharField(max_length=20, unique=True)			# should match DNS name eg. nakayun1
+	description = models.CharField(max_length=100, blank=True)	# add. description eg. 2D-MOT path
+	ip = models.CharField(max_length=20, blank=True)			# device ip

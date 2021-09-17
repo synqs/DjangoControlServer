@@ -2,8 +2,6 @@ const IndexTable = Vue.createApp({});
 
 IndexTable.component('index-table', {
 	data ()  { return {
-		status : { global : "Connecting to devices..." },
-		config : {},
 		addForm : {},
 		overview : {},
 		}
@@ -13,12 +11,6 @@ IndexTable.component('index-table', {
 	},
 	props: ['devices'],
 	template: `
-	
-	<div class="alert alert-info alert-dismissible fade show" role="alert">
-		[[ this.status['global'] ]]
-		<!-- button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button -->
-	</div>
-	
 	<div class="row mb-3">
 		<div class="col"><select v-model="this.addForm['model']" class="form-select">
 			<option value="main.pdmon">PDmon</option>
@@ -31,130 +23,115 @@ IndexTable.component('index-table', {
 	</div>
 	
 	<table class="table table-striped">
-		<thead class="table-dark">
-			<tr>
+		<thead class="table-dark"><tr>
 			<th>Name</th>
 			<th>Description</th>
 			<th>IP</th>
-			<th style="width: 250px; ">Status</th>
-			<th colspan=2></th>
-			</tr>
-		</thead>
+			<th>Status</th>
+			<th></th>
+			<th>Show Overview</th>
+		</tr></thead>
 		<tbody><tr v-for="device in this.devices">
-			<td>
-				<a v-bind:href="'/' + device.model + '/' + device.pk + '/'">[[ device.fields.name ]]</a>
-				<!-- button class="btn btn-warning" v-on:click="detail_device(device)">Detail</button -->
-			</td>
-			<td>[[ device.fields.description ]]</td>
-			<td>[[ device.fields.ip ]]</td>
-			<td>[[ this.status[device.fields.name] ]]</td>
-			<td><button class="btn btn-warning" v-on:click="remove_device(device)">Remove</button></td>
-			<td><div class="form-check form-switch">
-  				<input class="form-check-input" type="checkbox" v-model="this.overview[this.devices.indexOf(device)]">
-  			</div></td>
+			<device-widget v-bind:device="device" v-model="this.overview[this.devices.indexOf(device)]"></device-widget>
 		</tr></tbody>
 	</table>
 	
 	<div class="row">
 		<div class="col-4" v-for="index in Object.keys(this.overview).filter(dev => this.overview[dev])">
-			<overview_card v-bind:device="this.devices[index]"></overview_card>
+			<overview-card v-bind:device="this.devices[index]"></overview-card>
 		</div>
 	</div>
 	`,
-	mounted () {
-		for (dev in this.devices) {
-				this.init_device(this.devices[dev]);
-		};
+	mounted () { 
 	},
 	methods: {
 		add_device() {
-			console.log(this.addForm); console.log(typeof(this.addForm));
-			config = this.config;
-			config['data'][0] = 'ADD';
-			config['data'][1] = this.addForm;
-			console.log(config);
-			axios(config)
-				.then(response => {
-					//console.log(response.data);
-					this.status['global'] = response.data['message']; })
-				.catch(error => {
-					this.status['global'] = error;
-					console.log(error);
-				});
-		location.reload(true);
-		},
-		init_device(device) {
-			payload = { 'model' : device['model'], 'pk' : device['pk'] };
 			config = {	method : 'POST',
-					url : '/device/',
+					url : '/' + this.device['model'] + '/' + this.device.fields['name'] + '/',
 					xsrfCookieName: 'csrftoken',
 					xsrfHeaderName: 'X-CSRFTOKEN',
-					data : ['STATUS', payload] };
+					data : { command :'ADD', device : this.addForm, }
+			};
+			axios(config)
+				.then(response => {this.globalstatus = response.data['message']; })
+				.catch(error => {
+					this.globalstatus = error;
+					console.log(error);
+				});
+			location.reload(true);
+		},
+	},
+});
+
+IndexTable.component('device-widget', {
+	data () { return {
+		status : 'Trying to connect...',
+		config : {},
+		overview : false,
+		}
+	},
+	props : ['device', 'modelValue'],
+	emits: ['update:modelValue'],
+	compilerOptions: {
+		delimiters: ['[[', ']]'],
+	},
+	template: `
+	<td>
+		<a v-bind:href="'/' + device.model + '/' + device.fields['name'] + '/'">[[ device.fields['name'] ]]</a>
+		<!-- button class="btn btn-warning" v-on:click="detail_device()">Detail</button -->
+	</td>
+	<td>[[ device.fields['description'] ]]</td>
+	<td>[[ device.fields['ip'] ]]</td>
+	<td>[[ this.status ]]</td>
+	<td><button class="btn btn-warning" v-on:click="remove_device()">Remove</button></td>
+	<td><div class="form-check form-switch">
+		<input class="form-check-input" type="checkbox" v-on:click="this.overview = !this.overview, $emit('update:modelValue', this.overview)">
+	</div></td>
+	`,
+	mounted () {
+		this.get_device();
+	},
+	methods : {
+		get_device() {
+			payload = { 'model' : this.device['model'], 'pk' : this.device['pk'] };
+			config = {	method : 'POST',
+					url : '/' + this.device['model'] + '/' + this.device.fields['name'] + '/',
+					xsrfCookieName: 'csrftoken',
+					xsrfHeaderName: 'X-CSRFTOKEN',
+					data : { command : 'STATUS', device : payload, }
+			};
 			this.config = config;
 			axios(config)
-				.then(response => { 
-					this.status[device['fields']['name']] = response.data['message'];
-					this.status['global'] = "All devices ready!";
-				})
+				.then(response => {this.status = response.data['message'];})
 				.catch(error => {
-					this.status[device['fields']['name']] = error;
-					this.status['global'] = "There was an error...";
+					this.status = error;
+					globalstatus = "There was an error...";
 					console.log(error);
 				});
 		},
-		remove_device(device) {
-			payload = { 'model' : device['model'], 'pk' : device['pk'] };
+		remove_device() {
 			config = this.config;
-			config['data'][0] = 'DELETE';
-			config['data'][1] = payload;
-			console.log(config)
+			config['data']['command'] = 'DELETE';
 			axios(config)
-				.then(response => {
-					console.log(response);
-					this.status = response.data['message'];
-				})
+				.then(response => {this.status = response.data['message'];})
 				.catch(error => {
+					this.status = error;
 					this.status['global'] = error;
 					console.log(error);
 				});
 			location.reload(true);
 		},
-		// currently not in use
-		detail_device(device) {
-			location.href = '/main/detail.html';
-			//window.location.replace('/device/');
-			payload = { 'model' : device['model'], 'pk' : device['pk'] };
-			config = this.config;
-			config['data'][0] = 'DETAIL';
-			config['data'][1] = payload;
-			console.log(config)
-			axios(config) 
-				.then(response => {
-					console.log(response); 
-					//this.detail = response.data; 
-					})
-				.catch(error => console.log(error)); 
-		},
-		overview_device(device) {
-			var index = this.overview.indexOf(device);
-			if (index !== -1) {
-    				this.overview.splice(index, 1);
-			}
-			else {
-				this.overview.push(device);
-			}
-		},
 	},
 });
 
-IndexTable.component('overview_card', {
+IndexTable.component('overview-card', {
 	data () { return {
 		data : [],
 		datas : [],
-		setup : {	'status' : 'Trying to connect...', 'sleep' : '5', 'save' : '00:00:00', 'name' : 'test',
-					'convert' : {}, 'lock' : ''},
+		setup : {	'status' : 'Trying to connect...', 'sleep' : '5', 'save' : '00:00:00',
+					'name' : 'test', 'convert' : {}, 'lock' : ''},
 		key : {},
-		config : [],
+		init : true,
 		}
 	},
 	props : ['device'],
@@ -186,9 +163,9 @@ IndexTable.component('overview_card', {
 	</div>
 	`,
 	mounted () {
-		this.init_device();
+		this.get_device();
 	},
-	updated () { // export data every new day automatically
+	updated () { // export data as csv on savetime automatically & check lock
 		var now = this.data['updated'].slice(11,19);
 		var save = this.setup['save'].slice(0,7);
 		if (now.slice(0,7) == save && parseInt(now.slice(-1)) < parseInt(this.setup['sleep'])) {
@@ -199,26 +176,6 @@ IndexTable.component('overview_card', {
 		this.is_locked();
 	},
 	methods: {
-		init_device() { // initialize device and create config for further axios requests
-			payload = { model : this.device.model, pk : this.device.pk };
-			config = {	method : 'POST',
-					url : '/device/',
-					xsrfCookieName: 'csrftoken',
-					xsrfHeaderName: 'X-CSRFTOKEN',
-					data : ['STATUS', payload] };
-			this.config = config;
-			axios(config)
-				.then(response => {
-					this.data = response.data['value'];
-					this.setup['status'] = response.data['message'];
-					this.setup['name'] = this.device.fields.name + '_' + this.data['updated'].slice(0,10);
-					this.key = response.data['keys'];
-				})
-				.catch(error => {
-					this.setup['status'] = error;
-					console.log(error);
-				});
-		},
 		start_device() { // start fetching data every dt = sleeptime
 			this.switch = true;
 			this.timer = setInterval(()=>{this.get_device()}, 1000*this.setup['sleep']);
@@ -226,20 +183,24 @@ IndexTable.component('overview_card', {
 		stop_device() { // stop fetching data
 			clearInterval(this.timer);
 		},
-		get_device() { // fetch a single set of data directly from arduino (axios)
-			config = this.config;
-			config['data'][0] = 'DATA';
+		get_device() { // fetch a single set of data from arduino (with python in views.py)
+			payload = { 'model' : this.device['model'], 'pk' : this.device['pk'] };
+			config = {	method : 'POST',
+					url : '/' + this.device['model'] + '/' + this.device.fields['name'] + '/',
+					xsrfCookieName: 'csrftoken',
+					xsrfHeaderName: 'X-CSRFTOKEN',
+					data : { command :'STATUS', device : payload, }
+			};
 			axios(config)
 				.then(response => {
 					for ( k in Object.keys(this.setup['convert']) ) {
 						ch = Object.keys(this.setup['convert'])[k];
 						response.data['value'][ch] = this.conversion(response.data['value'][ch]);
 					}
-					
+					if ( this.init ) { this.key = response.data['keys']; this.init = !this.init; }
 					this.data = response.data['value'];
 					this.datas.unshift(response.data['value']);
 					this.setup['status'] = response.data['message'];
-
 				})
 				.catch(error => {
 					this.setup['status'] = error;
@@ -249,22 +210,8 @@ IndexTable.component('overview_card', {
 		is_locked() {
 			if ( this.setup['lock'] in this.key ) {
 				ch = this.setup['lock'];
-				console.log('yes');
 				if ( this.data[ch] < 2.8 || 4.8 < this.data[ch] ) {
 					this.setup['status'] = "Laser is not locked !!!";
-					
-					Email.send({
-							SecureToken : "950c40cc-2103-4fb0-a64c-2c732ae8fb81",
-							//Host: "smtp.gmail.com",
-							//Username : "naka.labpc@gmail.com",
-							//Password : "nakaramen",
-							To: 'klara101klaro@gmail.com',
-							From: "naka.labpc@gmail.com",
-							Subject: "NAKA",
-							Body: "Laser is not locked !!!",})
-						.then(function (message) {
-							alert("mail sent successfully")
-						});
 				};
 			};
 		},
