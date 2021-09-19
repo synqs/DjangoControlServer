@@ -5,6 +5,7 @@ from .forms import UpdateSetpointForm
 from django.core import serializers
 import requests, json
 from requests.exceptions import HTTPError
+from django.template.response import TemplateResponse
 
 ### device index related view ###
 def index(request):
@@ -39,7 +40,7 @@ def device(request, device_typ, device_name):
 	command = r_dict['command']
 	
 	if command == 'DELETE':
-		get_object_or_404(typ, pk=r_dict['device']['pk']).delete()
+		get_object_or_404(typ, name=device_name).delete()
 		response['message'] = 'Deleted successfully.'
 	if command == 'ADD':
 		r_dict['device'].pop('model')
@@ -49,7 +50,7 @@ def device(request, device_typ, device_name):
 
 	else: 
 		try:
-			device = get_object_or_404(typ, pk=r_dict['device']['pk']) # also consider 'update_or_create()'
+			device = get_object_or_404(typ, name=device_name) # also consider 'update_or_create()'
 			url = device.http_str() + 'data/get'
 			r = requests.get(url)
 			r.raise_for_status()
@@ -90,12 +91,22 @@ def setSetpoint(request):
 ### views to communitcate with slackbot ###
 
 def slackbot(request):
+	response = {}
+
+	if request.method == 'GET':
+		return render(request, 'main/slackbot.html')
+		
+	if request.method == 'POST':
+		print(request.text)
+		print(json.loads(request.body.decode()))
+		return HttpResponse()
+		
 	r_dict = json.loads(request.body.decode())
 	print(r_dict)
 	response = {}
 	
 	if r_dict['command'] == 'ALERT':
-		redirect_url = "http://localhost:8000/" + r_dict['device']
+		redirect_url = "http://localhost:8000/" + r_dict['device_url']
 		text = ":fire: ALERT!!! \n The laser is out of lock!"
 	else:
 		redirect_url = "https://mir-s3-cdn-cf.behance.net/project_modules/disp/8faa1a12225183.562654f31f78a.gif"
@@ -130,7 +141,7 @@ def slackbot(request):
 	}
 	headers = { 
 		"Content-type" : "application/json",
-		"Authorization" : "Bearer xoxb-151435687653-2406815256001-CrFMwV39xMDxa2KO2lElUUm2",
+		"Authorization" : "Bearer xoxb-151435687653-2406815256001-cN6yd7QMbAj9pZM9s6Sazt7v",
 	}
 	
 	try:

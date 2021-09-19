@@ -134,12 +134,11 @@ DetailTable.component('detail-table', {
 			clearInterval(this.timer);
 		},
 		get_device() { // fetch a single set of data from arduino (with python in views.py)
-			payload = { 'model' : this.device['model'], 'pk' : this.device['pk'] };
 			config = {	method : 'POST',
 					url : '/' + this.device['model'] + '/' + this.device.fields['name'] + '/',
 					xsrfCookieName: 'csrftoken',
 					xsrfHeaderName: 'X-CSRFTOKEN',
-					data : { command :'STATUS', device : payload, }
+					data : { command :'STATUS', }
 			};
 			axios(config)
 				.then(response => {
@@ -240,7 +239,7 @@ DetailTable.component('detail-table', {
 						url : '/slackbot/',
 						xsrfCookieName : 'csrftoken',
 						xsrfHeaderName : 'X-CSRFTOKEN',
-						data : { 	device : this.device['model'] + '/' + this.device.fields['name'] + '/',
+						data : { 	device_url : this.device['model'] + '/' + this.device.fields['name'] + '/',
 									command : command , message : 'Hello.', },
 			};
 					
@@ -255,7 +254,7 @@ DetailTable.component('detail-table', {
 				});
 		},
 	},
-});
+})
 
 /* These are functions for translating the html data to csv and downloading the log */
 function downloadCSV(csv, filename) {
@@ -271,10 +270,10 @@ function downloadCSV(csv, filename) {
 	document.body.appendChild(downloadLink); // Add the link to DOM
 
 	downloadLink.click(); // Click download link
-};
+}
 
-function get_CCSV(arr) {
-	var name = this.setup['name'] + '.csv';
+function exportTableToCSV(arr, arrname) {
+	var name = arrname + '.csv';
 	
 	var array = typeof arr != 'object' ? JSON.parse(arr) : arr;
 	var str = Object.keys(arr[0]).toString() + '\r\n';
@@ -288,7 +287,7 @@ function get_CCSV(arr) {
 		str += line + '\r\n';
 	}	
 	downloadCSV(str, name); // Download CSV file
-};
+}
 
 /* At last, mount the detail-app */
 DetailTable.mount('#devicedetail');

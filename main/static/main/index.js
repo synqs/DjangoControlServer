@@ -22,7 +22,7 @@ IndexTable.component('index-table', {
 		<div class="col"><button class="btn btn-info w-100" v-on:click="add_device()">submit</button></div>
 	</div>
 	
-	<table class="table table-striped">
+	<table class="table table-striped align-middle">
 		<thead class="table-dark"><tr>
 			<th>Name</th>
 			<th>Description</th>
@@ -77,8 +77,7 @@ IndexTable.component('device-widget', {
 	},
 	template: `
 	<td>
-		<a v-bind:href="'/' + device.model + '/' + device.fields['name'] + '/'">[[ device.fields['name'] ]]</a>
-		<!-- button class="btn btn-warning" v-on:click="detail_device()">Detail</button -->
+		<button class="btn btn-secondary" v-on:click="detail_device()">[[ device.fields['name'] ]]</button>
 	</td>
 	<td>[[ device.fields['description'] ]]</td>
 	<td>[[ device.fields['ip'] ]]</td>
@@ -93,12 +92,11 @@ IndexTable.component('device-widget', {
 	},
 	methods : {
 		get_device() {
-			payload = { 'model' : this.device['model'], 'pk' : this.device['pk'] };
 			config = {	method : 'POST',
 					url : '/' + this.device['model'] + '/' + this.device.fields['name'] + '/',
 					xsrfCookieName: 'csrftoken',
 					xsrfHeaderName: 'X-CSRFTOKEN',
-					data : { command : 'STATUS', device : payload, }
+					data : { command : 'STATUS',}
 			};
 			this.config = config;
 			axios(config)
@@ -120,6 +118,10 @@ IndexTable.component('device-widget', {
 					console.log(error);
 				});
 			location.reload(true);
+		},
+		detail_device() {
+			var windowFeatures = "menubar=yes,location=yes,resizable=yes,scrollbars=yes,status=yes";
+			window.open('/' + this.device['model'] + '/' + this.device.fields['name'] + '/', "test", windowFeatures);
 		},
 	},
 });
@@ -184,12 +186,11 @@ IndexTable.component('overview-card', {
 			clearInterval(this.timer);
 		},
 		get_device() { // fetch a single set of data from arduino (with python in views.py)
-			payload = { 'model' : this.device['model'], 'pk' : this.device['pk'] };
 			config = {	method : 'POST',
 					url : '/' + this.device['model'] + '/' + this.device.fields['name'] + '/',
 					xsrfCookieName: 'csrftoken',
 					xsrfHeaderName: 'X-CSRFTOKEN',
-					data : { command :'STATUS', device : payload, }
+					data : { command :'STATUS', }
 			};
 			axios(config)
 				.then(response => {

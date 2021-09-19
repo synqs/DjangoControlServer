@@ -1,0 +1,12 @@
+{% extends "main/masterpage.html" %}
+{% load static %}
+
+{% block content %}
+{% csrf_token %}
+
+<div class="container-fluid" id="slackbot">
+	<slackbot></slackbot>
+</div>
+
+<script src="{% static 'main/slackbot.js' %}?rand=23423422"></script>
+{% endblock content %}
