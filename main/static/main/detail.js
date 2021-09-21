@@ -140,6 +140,7 @@ DetailTable.component('detail-table', {
 					xsrfHeaderName: 'X-CSRFTOKEN',
 					data : { command :'STATUS', }
 			};
+			this.config = config;
 			axios(config)
 				.then(response => {
 					if ( this.init ) { 
