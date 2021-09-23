@@ -23,9 +23,9 @@ function range(start, end) {
 //console.log(token);
 
 /* This is the main app for the detail page - below follow tables for PDmons and Tctrls */
-const DetailTable = Vue.createApp({})
+const ArduinoDetail = Vue.createApp({})
 
-DetailTable.component('detail-table', {
+ArduinoDetail.component('arduino', {
 	data() { return {
 		data : [],
 		datas : [],
@@ -291,4 +291,4 @@ function exportTableToCSV(arr, arrname) {
 }
 
 /* At last, mount the detail-app */
-DetailTable.mount('#devicedetail');
+ArduinoDetail.mount('#arduino');

@@ -1,0 +1,10 @@
+{% extends "main/masterpage.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container-fluid" id="arduino">
+	<arduino v-bind:device="{{ device }}"></arduino>
+</div>
+
+<script type="text/javascript" src="{% static 'main/arduino.js' %}"></script>
+{% endblock %}

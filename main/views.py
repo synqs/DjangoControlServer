@@ -1,11 +1,15 @@
-from django.shortcuts import render, redirect, get_object_or_404, get_list_or_404
-from django.http import HttpResponse, Http404, HttpResponseRedirect
-from .models import PDmon, Tctrl
-from .forms import UpdateSetpointForm
+from django.shortcuts import render, get_object_or_404, get_list_or_404
+from django.http import HttpResponse
 from django.core import serializers
-import requests, json
+from django.views.decorators.csrf import csrf_exempt
+
+from .models import PDmon, Tctrl
+
+import requests, json, os
+import .mokugo
+
 from requests.exceptions import HTTPError
-from django.template.response import TemplateResponse
+from urllib.parse import parse_qs
 
 ### device index related view ###
 def index(request):
@@ -18,8 +22,8 @@ def index(request):
 		context['message'] = 'No devices available!'
 	return render(request, 'main/index.html', context) # keep it like this or use the render-context shortcut...?
 
-### device detail related view ###
-def device(request, device_typ, device_name):
+### arduino detail related view ###
+def arduino(request, device_typ, device_name):
 	response = {}
 	
 	if device_typ == 'main.pdmon' : typ = PDmon
@@ -32,7 +36,7 @@ def device(request, device_typ, device_name):
 	
 		response['device'] = json.loads(detail[1:-1])
 		response['message'] = 'Device ready.'
-		return render(request, 'main/detail.html', response)
+		return render(request, 'main/arduino.html', response)
 		
 	# THIS IS FOR PROCESSING THE AXIOS REQUESTS #
 	r_dict = json.loads(request.body.decode())
@@ -82,24 +86,30 @@ def device(request, device_typ, device_name):
 	print(response)
 	return HttpResponse(json.dumps(response))
 
-def setSetpoint(request):
-	print('blub')
-	form = UpdateSetpoint(request.POST)
-	return HttpResponse({'form' : form })
-
+### views related to the moku:go ###
+def mokugo(request):
+	response = {}
+	r_dict = json.loads(request.body.decode())
 	
-### views to communitcate with slackbot ###
+	try:
+		device = get_object_or_404(mokugo, name=device_name)
+		print(device); print(type(device))
+		mokugo_data(ip=device.ip())
+	except Exception as err:
+		response['message'] = str(err)
+	else:
+		response['messgae'] = 'Data available.'
+		response['data'] = data
+	finally:
+		return HttpResponse(json.dumps(response))
 
+### views to communitcate with slackbot ###
 def slackbot(request):
 	response = {}
 
 	if request.method == 'GET':
+		print(request)
 		return render(request, 'main/slackbot.html')
-		
-	if request.method == 'POST':
-		print(request.text)
-		print(json.loads(request.body.decode()))
-		return HttpResponse()
 		
 	r_dict = json.loads(request.body.decode())
 	print(r_dict)
@@ -141,7 +151,7 @@ def slackbot(request):
 	}
 	headers = { 
 		"Content-type" : "application/json",
-		"Authorization" : "Bearer xoxb-151435687653-2406815256001-cN6yd7QMbAj9pZM9s6Sazt7v",
+		"Authorization" : "Bearer " + os.getenv("SLACKBOT_TOKEN"),
 	}
 	
 	try:
@@ -158,3 +168,53 @@ def slackbot(request):
 		response['message'] = 'Message send!'
 			
 	return HttpResponse(json.dumps(response))
+
+@csrf_exempt
+def commands(request):
+	qstring = request.body.decode()
+	print(json.dumps(parse_qs(qstring)))
+	json_dict = dict(parse_qs(qstring))
+	
+	print(json_dict['command'][0])
+	response = { "text" : "Command received!" }
+	return HttpResponse(json.dumps(response),status=200)
+
+@csrf_exempt	
+def events(request):
+	string = request.body.decode('utf-8')
+	json_dict = {x.split('=')[0]:int(x.split('=')[1]) for x in string.split("&")}
+	print(json_dict)
+	
+	if json_dict['token'] != os.getenv("VERIFICATION_TOKEN"):
+		return HttpResponse(status=403)
+		
+	#return the challenge code here
+	if 'type' in json_dict:
+		if json_dict['type'] == 'url_verification':
+			response_dict = {"challenge": json_dict['challenge']}
+			return HttpResponse(json.dumps(response_dict), safe=False)
+	
+	if ('event' in json_dict):
+		event_msg = json_dict['event']
+		if 'bot_id' in event_msg:
+			return HttpResponse(status=200)
+	
+	if event_msg['type'] == 'message':
+		user = event_msg['user']
+		channel = event_msg['channel']
+		
+		response_msg = ":wave:, Hello <@%s>" % user
+		url = "https://slack.com/api/chat.postMessage"
+		payload = {
+			"channel": channel,
+			"text": response_msg,
+		}
+		headers = { 
+			"Content-type" : "application/json",
+			"Authorization" : "Bearer " + os.getenv("SLACKBOT_TOKEN"),
+		}
+		
+		r = requests.post(url, json=payload, headers=headers)
+		return HttpResponse(status=200)
+	
+	return HttpResponse(status=200)

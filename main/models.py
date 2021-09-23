@@ -85,3 +85,6 @@ class mokugo(models.Model):
 	
 	def __str__(self):
 		return self.name
+		
+	def ip(self):
+		return self.ip
