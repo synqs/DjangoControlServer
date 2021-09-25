@@ -4,11 +4,11 @@
 {% block content %}
 {% csrf_token %}
 
-<p>{{ bot_message }}</p>
+<p>{{ message }}</p>
 
 <div class="container-fluid" id="mokugo">
-	<mokugo></mokugo>
+	<mokugo v-bind:mokugo="{{ device }}"></mokugo>
 </div>
 
-<script src="{% static 'main/mokugo.js' %}?rand=23423422"></script>
+<script src="{% static 'main/mokugo.js' %}"></script>
 {% endblock content %}

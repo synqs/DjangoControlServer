@@ -3,10 +3,9 @@ from django.http import HttpResponse
 from django.core import serializers
 from django.views.decorators.csrf import csrf_exempt
 
-from .models import PDmon, Tctrl
+from .models import PDmon, Tctrl, MokuGo
 
 import requests, json, os
-import .mokugo
 
 from requests.exceptions import HTTPError
 from urllib.parse import parse_qs
@@ -87,19 +86,35 @@ def arduino(request, device_typ, device_name):
 	return HttpResponse(json.dumps(response))
 
 ### views related to the moku:go ###
-def mokugo(request):
+def mokugo(request, mokugo_name):
 	response = {}
-	r_dict = json.loads(request.body.decode())
+	mokugo = get_object_or_404(MokuGo, name=mokugo_name)
+	print(mokugo); print(type(mokugo))
+	
+	if request.method == 'GET' :
+		detail = serializers.serialize('json', [mokugo])
+	
+		response['device'] = json.loads(detail[1:-1])
+		response['message'] = 'Device ready.'
+		return render(request, 'main/mokugo.html', response)
 	
 	try:
-		device = get_object_or_404(mokugo, name=device_name)
-		print(device); print(type(device))
-		mokugo_data(ip=device.ip())
+		mokugo.ping()
 	except Exception as err:
 		response['message'] = str(err)
 	else:
-		response['messgae'] = 'Data available.'
-		response['data'] = data
+		r_dict = json.loads(request.body.decode())
+		print(r_dict)
+		if r_dict['command'] == 'DATA':
+			print('data')
+			osc = mokugo.osc()
+			print(osc)
+			response['data'] = mokugo.osc()['data']
+			response['message'] = 'Data available.'
+		if r_dict['command'] == 'EXIT':
+			if mokugo.session():
+				mokugo.disconnect(session)
+			response['message'] = 'Mokugo disconnected.'
 	finally:
 		return HttpResponse(json.dumps(response))
 

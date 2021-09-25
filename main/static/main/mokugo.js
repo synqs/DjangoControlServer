@@ -1,19 +1,20 @@
 const MokugoDetail = Vue.createApp({});
 
-MokugoDetail.component('slackbot', {
+MokugoDetail.component('mokugo', {
 	data ()  { return {
 		data : { 'message' : '',},
 		}
 	},
+	props : ['mokugo'],
 	compilerOptions: {
 		delimiters: ['[[', ']]'],
 	},
 	template: `
 	[[ this.data['message'] ]]
+	[[ this.mokugo ]]
 	
-	<div class="input-group mb-3">
-		<input v-model="message" class="form-control" placeholder="Text to send via SlackBot">
-		<button class="btn btn-outline-secondary" v-on:click="this.get_mokugo()">SEND!</button>
+	<div class="mb-3 text-center">
+		<button class="btn btn-outline-secondary" v-on:click="this.get_mokugo()">Mokugo!</button>
 	</div>
 	[[ this.data ]]
 	`,
@@ -23,16 +24,30 @@ MokugoDetail.component('slackbot', {
 		get_mokugo() {
 			ip = '129.206.180.142'
 			config = {	method : 'POST',
-					url : '/mokugo/',
+					url : '/mokugo/' + this.mokugo.fields['name'] + '/',
 					xsrfCookieName: 'csrftoken',
 					xsrfHeaderName: 'X-CSRFTOKEN',
-					data : { 'ip' : ip }
+					data : { 'ip' : ip, 'command' : 'DATA', }
 			};
 			axios(config)
 				.then(response => {
 					console.log(response.data);
 					this.data = response.data;
-					this.message = response.data['message']
+				})
+				.catch(error => {console.log(error);});
+		},
+		exit_mokugo() {
+			ip = '129.206.180.142'
+			config = {	method : 'POST',
+					url : '/mokugo/',
+					xsrfCookieName: 'csrftoken',
+					xsrfHeaderName: 'X-CSRFTOKEN',
+					data : { 'ip' : ip, 'command' : 'EXIT', }
+			};
+			axios(config)
+				.then(response => {
+					console.log(response.data);
+					this.data = response.data;
 				})
 				.catch(error => {console.log(error);});
 		},
