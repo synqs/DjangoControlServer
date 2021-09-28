@@ -93,7 +93,7 @@ IndexTable.component('device-widget', {
 	methods : {
 		get_device() {
 			config = {	method : 'POST',
-					url : '/' + this.device['model'] + '/' + this.device.fields['name'] + '/',
+					url : '/arduino/' + this.device['model'] + '/' + this.device.fields['name'] + '/',
 					xsrfCookieName: 'csrftoken',
 					xsrfHeaderName: 'X-CSRFTOKEN',
 					data : { command : 'STATUS',}
@@ -121,7 +121,7 @@ IndexTable.component('device-widget', {
 		},
 		detail_device() {
 			var windowFeatures = "menubar=yes,location=yes,resizable=yes,scrollbars=yes,status=yes";
-			window.open('/' + this.device['model'] + '/' + this.device.fields['name'] + '/', "test", windowFeatures);
+			window.open('/arduino/' + this.device['model'] + '/' + this.device.fields['name'] + '/', "test", windowFeatures);
 		},
 	},
 });
@@ -187,7 +187,7 @@ IndexTable.component('overview-card', {
 		},
 		get_device() { // fetch a single set of data from arduino (with python in views.py)
 			config = {	method : 'POST',
-					url : '/' + this.device['model'] + '/' + this.device.fields['name'] + '/',
+					url : '/arduino/' + this.device.fields['name'] + '/',
 					xsrfCookieName: 'csrftoken',
 					xsrfHeaderName: 'X-CSRFTOKEN',
 					data : { command :'STATUS', }

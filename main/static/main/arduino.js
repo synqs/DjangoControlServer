@@ -135,7 +135,7 @@ ArduinoDetail.component('arduino', {
 		},
 		get_device() { // fetch a single set of data from arduino (with python in views.py)
 			config = {	method : 'POST',
-					url : '/' + this.device['model'] + '/' + this.device.fields['name'] + '/',
+					url : '/arduino/' + this.device['model'] + '/' + this.device.fields['name'] + '/',
 					xsrfCookieName: 'csrftoken',
 					xsrfHeaderName: 'X-CSRFTOKEN',
 					data : { command :'STATUS', }

@@ -39,7 +39,7 @@ MokugoDetail.component('mokugo', {
 		exit_mokugo() {
 			ip = '129.206.180.142'
 			config = {	method : 'POST',
-					url : '/mokugo/',
+					url : '/mokugo/' + this.mokugo.fields['name'] + '/',
 					xsrfCookieName: 'csrftoken',
 					xsrfHeaderName: 'X-CSRFTOKEN',
 					data : { 'ip' : ip, 'command' : 'EXIT', }
