@@ -6,11 +6,13 @@ This is a minimalistic control server for small lab devices.
 	- [x] t_control
 	- [x] pd_monitor
 	- [ ] rp_control
+	- [ ] mokugo
 - [x] visualization with e.g. plotly
 - [x] exporting and saving data as csv
-- [ ] editable home screen for monitoring several devices at the same time
+- [x] editable home screen for monitoring several devices at the same time
 - [ ] more warnings when editing/deleting stuff
 - [ ] maximum values/valid inputs for parameters
+- [ ] slackbot communication
 
 ## how to 
 1. Download the github repo on your local computer.
