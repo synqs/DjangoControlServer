@@ -12,6 +12,9 @@ class PDmon(models.Model):
 	# parameters/values for pdmon
 	dVmax = models.FloatField(blank=True, default=0.5)
 
+	class Meta:
+		verbose_name = "PDmon"
+	
 	def __str__(self):
 		return self.name
 
@@ -52,6 +55,9 @@ class Tctrl(models.Model):
 	D =  models.FloatField(blank=True, default=0)
 	dTmax = models.FloatField(blank=True, default=2)
 	
+	class Meta:
+		verbose_name = "Tctrl"
+		
 	def __str__(self):
 		return self.name
 
@@ -85,6 +91,9 @@ class MokuGo(models.Model):
 	
 	session = models.BooleanField(default=False, editable=False)
 	
+	class Meta:
+		verbose_name = "MokuGo"
+		
 	def __str__(self):
 		return self.name
 		

@@ -64,7 +64,7 @@ ArduinoDetail.component('arduino', {
 			<button class="btn btn-success" data-bs-toggle="button" autocomplete="off" v-on:click="start_device()">start</button>
 			<button class="btn btn-danger" v-on:click="stop_device()">stop</button>
 			<button class="btn btn-secondary" v-on:click="get_device()">get</button>
-			<button class="btn btn-primary" v-on:click="this.get_CSV()">export as CSV</button>
+			<button class="btn btn-primary" v-on:click="get_CSV()">export as CSV</button>
 			<button class="btn btn-warning" v-on:click="this.reset()">reset</button>
 			</div>
 			
@@ -114,15 +114,6 @@ ArduinoDetail.component('arduino', {
 		this.get_device();
 	},
 	updated () { // export data every new day automatically
-		var now = this.data['updated'].slice(11,19);
-		var save = this.setup['save'].slice(0,7);
-		if (now.slice(0,7) == save && parseInt(now.slice(-1)) < parseInt(this.setup['sleep'])) {
-			this.get_CSV();
-			this.datas = [];
-			Plotly.deleteTraces('init_plot', [0,1,2,3,4,5]);
-			this.init_plot(Object.keys(this.key));
-		}
-		
 		this.is_locked();
 	},
 	methods: {
@@ -157,6 +148,8 @@ ArduinoDetail.component('arduino', {
 					this.datas.unshift(response.data['value']);
 					this.setup['status'] = response.data['message'];
 					this.update_plot(response.data['value']);
+					
+					this.check_time()
 				})
 				.catch(error => {
 					this.setup['status'] = error;
@@ -213,6 +206,18 @@ ArduinoDetail.component('arduino', {
 				};
 			};
 		},
+		check_time() {
+			var now = this.data['updated'].slice(11,19);
+			var save = this.setup['save'].slice(0,7);
+			console.log('Is ' + now.slice(0,7) + ' equal to ' + save + ' ?');
+			console.log('And is ' + parseInt(now.slice(-1)) + ' smaller than ' + parseInt(this.setup['sleep']) + ' ?');
+			if (now.slice(0,7) == save && ( parseInt(now.slice(-1)) < parseInt(this.setup['sleep']) ) ) {
+				this.get_CSV();
+				this.datas = [];
+				Plotly.deleteTraces('init_plot', [0,1,2,3,4,5]);
+				this.init_plot(Object.keys(this.key));
+			}
+		},
 		get_CSV() {
 			var name = this.setup['name'] + '.csv';
 			
@@ -257,6 +262,9 @@ ArduinoDetail.component('arduino', {
 	},
 })
 
+/* At last, mount the detail-app */
+ArduinoDetail.mount('#arduino');
+
 /* These are functions for translating the html data to csv and downloading the log */
 function downloadCSV(csv, filename) {
 	var csvFile;
@@ -273,8 +281,8 @@ function downloadCSV(csv, filename) {
 	downloadLink.click(); // Click download link
 }
 
-function exportTableToCSV(arr, arrname) {
-	var name = arrname + '.csv';
+function exportTableToCSV() {
+	var name = this.setup['name'] + '.csv';
 	
 	var array = typeof arr != 'object' ? JSON.parse(arr) : arr;
 	var str = Object.keys(arr[0]).toString() + '\r\n';
@@ -289,6 +297,3 @@ function exportTableToCSV(arr, arrname) {
 	}	
 	downloadCSV(str, name); // Download CSV file
 }
-
-/* At last, mount the detail-app */
-ArduinoDetail.mount('#arduino');
