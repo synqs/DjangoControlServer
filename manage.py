@@ -7,6 +7,13 @@ import sys
 def main():
     """Run administrative tasks."""
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'DjangoControlServer.settings')
+    
+    # Add the apps directoriy to Python's path. In production it will
+    # be necessary to add the apps directory to the path, too.
+    from os.path import abspath, dirname, join
+    PROJECT_ROOT = abspath(dirname(__file__))
+    sys.path.append(join(PROJECT_ROOT, "apps"))
+    
     try:
         from django.core.management import execute_from_command_line
     except ImportError as exc:

@@ -47,7 +47,10 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     
-    'main.apps.MainConfig',
+    'apps.main.apps.MainConfig',
+    'apps.mokugo.apps.MokugoConfig',
+    'apps.arduino.apps.ArduinoConfig',
+    'apps.slackbot.apps.SlackbotConfig',
 ]
 
 MIDDLEWARE = [

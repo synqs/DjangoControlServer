@@ -1,130 +1,20 @@
 from django.shortcuts import render, get_object_or_404, get_list_or_404
 from django.http import HttpResponse
 from django.core import serializers
-from django.views.decorators.csrf import csrf_exempt
 
-from .models import PDmon, Tctrl, MokuGo
-
+#from apps import arduino, mokugo
 import requests, json, os
 
 from requests.exceptions import HTTPError
 from urllib.parse import parse_qs
 
-### device index related view ###
-def index(request):
-	pdmons = get_list_or_404(PDmon)
-	tctrls = get_list_or_404(Tctrl)
-	
-	device_list = serializers.serialize('json', [*pdmons, *tctrls])
-	context = { 'device_list' : device_list }
-	if device_list == "":
-		context['message'] = 'No devices available!'
-	return render(request, 'main/index.html', context) # keep it like this or use the render-context shortcut...?
-
-### arduino detail related view ###
-def arduino(request, device_typ, device_name):
-	response = {}
-	
-	if device_typ == 'main.pdmon' : typ = PDmon
-	else : typ = Tctrl
-	
-	# THIS IS FOR RENDERING THE HTML PAGE #
-	if request.method == 'GET' :
-		device = get_object_or_404(typ, name=device_name)
-		detail = serializers.serialize('json', [device])
-	
-		response['device'] = json.loads(detail[1:-1])
-		response['message'] = 'Device ready.'
-		return render(request, 'main/arduino.html', response)
-		
-	# THIS IS FOR PROCESSING THE AXIOS REQUESTS #
-	r_dict = json.loads(request.body.decode())
-	print(r_dict)
-	command = r_dict['command']
-	
-	if command == 'DELETE':
-		get_object_or_404(typ, name=device_name).delete()
-		response['message'] = 'Deleted successfully.'
-	if command == 'ADD':
-		r_dict['device'].pop('model')
-		device = typ.objects.create(**r_dict['device'])
-		device.save()
-		response['message'] = 'New device added.'
-
-	else: 
-		try:
-			device = get_object_or_404(typ, name=device_name) # also consider 'update_or_create()'
-			url = device.http_str() + 'data/get'
-			r = requests.get(url)
-			r.raise_for_status()
-		except HTTPError as http_err:
-			response['message'] = str(http_err) 
-		except Exception as err:
-			response['message'] = str(err) 
-
-		else:
-			if command == 'STATUS':
-				response = r.json()
-				response['keys'] = device.keys()
-				response['message'] = 'Device ready.'
-
-			elif command == 'DETAIL':
-				detail = serializers.serialize('json', [device])
-				response['device'] = json.loads(detail[1:-1])
-				response['message'] = 'Device available.'
-
-				return render(request, 'main/detail.html', response)
-		
-			elif command == 'EDIT':
-				for p in r_dict['params']: device.set(p, r_dict['params'][p])
-				device.save()
-				response['message'] = 'Parameters updated successfully.'
-			else:
-				response['message'] = 'Invalid operation.'
-	
-	print(response)
-	return HttpResponse(json.dumps(response))
-
-### views related to the moku:go ###
-def mokugo(request, mokugo_name):
-	response = {}
-	mokugo = get_object_or_404(MokuGo, name=mokugo_name)
-	print(mokugo); print(type(mokugo))
-	
-	if request.method == 'GET' :
-		detail = serializers.serialize('json', [mokugo])
-	
-		response['device'] = json.loads(detail[1:-1])
-		response['message'] = 'Device ready.'
-		return render(request, 'main/mokugo.html', response)
-	
-	try:
-		mokugo.ping()
-	except Exception as err:
-		response['message'] = str(err)
-	else:
-		r_dict = json.loads(request.body.decode())
-		print(r_dict)
-		if r_dict['command'] == 'DATA':
-			print('data')
-			osc = mokugo.osc()
-			print(osc)
-			response['data'] = mokugo.osc()['data']
-			response['message'] = 'Data available.'
-		if r_dict['command'] == 'EXIT':
-			if mokugo.session():
-				mokugo.disconnect(session)
-			response['message'] = 'Mokugo disconnected.'
-	finally:
-		return HttpResponse(json.dumps(response))
-
-### views to communitcate with slackbot ###
+# Create your views here.
 def slackbot(request):
 	response = {}
 
 	if request.method == 'GET':
 		print(request)
-		return render(request, 'main/slackbot.html')
+		return render(request, 'slackbot/slackbot.html')
 		
 	r_dict = json.loads(request.body.decode())
 	print(r_dict)
@@ -184,7 +74,6 @@ def slackbot(request):
 			
 	return HttpResponse(json.dumps(response))
 
-@csrf_exempt
 def commands(request):
 	qstring = request.body.decode()
 	print(json.dumps(parse_qs(qstring)))
@@ -193,8 +82,7 @@ def commands(request):
 	print(json_dict['command'][0])
 	response = { "text" : "Command received!" }
 	return HttpResponse(json.dumps(response),status=200)
-
-@csrf_exempt	
+	
 def events(request):
 	string = request.body.decode('utf-8')
 	json_dict = {x.split('=')[0]:int(x.split('=')[1]) for x in string.split("&")}
