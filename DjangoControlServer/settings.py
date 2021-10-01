@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     'apps.main.apps.MainConfig',
     'apps.mokugo.apps.MokugoConfig',
     'apps.arduino.apps.ArduinoConfig',
+    'apps.redpitaya.apps.RedpitayaConfig',
     'apps.slackbot.apps.SlackbotConfig',
 ]
 
