@@ -5,8 +5,17 @@ class mokugo(models.Model):
 	id = models.BigAutoField(primary_key=True)
 	name = models.CharField(max_length=20, unique=True)			# should match DNS name eg. nakayun1
 	description = models.CharField(max_length=100, blank=True)	# add. description eg. 2D-MOT path
-	ip = models.CharField(max_length=20, blank=True)			# device ip
+	ip = models.CharField(max_length=20, unique=True)			# device ip
 	
+	@classmethod
+	def create(self, name, ip):
+		mokugo = self.create(name=self.name, ip=self.ip)
+		device = device(content_type=self, object_ide=self.id)
+		device.save()
+		
+		return mokugo
+		
+		
 	class Meta:
 		verbose_name = "MokuGo"
 		

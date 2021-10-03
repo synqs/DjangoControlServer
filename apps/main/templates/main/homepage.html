@@ -1,0 +1,25 @@
+{% extends "main/masterpage.html" %}
+{% load static %}
+
+{% block content %}
+{% csrf_token %}
+
+<form action="{% url 'main:index' %}" method="get">
+	<input type="submit" class="btn btn-primary" value="INDEX">
+</form>
+
+<!-- form action="{% url 'slackbot:slackbot' %}" method="get">
+	<input type="submit" class="btn btn-primary" value="SLACKBOT">
+</form>
+
+<form action="{% url 'laser:laser' %}" method="get">
+	<input type="submit" class="btn btn-primary" value="LASER">
+</form>
+
+<div class="container-fluid" id="index">
+	<index-table></index-table> see views... should we pass the index with the view or load it with axios?>
+	<index-table v-bind:devices="{{ device_list }}"></index-table>
+</div>
+
+<script src="{% static 'main/index.js' %}"></script -->
+{% endblock content %}
