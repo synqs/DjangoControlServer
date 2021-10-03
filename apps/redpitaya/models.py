@@ -12,3 +12,6 @@ class redpitaya(models.Model):
 		
 	def __str__(self):
 		return self.name
+		
+	def get_absolut_url(self):
+		return "redpitaya/%n/" % self.name
