@@ -1,4 +1,6 @@
 from django.db import models
+from main.models import create_device
+from django.db.models.signals import post_save
 
 # Create your models here.
 class redpitaya(models.Model):
@@ -13,5 +15,7 @@ class redpitaya(models.Model):
 	def __str__(self):
 		return self.name
 		
-	def get_absolut_url(self):
-		return "redpitaya/%n/" % self.name
+	def get_absolute_url(self):
+		return "redpitaya/%s/" % self.name
+		
+post_save.connect(create_device, sender=redpitaya)

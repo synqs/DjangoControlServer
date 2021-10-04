@@ -1,4 +1,6 @@
 from django.db import models
+from main.models import create_device
+from django.db.models.signals import post_save
 
 # Create your models here.
 class pdmon(models.Model):
@@ -13,8 +15,8 @@ class pdmon(models.Model):
 	def __str__(self):
 		return self.name
 		
-	def get_absolut_url(self):
-		return "arduino/%n/" % self.name
+	def get_absolute_url(self):
+		return "arduino/%s/" % self.name
 
 	def http_str(self):
 		return 'http://' + self.ip + '/'
@@ -24,6 +26,8 @@ class pdmon(models.Model):
 		for i in range(6): keys["A" + str(i)] = True
 		
 		return keys
+
+post_save.connect(create_device, sender=pdmon)
 
 class tctrl(models.Model):
 	id = models.BigAutoField(primary_key=True)
@@ -37,8 +41,8 @@ class tctrl(models.Model):
 	def __str__(self):
 		return self.name
 		
-	def get_absolut_url(self):
-		return "arduino/%n/" % self.name
+	def get_absolute_url(self):
+		return "arduino/%s/" % self.name
 
 	def http_str(self):
 		return 'http://' + self.ip + '/'
@@ -56,3 +60,5 @@ class tctrl(models.Model):
 			return r.ok;
 		except ConnectionError:
 			return False
+
+post_save.connect(create_device, sender=tctrl)			

@@ -3,18 +3,14 @@
 
 {% block content %}
 {% csrf_token %}
-{% if message %}<h2>{{ message }}</h2>{% endif %}
 
+{% if device_list %}
 <div class="container-fluid" id="index">
-	<!--index-table></index-table> see views... should we pass the index with the view or load it with axios? -->
 	<index-table v-bind:devices="{{ device_list }}"></index-table>
 </div>
+{% else %}
+No devices registered...
+{% endif %}
 
 <script src="{% static 'main/index.js' %}"></script>
 {% endblock content %}
-
-{% block redirect %} 
-<form action="{% url 'main:index' %}" method="get">
-	<input type="submit" class="btn btn-primary" value="REFRESH">
-</form>
-{% endblock %}

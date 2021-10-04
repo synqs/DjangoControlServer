@@ -94,19 +94,17 @@ IndexTable.component('device-widget', {
 		//this.get_device();
 	},
 	methods : {
-		get_device() {
-			config = {	method : 'POST',
-					url : '/arduino/' + this.device['model'] + '/' + this.device.fields['name'] + '/',
+		ping_device() {
+			config = {	method : 'GET',
+					url : this.device.fields['url'],
 					xsrfCookieName: 'csrftoken',
 					xsrfHeaderName: 'X-CSRFTOKEN',
-					data : { command : 'STATUS',}
 			};
 			this.config = config;
 			axios(config)
-				.then(response => {this.status = response.data['message'];})
+				.then(response => {console.log(response);})
 				.catch(error => {
 					this.status = error;
-					globalstatus = "There was an error...";
 					console.log(error);
 				});
 		},
@@ -124,7 +122,7 @@ IndexTable.component('device-widget', {
 		},
 		detail_device() {
 			var windowFeatures = "menubar=yes,location=yes,resizable=yes,scrollbars=yes,status=yes";
-			window.open('/arduino/' + this.device['model'] + '/' + this.device.fields['name'] + '/', "test", windowFeatures);
+			window.open(this.device.fields['url']);
 		},
 	},
 });
@@ -134,7 +132,7 @@ IndexTable.component('overview-card', {
 		data : [],
 		datas : [],
 		setup : {	'status' : 'Trying to connect...', 'sleep' : '5', 'save' : '00:00:00',
-					'name' : 'test', 'convert' : {}, 'lock' : ''},
+				'name' : 'test', 'convert' : {}, 'lock' : ''},
 		key : {},
 		init : true,
 		}
