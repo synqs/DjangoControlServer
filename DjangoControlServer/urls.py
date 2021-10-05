@@ -20,6 +20,7 @@ urlpatterns = [
 	path('admin/', admin.site.urls),
 	path('', include('main.urls')),
 	path('arduino/', include('arduino.urls')),
+	path('laser/', include('laser.urls')),
 	path('mokugo/', include('mokugo.urls')),
 	path('redpitaya/', include('redpitaya.urls')),
 	path('slackbot/', include('slackbot.urls')),

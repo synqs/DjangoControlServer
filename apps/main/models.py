@@ -19,7 +19,7 @@ class device(models.Model):
 	def ping(self):
 		import os 
 		try:  r = os.system('ping -c 1 ' + self.ip)
-		except r =! 0: return False
+		except r != 0: return False
 		else: return True
 
 def create_device(sender, instance, created, **kwargs):

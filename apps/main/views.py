@@ -13,21 +13,12 @@ class HomepageView(TemplateView):
 	template_name = 'main/homepage.html'
 
 class IndexView(ListView):
+	model = device
 	template_name = 'main/index.html'
 	context_object_name = 'device_list'
-	model = device
 	
 	allow_empty = True
 	
 	def get_queryset(self):
 		devices = device.objects.all()
 		return serializers.serialize('json', [*devices, ])
-	
-	'''
-		pdmons = get_list_or_404(pdmon)
-		tctrls = get_list_or_404(tctrl)
-		mokugos = get_list_or_404(mokugo)
-		redpitayas = get_list_or_404(redpitaya)
-	
-		return serializers.serialize('json', [*pdmons, *tctrls, *mokugos, *redpitayas])
-	'''
