@@ -84,7 +84,7 @@ IndexTable.component('device-widget', {
 	</td>
 	<td>[[ device.fields['description'] ]]</td>
 	<td>[[ device.fields['ip'] ]]</td>
-	<td>[[ device.ping() ]]</td>
+	<td>[[ this.status ]]</td>
 	<td><button class="btn btn-warning" v-on:click="remove_device()">Remove</button></td>
 	<td><div class="form-check form-switch">
 		<input class="form-check-input" type="checkbox" v-on:click="this.overview = !this.overview, $emit('update:modelValue', this.overview)">
@@ -122,7 +122,7 @@ IndexTable.component('device-widget', {
 		},
 		detail_device() {
 			var windowFeatures = "menubar=yes,location=yes,resizable=yes,scrollbars=yes,status=yes";
-			window.open(this.device.fields['url']);
+			window.open('http://localhost:8000/' + this.device.fields['url']);
 		},
 	},
 });

@@ -2,9 +2,11 @@
 {% load static %}
 
 {% block content %}
+{% csrf_token %}
+
 <div class="container-fluid" id="arduino">
-	<arduino v-bind:device="{{ device }}"></arduino>
+	<arduino v-bind:device="{{ arduino }}"></arduino>
 </div>
 
-<script type="text/javascript" src="{% static 'main/arduino.js' %}"></script>
+<script type="text/javascript" src="{% static 'arduino/arduino.js' %}"></script>
 {% endblock %}

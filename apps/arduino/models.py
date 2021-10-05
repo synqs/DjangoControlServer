@@ -16,7 +16,7 @@ class pdmon(models.Model):
 		return self.name
 		
 	def get_absolute_url(self):
-		return "arduino/%s/" % self.name
+		return "arduino/pdmon/%s/" % self.name
 
 	def http_str(self):
 		return 'http://' + self.ip + '/'
@@ -42,14 +42,14 @@ class tctrl(models.Model):
 		return self.name
 		
 	def get_absolute_url(self):
-		return "arduino/%s/" % self.name
+		return "arduino/tctrl/%s/" % self.name
 
 	def http_str(self):
 		return 'http://' + self.ip + '/'
 
 	def keys(self):
 		keys = {	'updated':'true', 'setpoint':'true', 'T':'true', 'error':'true',
-				'output':'true', 'P':'true', 'I':'true', 'D':'true'}
+					'output':'true', 'P':'true', 'I':'true', 'D':'true'}
 		return keys
 
 	def set(self, key, param):

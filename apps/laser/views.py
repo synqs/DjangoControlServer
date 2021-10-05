@@ -12,5 +12,10 @@ class LaserDetailView(DetailView):
 	slug_field = 'name'
 	template_name = 'laser/laser.html'
 	
+	def get_context_data(self, **kwargs):
+		Laser = super().get_object()
+		print(json.loads(serializers.serialize('json', [Laser]))[0])
+		return { 'laser' : json.loads(serializers.serialize('json', [Laser]))[0]['fields'] }
+	
 def laser(request):
 	return HttpResponse('ok')

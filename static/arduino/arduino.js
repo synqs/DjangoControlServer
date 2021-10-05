@@ -41,14 +41,14 @@ ArduinoDetail.component('arduino', {
 	compilerOptions: {
 		delimiters: ['[[', ']]'],
 	},
-	props: ['device'],
+	props: ['model', 'device'],
 	template: `
 	<div class="row mb-3 align-middle">
 		<div class="col"><div class="card">
 			<div class="card-header text-light bg-dark"><div class="row align-center">
 				<div class="col-7">
-					<h3>[[ device.fields.name ]]:[[ device.fields.ip ]]</h3>
-					<h5>[[ device.fields.description ]]</h5>
+					<h3>[[ device.name ]]:[[ device.ip ]]</h3>
+					<h5>[[ device.description ]]</h5>
 				</div>
 				<div class="col-5">
 					<h6>CSV name : <input v-model="this.setup['name']" placeholder="name for CSV"/>.csv</h6>
@@ -74,7 +74,7 @@ ArduinoDetail.component('arduino', {
 		</div>
 	</div>
 	
-	<div v-if="this.device.model == 'main.tctrl'" class="row mb-3">
+	<div v-if="this.model == 'tctrl'" class="row mb-3">
 		<div class="col"><input v-model="this.editForm['setpoint']" class="form-control" placeholder="setpoint"></div>
 		<div class="col"><input v-model="this.editForm['P']" class="form-control" placeholder="P"></div>
 		<div class="col"><input v-model="this.editForm['I']" class="form-control" placeholder="I"></div>
@@ -82,7 +82,7 @@ ArduinoDetail.component('arduino', {
 		<div class="col-2"><button class="btn btn-info w-100" v-on:click="edit_device()">submit</button></div>
 	</div>
 	
-	<div v-if="this.device.model == 'main.pdmon'" class="row mb-3">
+	<div v-if="this.model == 'pdmon'" class="row mb-3">
 		<div class="col-2">Convert to measure 0-12V :</div>
 		<div class="col text-center" v-for="k in Object.keys(this.key).splice(1)">
   			<div class="form-check form-switch">
@@ -126,7 +126,7 @@ ArduinoDetail.component('arduino', {
 		},
 		get_device() { // fetch a single set of data from arduino (with python in views.py)
 			config = {	method : 'POST',
-					url : '/arduino/' + this.device['model'] + '/' + this.device.fields['name'] + '/',
+					url : '/arduino/'  + this.device['name'] + '/',
 					xsrfCookieName: 'csrftoken',
 					xsrfHeaderName: 'X-CSRFTOKEN',
 					data : { command :'STATUS', }
@@ -137,7 +137,7 @@ ArduinoDetail.component('arduino', {
 					if ( this.init ) { 
 						this.key = response.data['keys']; 
 						this.init_plot(response.data['keys']);
-						this.setup['name'] = this.device.fields.name + '_' + response.data['value']['updated'].slice(0,10);
+						this.setup['name'] = this.device.name + '_' + response.data['value']['updated'].slice(0,10);
 						this.init = !this.init;
 					}
 					for ( k in Object.keys(this.setup['convert']) ) {
@@ -245,7 +245,7 @@ ArduinoDetail.component('arduino', {
 						url : '/slackbot/',
 						xsrfCookieName : 'csrftoken',
 						xsrfHeaderName : 'X-CSRFTOKEN',
-						data : { 	device_url : this.device['model'] + '/' + this.device.fields['name'] + '/',
+						data : { 	device_url : this.device['model'] + '/' + this.device['name'] + '/',
 									command : command , message : 'Hello.', },
 			};
 					

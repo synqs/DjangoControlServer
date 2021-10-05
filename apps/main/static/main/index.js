@@ -122,7 +122,7 @@ IndexTable.component('device-widget', {
 		},
 		detail_device() {
 			var windowFeatures = "menubar=yes,location=yes,resizable=yes,scrollbars=yes,status=yes";
-			window.open(this.device.fields['url']);
+			window.open('http://localhost:8000/' + this.device.fields['url']);
 		},
 	},
 });

@@ -3,11 +3,10 @@
 
 {% block content %}
 <p>{{ laser }}</p>
-<p>{{ object }}</p>
 
-<!-- div class="container-fluid" id="mokugo">
-	<mokugo v-bind:mokugo="{{ device }}"></mokugo>
+<div class="container-fluid" id="laser">
+	<laser v-bind:laser="{{ laser }}"></laser>
 </div>
 
-<script src="{% static 'redpitaya/redpitaya.js' %}"></script -->
+<script src="{% static 'laser/laser.js' %}"></script>
 {% endblock content %}
