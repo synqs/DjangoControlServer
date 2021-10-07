@@ -29,7 +29,6 @@ class TctrlDetailView(DetailView):
 	
 	def get_context_data(self, **kwargs):
 		Arduino = super().get_object()
-		Arduino = super().get_object()
 		context = super().get_context_data()
 		context['arduino'] = json.loads(serializers.serialize('json', [Arduino]))[0]['fields']
 		context['arduino']['model'] = 'tctrl'

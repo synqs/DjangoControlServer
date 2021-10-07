@@ -8,6 +8,7 @@ class device(models.Model):
 	object_id = models.PositiveIntegerField()
 	content_object = GenericForeignKey('content_type', 'object_id')
 	
+	model = models.CharField(max_length=20, default='none')
 	name = models.CharField(max_length=20, unique=True)		# should match DNS name eg. nakayun1
 	description = models.CharField(max_length=100, blank=True)	# add. description eg. 2D-MOT path
 	ip = models.CharField(max_length=20, unique=True)		# device ip
@@ -18,9 +19,9 @@ class device(models.Model):
 		
 	def ping(self):
 		import os 
-		try:  r = os.system('ping -c 1 ' + self.ip)
-		except r != 0: return False
-		else: return True
+		r = os.system('ping -c 1 ' + self.ip)
+		print(r)
+		return r
 
 def create_device(sender, instance, created, **kwargs):
 	content_type = ContentType.objects.get_for_model(instance)
@@ -29,6 +30,7 @@ def create_device(sender, instance, created, **kwargs):
 	except device.DoesNotExist:
 		d = device(content_type=content_type, object_id=instance.id)
 		
+	d.model = sender._meta.verbose_name
 	d.name = instance.name + ' '
 	d.description = instance.description
 	d.ip = instance.ip + ' '
