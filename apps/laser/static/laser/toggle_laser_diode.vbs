@@ -1,9 +1,8 @@
-Dim Arg, ip, edfa, voltage
+Dim Arg, ip, toggle
 Set Arg = Wscript.Arguments
 
 ip = Arg(0)
-edfa = Arg(1)
-voltage = Arg(2)
+toggle = Arg(1)
 
 set Shell=CreateObject("WScript.Shell")
 
@@ -11,11 +10,11 @@ Shell.run "cmd /K"
 wscript.sleep(1000)
 sendkeys ("telnet.exe " &ip& " 23{ENTER}")
 wscript.sleep(4000)
-sendkeys ("ls_tool edfa_set_phdout " &edfa& " " &voltage& "{ENTER}")
+sendkeys ("ls_tool Enable_Curent_Laser_Diode " &toggle& "{ENTER}")
 wscript.sleep(100)
-'sendkeys ("exit{ENTER}")
-'wscript.sleep(100)
-'sendkeys ("exit{ENTER}")
+sendkeys ("exit{ENTER}")
+wscript.sleep(100)
+sendkeys ("exit{ENTER}")
 
 function sendkeys (strkeys)
 on error resume next

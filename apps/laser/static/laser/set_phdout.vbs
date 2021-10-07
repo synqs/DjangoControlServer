@@ -13,9 +13,9 @@ sendkeys ("telnet.exe " &ip& " 23{ENTER}")
 wscript.sleep(4000)
 sendkeys ("ls_tool edfa_set_phdout " &edfa& " " &voltage& "{ENTER}")
 wscript.sleep(100)
-'sendkeys ("exit{ENTER}")
-'wscript.sleep(100)
-'sendkeys ("exit{ENTER}")
+sendkeys ("exit{ENTER}")
+wscript.sleep(100)
+sendkeys ("exit{ENTER}")
 
 function sendkeys (strkeys)
 on error resume next
