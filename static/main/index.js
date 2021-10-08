@@ -50,7 +50,7 @@ IndexTable.component('index-table', {
 	methods: {
 		add_device() {
 			config = {	method : 'POST',
-					url : '/' + this.device['model'] + '/' + this.device.fields['name'] + '/',
+					url : '/' + this.device['model'] + '/' + this.device['name'] + '/',
 					xsrfCookieName: 'csrftoken',
 					xsrfHeaderName: 'X-CSRFTOKEN',
 					data : { command :'ADD', device : this.addForm, }
@@ -80,10 +80,10 @@ IndexTable.component('device-widget', {
 	},
 	template: `
 	<td>
-		<button class="btn btn-secondary" v-on:click="detail_device()">[[ device.fields['name'] ]]</button>
+		<button class="btn btn-secondary" v-on:click="detail_device()">[[ this.device['name'] ]]</button>
 	</td>
-	<td>[[ device.fields['description'] ]]</td>
-	<td>[[ device.fields['ip'] ]]</td>
+	<td>[[ this.device['description'] ]]</td>
+	<td>[[ this.device['ip'] ]]</td>
 	<td>[[ this.status ]]</td>
 	<td><button class="btn btn-warning" v-on:click="remove_device()">Remove</button></td>
 	<td><div class="form-check form-switch">
@@ -91,18 +91,21 @@ IndexTable.component('device-widget', {
 	</div></td>
 	`,
 	mounted () {
-		//this.get_device();
+		this.ping_device();
 	},
 	methods : {
 		ping_device() {
-			config = {	method : 'GET',
-					url : this.device.fields['url'],
+			config = {	method : 'POST',
+					url : 'ping/',
 					xsrfCookieName: 'csrftoken',
 					xsrfHeaderName: 'X-CSRFTOKEN',
+					data: { 'ip' : this.device['ip'] },
 			};
 			this.config = config;
 			axios(config)
-				.then(response => {console.log(response);})
+				.then(response => {
+					this.status = response.data;
+					console.log(response.data);})
 				.catch(error => {
 					this.status = error;
 					console.log(error);
@@ -122,7 +125,7 @@ IndexTable.component('device-widget', {
 		},
 		detail_device() {
 			var windowFeatures = "menubar=yes,location=yes,resizable=yes,scrollbars=yes,status=yes";
-			window.open('http://localhost:8000/' + this.device.fields['url']);
+			window.open('http://localhost:8000/' + this.device['url']);
 		},
 	},
 });
@@ -145,7 +148,7 @@ IndexTable.component('overview-card', {
 	<div class="card">
 		<div class="card-header bg-info text-light"><div class="row align-center">
 				<div class="col-5">
-					<h5>[[ device.fields.name ]]:</h5><h5>[[ device.fields.ip ]]</h5>
+					<h5>[[ device.name ]]:</h5><h5>[[ device.ip ]]</h5>
 				</div>
 				<div class="col-7">
 					<h6>CSV name : <input class="w-50" v-model="this.setup['name']" placeholder="name for CSV"/>.csv</h6>
@@ -188,7 +191,7 @@ IndexTable.component('overview-card', {
 		},
 		get_device() { // fetch a single set of data from arduino (with python in views.py)
 			config = {	method : 'POST',
-					url : '/arduino/' + this.device.fields['name'] + '/',
+					url : '/arduino/' + this.device['name'] + '/',
 					xsrfCookieName: 'csrftoken',
 					xsrfHeaderName: 'X-CSRFTOKEN',
 					data : { command :'STATUS', }

@@ -5,9 +5,9 @@ from django.db.models.signals import post_save
 # Create your models here.
 class pdmon(models.Model):
 	id = models.BigAutoField(primary_key=True)
-	name = models.CharField(max_length=20, unique=True)			# should match DNS name eg. nakayun1
+	name = models.CharField(max_length=20, unique=True)		# should match DNS name eg. nakayun1
 	description = models.CharField(max_length=100, blank=True)	# add. description eg. 2D-MOT path
-	ip = models.CharField(max_length=20)						# device ip
+	ip = models.CharField(max_length=20)				# device ip
 	
 	class Meta:
 		verbose_name = "PDmon"

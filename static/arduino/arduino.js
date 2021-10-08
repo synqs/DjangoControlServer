@@ -41,7 +41,7 @@ ArduinoDetail.component('arduino', {
 	compilerOptions: {
 		delimiters: ['[[', ']]'],
 	},
-	props: ['model', 'device'],
+	props: ['device'],
 	template: `
 	<div class="row mb-3 align-middle">
 		<div class="col"><div class="card">
@@ -74,7 +74,7 @@ ArduinoDetail.component('arduino', {
 		</div>
 	</div>
 	
-	<div v-if="this.model == 'tctrl'" class="row mb-3">
+	<div v-if="this.device['model'] == 'tctrl'" class="row mb-3">
 		<div class="col"><input v-model="this.editForm['setpoint']" class="form-control" placeholder="setpoint"></div>
 		<div class="col"><input v-model="this.editForm['P']" class="form-control" placeholder="P"></div>
 		<div class="col"><input v-model="this.editForm['I']" class="form-control" placeholder="I"></div>
@@ -82,7 +82,7 @@ ArduinoDetail.component('arduino', {
 		<div class="col-2"><button class="btn btn-info w-100" v-on:click="edit_device()">submit</button></div>
 	</div>
 	
-	<div v-if="this.model == 'pdmon'" class="row mb-3">
+	<div v-if="this.device['model'] == 'pdmon'" class="row mb-3">
 		<div class="col-2">Convert to measure 0-12V :</div>
 		<div class="col text-center" v-for="k in Object.keys(this.key).splice(1)">
   			<div class="form-check form-switch">
@@ -215,7 +215,8 @@ ArduinoDetail.component('arduino', {
 				this.get_CSV();
 				this.datas = [];
 				Plotly.deleteTraces('init_plot', [0,1,2,3,4,5]);
-				this.init_plot(Object.keys(this.key));
+				//this.init_plot(Object.keys(this.key));
+				this.init = !this.init;
 			}
 		},
 		get_CSV() {
@@ -245,7 +246,7 @@ ArduinoDetail.component('arduino', {
 						url : '/slackbot/',
 						xsrfCookieName : 'csrftoken',
 						xsrfHeaderName : 'X-CSRFTOKEN',
-						data : { 	device_url : this.device['model'] + '/' + this.device['name'] + '/',
+						data : { 	device_url : this.model + '/' + this.device['name'] + '/',
 									command : command , message : 'Hello.', },
 			};
 					

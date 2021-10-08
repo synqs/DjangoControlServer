@@ -20,12 +20,10 @@ class IndexView(ListView):
 	allow_empty = True
 	
 	def get_queryset(self):
-		# context = super().get_queryset()
 		context = []
 		devices = device.objects.all()
 		# devices = serializers.serialize('json', [*device.objects.all(),])
 		for dev in devices:
-			print(dev)
 			context.append(json.loads(serializers.serialize('json', [dev]))[0]['fields'])
 		return context
 
@@ -41,9 +39,11 @@ class ping_device(DetailView):
 
 def ping(request):
 	r_dict = json.loads(request.body.decode())
-	print(r_dict)
 	ip = r_dict['ip']
 
-	success = os.system("ping -n 1 " + ip)
-	print(success)
-	return HttpResponse({ 'message' : success })
+	# success = os.system('ping -n 1 ' + ip + ' | find "TTL"')
+	
+	success = os.system("apps\main\static\main\ping.bat " + ip)
+	
+	if success == 1 : return HttpResponse({ 'Device ready.' })
+	else : return HttpResponse({ 'Failed to conect.' })

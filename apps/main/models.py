@@ -9,10 +9,10 @@ class device(models.Model):
 	content_object = GenericForeignKey('content_type', 'object_id')
 	
 	model = models.CharField(max_length=20, default='none')
-	name = models.CharField(max_length=20, unique=True)		# should match DNS name eg. nakayun1
+	name = models.CharField(max_length=20)				# should match DNS name eg. nakayun1
 	description = models.CharField(max_length=100, blank=True)	# add. description eg. 2D-MOT path
 	ip = models.CharField(max_length=20, unique=True)		# device ip
-	url = models.CharField(max_length=50, unique=True)
+	url = models.CharField(max_length=50)
 	
 	def __str__(self):
 		return self.name
@@ -31,8 +31,8 @@ def create_device(sender, instance, created, **kwargs):
 		d = device(content_type=content_type, object_id=instance.id)
 		
 	d.model = sender._meta.verbose_name
-	d.name = instance.name + ' '
+	d.name = instance.name
 	d.description = instance.description
-	d.ip = instance.ip + ' '
+	d.ip = instance.ip
 	d.url = instance.get_absolute_url()
 	d.save()

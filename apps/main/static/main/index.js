@@ -91,19 +91,21 @@ IndexTable.component('device-widget', {
 	</div></td>
 	`,
 	mounted () {
-		//this.get_device();
+		this.ping_device();
 	},
 	methods : {
 		ping_device() {
-			config = {	method : 'GET',
-					url : 'index/ping/',
+			config = {	method : 'POST',
+					url : 'ping/',
 					xsrfCookieName: 'csrftoken',
 					xsrfHeaderName: 'X-CSRFTOKEN',
 					data: { 'ip' : this.device['ip'] },
 			};
 			this.config = config;
 			axios(config)
-				.then(response => {console.log(response);})
+				.then(response => {
+					this.status = response.data;
+					console.log(response.data);})
 				.catch(error => {
 					this.status = error;
 					console.log(error);
