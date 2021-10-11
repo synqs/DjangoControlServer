@@ -15,9 +15,13 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from django.views.generic import RedirectView
 
 urlpatterns = [
 	path('admin/', admin.site.urls),
 	path('', include('main.urls')),
+	path('arduino/', include('arduino.urls')),
+	path('laser/', include('laser.urls')),
+	path('mokugo/', include('mokugo.urls')),
+	path('redpitaya/', include('redpitaya.urls')),
+	path('slackbot/', include('slackbot.urls')),
 ]

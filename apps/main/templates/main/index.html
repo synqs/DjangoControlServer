@@ -1,0 +1,16 @@
+{% extends "main/masterpage.html" %}
+{% load static %}
+
+{% block content %}
+{% csrf_token %}
+
+{% if device_list %}
+<div class="container-fluid" id="index">
+	<index-table v-bind:devices="{{ device_list }}"></index-table>
+</div>
+{% else %}
+No devices registered...
+{% endif %}
+
+<script src="{% static 'main/index.js' %}"></script>
+{% endblock content %}

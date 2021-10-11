@@ -1,0 +1,14 @@
+{% extends "main/masterpage.html" %}
+{% load static %}
+
+{% block content %}
+{% csrf_token %}
+
+<form action="{% url 'main:index' %}" method="get">
+	<input type="submit" class="btn btn-primary" value="INDEX">
+</form>
+
+<form action="{% url 'laser:laser' 'klaser' %}" method="get">
+	<input type="submit" class="btn btn-primary" value="LASER">
+</form>
+{% endblock content %}

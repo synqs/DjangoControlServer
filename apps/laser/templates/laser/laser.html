@@ -1,0 +1,10 @@
+{% extends "main/masterpage.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container-fluid" id="laser">
+	<laser v-bind:laser="{{ laser }}"></laser>
+</div>
+
+<script src="{% static 'laser/laser.js' %}"></script>
+{% endblock content %}
