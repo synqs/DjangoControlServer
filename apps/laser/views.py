@@ -8,13 +8,14 @@ import requests, json, os
 
 # Create your views here.
 class LaserDetailView(DetailView):
-	model = laser
-	slug_field = 'name'
-	template_name = 'laser/laser.html'
-	
-	def get_context_data(self, **kwargs):
-		Laser = super().get_object()
-		return { 'laser' : json.loads(serializers.serialize('json', [Laser]))[0]['fields'] }
+    model = laser
+    slug_url_kwarg = 'laser_name'
+    slug_field = 'name'
+    template_name = 'laser/laser.html'
+    
+    def get_context_data(self, **kwargs):
+        Laser = super().get_object()
+        return { 'laser' : json.loads(serializers.serialize('json', [Laser]))[0]['fields'] }
 	
 def laser(request, slug):
 	response = {}

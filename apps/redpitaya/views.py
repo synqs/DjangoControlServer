@@ -1,11 +1,27 @@
-from django.shortcuts import render, get_object_or_404, get_list_or_404
-from django.http import HttpResponse
+from django.views.generic import ListView, DetailView, TemplateView
+from django.shortcuts import render, get_object_or_404
+from django.http import HttpResponse, Http404
 from django.core import serializers
 
-#from apps import arduino, mokugo
-import requests, json, os
+from .models import redpitaya
+
+import requests, json
+from requests.exceptions import HTTPError
 
 # Create your views here.
+class RedPitayaDetailView(DetailView):
+    model = redpitaya
+    slug_url_kwarg = 'redpitaya_name'
+    slug_field = 'name'
+    template_name = 'redpitaya/redpitaya.html'
+    
+    def get_context_data(self, **kwargs):
+        Redpitaya = super().get_object()
+        context = {}
+        context['redpitaya'] = json.loads(serializers.serialize('json', [Redpitaya]))[0]['fields']
+        context['redpitaya']['model'] = 'redpitaya'
+        return context
+        
 def redpitaya(request, redpitaya_name):
 	response = {}
 	

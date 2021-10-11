@@ -1,5 +1,4 @@
-from django.views.generic import ListView, DetailView, TemplateView
-from django.shortcuts import render
+from django.views.generic import ListView, DetailView, View
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse, Http404
 from django.core import serializers
@@ -11,28 +10,30 @@ from requests.exceptions import HTTPError
 
 # Create your views here.
 class PDmonDetailView(DetailView):
-	model = pdmon
-	slug_field = 'name'
-	template_name = 'arduino/arduino.html'
-	
-	def get_context_data(self, **kwargs):
-		Arduino = super().get_object()
-		context = super().get_context_data()
-		context['arduino'] = json.loads(serializers.serialize('json', [Arduino]))[0]['fields']
-		context['arduino']['model'] = 'pdmon'
-		return context
+    model = pdmon
+    slug_url_kwarg = 'arduino_name'
+    slug_field = 'name'
+    template_name = 'arduino/arduino.html'
+    
+    def get_context_data(self, **kwargs):
+        context = {}
+        Arduino = super().get_object()
+        context['arduino'] = json.loads(serializers.serialize('json', [Arduino]))[0]['fields']
+        context['arduino']['model'] = 'pdmon'
+        return context
 		
 class TctrlDetailView(DetailView):
-	model = tctrl
-	slug_field = 'name'
-	template_name = 'arduino/arduino.html'
-	
-	def get_context_data(self, **kwargs):
-		Arduino = super().get_object()
-		context = super().get_context_data()
-		context['arduino'] = json.loads(serializers.serialize('json', [Arduino]))[0]['fields']
-		context['arduino']['model'] = 'tctrl'
-		return context
+    model = tctrl
+    slug_url_kwarg = 'arduino_name'
+    slug_field = 'name'
+    template_name = 'arduino/arduino.html'
+    
+    def get_context_data(self, **kwargs):
+        Arduino = super().get_object()
+        context = {}
+        context['arduino'] = json.loads(serializers.serialize('json', [Arduino]))[0]['fields']
+        context['arduino']['model'] = 'tctrl'
+        return context
 	
 def arduino(request, arduino_name):
 	response = {}
