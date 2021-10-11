@@ -80,7 +80,7 @@ LaserDetail.component('laser', {
 				else { this.control('TOGGLE_EDFA', 'ON'); }
 				this.setup['edfa'] != this.setup['edfa'];
 			}
-			else { this.setup['status'] = 'Power setpoint invalid!" }
+			else { this.setup['status'] = 'Power setpoint invalid!' }
 		},
 		update_edfa() {
 			this.control('UPDATE_EDFA', editForm);

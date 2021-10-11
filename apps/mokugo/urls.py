@@ -3,6 +3,6 @@ from . import views
 
 app_name='mokugo'
 urlpatterns = [
-	path('<slug:mokugo_name>/', views.mokugo, name='mokugo'),
-	path('<slug:mokugo_name>/ping/', views.mokugo_ping, name='mokugo'),
+	path('<slug:slug>/', views.MokugoDetailView.as_view(), name='mokugo'),
+	path('<slug:mokugo_name>/ping/', views.mokugo_ping, name='mokugo_ping'),
 ]

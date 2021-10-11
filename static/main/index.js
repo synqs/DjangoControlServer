@@ -11,9 +11,6 @@ IndexTable.component('index-table', {
 	},
 	props: ['devices'],
 	template: `
-	
-	[[ this.devices ]]
-	
 	<div class="row mb-3">
 		<div class="col"><select v-model="this.addForm['model']" class="form-select">
 			<option value="main.pdmon">PDmon</option>

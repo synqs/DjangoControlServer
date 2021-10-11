@@ -40,10 +40,8 @@ class ping_device(DetailView):
 def ping(request):
 	r_dict = json.loads(request.body.decode())
 	ip = r_dict['ip']
-
-	# success = os.system('ping -n 1 ' + ip + ' | find "TTL"')
 	
-	success = os.system("apps\main\static\main\ping.bat " + ip)
-	
-	if success == 1 : return HttpResponse({ 'Device ready.' })
+	success = os.system("./apps/main/static/main/ping.sh " + ip)
+	print('success = ' + ip + ' --- ', success)
+	if success == 0 : return HttpResponse({ 'Device ready.' })
 	else : return HttpResponse({ 'Failed to conect.' })
