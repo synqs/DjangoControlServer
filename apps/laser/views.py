@@ -24,29 +24,28 @@ def laser(request, slug):
 
 	if command == 'PING':
 		ip = r_dict['payload']
-		success = os.system("apps\main\static\main\ping.bat " + ip)
-		print(success)
-		print("static\main\ping.bat " + ip)
+		success = os.system("apps\main\static\main\ping.cmd " + ip)
+		print('success = ' + ip + ' --- ', success)
 	
-		if success == 1 : response['message'] =  'Device ready.'
+		if success == 0 : response['message'] =  'Device ready.'
 		else : response['message'] = 'Failed to connect.'
 
 	if command == 'TOGGLE':
 		toggle = r_dict['payload']
-		print('toggle')
-		response['message'] = "Laser Diode ON."
-		# os.system("apps\laser\static\laser\toggle_laser_diode.bat " + toggle)
-	
+		print('toggle : ', toggle)
+		os.system("apps\laser\static\laser\toggle_laser_diode.bat " + toggle)
+		response['message'] = "Laser Diode " + toggle + "."
+        
 	if command == 'TOGGLE_EDFA':
 		toggle = r_dict['payload']
 		print('toggle_edfa')
-		response['message'] = "EDFAs ON."
 		# os.system("apps\laser\static\laser\toggle_edfa.bat " + toggle)
+		response['message'] = "EDFAs " + toggle + "."
 
 	if command == 'UPDATE_EDFA':
 		voltage = r_dict['payload'] * 0.01
 		print(voltage)
-		response['message'] = "Power parameter updated."
 		# os.system("apps\laser\static\laser\toggle_laser_diode.bat " + voltage)
+		response['message'] = "Power parameter updated."
 
 	return HttpResponse(json.dumps(response))

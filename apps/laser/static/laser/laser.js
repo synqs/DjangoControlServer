@@ -22,6 +22,8 @@ LaserDetail.component('laser', {
 	
 	<div class="alert alert-info" role="alert">[[ this.setup['status'] ]]</div>
 	
+	[[ this.setup['laser'] ]]
+	
 	<table class="table table-striped">
 		<thead>
 			<tr class="bg-dark text-light">
@@ -69,7 +71,7 @@ LaserDetail.component('laser', {
 				this.control('TOGGLE', 'ON');
 				this.toggle_counter();
 			}
-			this.setup['laser'] != this.setup['laser'];
+			this.setup['laser'] =! this.setup['laser'];
 		},
 		toggle_counter() {
 			this.timer = setInterval(() => { this.setup['counter']--}, 1000)

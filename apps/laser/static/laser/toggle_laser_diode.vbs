@@ -10,9 +10,7 @@ Shell.run "cmd /K"
 wscript.sleep(1000)
 sendkeys ("telnet.exe " &ip& " 23{ENTER}")
 wscript.sleep(4000)
-sendkeys ("ls_tool Enable_Curent_Laser_Diode " &toggle& "{ENTER}")
-wscript.sleep(100)
-sendkeys ("exit{ENTER}")
+sendkeys ("ls_tool Enable_Current_Laser_Diode " &toggle& "{ENTER}")
 wscript.sleep(100)
 sendkeys ("exit{ENTER}")
 
