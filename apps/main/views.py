@@ -5,7 +5,7 @@ from .models import device
 from django.core import serializers
 
 from .models import device
-import requests, json, os
+import requests, json, os, platform, subprocess
 
 
 ### device index related view ###
