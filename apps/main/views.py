@@ -41,7 +41,10 @@ def ping(request):
 	r_dict = json.loads(request.body.decode())
 	ip = r_dict['ip']
 	
-	success = os.system("apps\main\static\main\ping.cmd " + ip)
+	parameter = '-n' if platform.system().lower()=='windows' else '-c'
+	command = ['ping', parameter, '1', ip]
+	success = subprocess.call(command, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 	print('success = ' + ip + ' --- ', success)
+	
 	if success == 0 : return HttpResponse({ 'Device ready.' })
 	else : return HttpResponse({ 'Failed to conect.' })
