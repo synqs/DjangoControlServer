@@ -92,7 +92,7 @@ ArduinoDetail.component('arduino', {
 		<div class="col-3 text-center">laser lock : <input class="w-50" v-model="this.setup['lock']" placeholder="channel (e.g. A3)"></div>
   	</div>
 	
-	<button class="btn btn-info w-100" v-on:click="this.slackbot('TALK')">talk to me!</button>
+	<!-- button class="btn btn-info w-100" v-on:click="this.slackbot('TALK')">talk to me!</button -->
 	
   	<div id="init_plot" style="width:1600px;height:650px;"></div>
   	
@@ -134,6 +134,7 @@ ArduinoDetail.component('arduino', {
 			this.config = config;
 			axios(config)
 				.then(response => {
+					if ( response.data['value'] ) {
 					if ( this.init ) { 
 						this.key = response.data['keys']; 
 						this.init_plot(response.data['keys']);
@@ -144,12 +145,14 @@ ArduinoDetail.component('arduino', {
 						ch = Object.keys(this.setup['convert'])[k];
 						response.data['value'][ch] = this.conversion(response.data['value'][ch]);
 					}
-					this.data = response.data['value'];
-					this.datas.unshift(response.data['value']);
-					this.setup['status'] = response.data['message'];
-					this.update_plot(response.data['value']);
+						this.data = response.data['value'];
+						this.datas.unshift(response.data['value']);
+						this.update_plot(response.data['value']);
 					
-					this.check_time()
+						this.check_time()
+					}
+					
+					this.setup['status'] = response.data['message'];
 				})
 				.catch(error => {
 					this.setup['status'] = error;

@@ -4,7 +4,7 @@ from django.http import HttpResponse
 from django.core import serializers
 
 from .models import laser
-import requests, json, os
+import telnetlib, json, subprocess, platform
 
 # Create your views here.
 class LaserDetailView(DetailView):
@@ -25,8 +25,9 @@ def laser(request, slug):
 
 	if command == 'PING':
 		ip = r_dict['payload']
-		success = os.system("apps\main\static\main\ping.cmd " + ip)
-		print('success = ' + ip + ' --- ', success)
+		parameter = '-n' if platform.system().lower()=='windows' else '-c'
+		command = ['ping', parameter, '1', ip]
+		success = subprocess.call(command, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 	
 		if success == 0 : response['message'] =  'Device ready.'
 		else : response['message'] = 'Failed to connect.'
@@ -50,3 +51,16 @@ def laser(request, slug):
 		response['message'] = "Power parameter updated."
 
 	return HttpResponse(json.dumps(response))
+	
+class telnet_command:
+	
+	def __init__(self, server, data={}):
+		host = telnetlib.Telnet( server )
+		self.__host = host
+		
+		self.__functionable = { 'write' : self.write,
+					'exit' : host.close }
+		
+	def write(self, text):
+		self.__host.write( '{}\n'.format( text ) )
+	

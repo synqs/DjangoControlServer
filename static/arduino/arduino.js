@@ -92,7 +92,7 @@ ArduinoDetail.component('arduino', {
 		<div class="col-3 text-center">laser lock : <input class="w-50" v-model="this.setup['lock']" placeholder="channel (e.g. A3)"></div>
   	</div>
 	
-	<button class="btn btn-info w-100" v-on:click="this.slackbot('TALK')">talk to me!</button>
+	<!-- button class="btn btn-info w-100" v-on:click="this.slackbot('TALK')">talk to me!</button -->
 	
   	<div id="init_plot" style="width:1600px;height:650px;"></div>
   	

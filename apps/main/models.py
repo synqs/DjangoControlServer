@@ -18,10 +18,13 @@ class device(models.Model):
 		return self.name
 		
 	def ping(self):
-		import os 
-		r = os.system('ping -c 1 ' + self.ip)
-		print(r)
-		return r
+		import platform, subprocess
+		parameter = '-n' if platform.system().lower()=='windows' else '-c'
+		command = ['ping', parameter, '1', self.ip]
+		success = subprocess.call(command, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+		
+		if success == 0 : return True
+		else : return False
 
 def create_device(sender, instance, created, **kwargs):
 	content_type = ContentType.objects.get_for_model(instance)

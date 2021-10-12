@@ -92,8 +92,8 @@ IndexTable.component('device-widget', {
 	},
 	methods : {
 		ping_device() {
-			config = {	method : 'POST',
-					url : 'ping/',
+			config = {	method : 'GET',
+					url : 'ping/' + this.device['name'] + '/',
 					xsrfCookieName: 'csrftoken',
 					xsrfHeaderName: 'X-CSRFTOKEN',
 					data: { 'ip' : this.device['ip'] },
@@ -101,7 +101,7 @@ IndexTable.component('device-widget', {
 			this.config = config;
 			axios(config)
 				.then(response => {
-					this.status = response.data;
+					this.status = response.data['message'];
 					console.log(response.data);})
 				.catch(error => {
 					this.status = error;

@@ -1,4 +1,4 @@
-from django.views.generic import ListView, DetailView, TemplateView
+from django.views.generic import ListView, DetailView, TemplateView, View
 from django.shortcuts import render, get_object_or_404, get_list_or_404
 from django.http import HttpResponse
 from .models import device
@@ -27,24 +27,11 @@ class IndexView(ListView):
 			context.append(json.loads(serializers.serialize('json', [dev]))[0]['fields'])
 		return context
 
-class ping_device(DetailView):
+class PingView(View):
 	model = device
-	slug_field = 'name'
-	template_name = 'ping.html'
 
-	def get_context_data(self):
-		Device = super().get_object()
-		success = dev.ping()
-		return success
-
-def ping(request):
-	r_dict = json.loads(request.body.decode())
-	ip = r_dict['ip']
-	
-	parameter = '-n' if platform.system().lower()=='windows' else '-c'
-	command = ['ping', parameter, '1', ip]
-	success = subprocess.call(command, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-	print('success = ' + ip + ' --- ', success)
-	
-	if success == 0 : return HttpResponse({ 'Device ready.' })
-	else : return HttpResponse({ 'Failed to conect.' })
+	def get(self, request, *args, **kwargs):
+		Device = get_object_or_404(self.model, name=kwargs['device_name'])
+		success = Device.ping()
+		if success : return HttpResponse(json.dumps({ 'message' : 'Device ready.' }))
+		else : return HttpResponse(json.dumps({ 'message' : 'Failed to connect.' }))

@@ -39,9 +39,9 @@ def arduino(request, arduino_name):
 	response = {}
 	
 	try: arduino = get_object_or_404(pdmon, name=arduino_name)
-	except 404:
+	except Http404:
 		try: arduino = get_object_or_404(tctrl, name=arduino_name)
-		except 404:
+		except Http404:
 			response['message'] = 'New arduino added.'
 			return HttpResponse(json.dumps(response))
 	finally: pass
@@ -63,7 +63,8 @@ def arduino(request, arduino_name):
 	else: 
 		try:
 			url = arduino.http_str() + 'data/get'
-			r = requests.get(url)
+			print('http://' + arduino.ip + ':80')
+			r = requests.get(url, proxies={ 'http' : 'http://' + arduino.ip + ':80' })
 			r.raise_for_status()
 		except HTTPError as http_err:
 			response['message'] = str(http_err) 
