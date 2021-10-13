@@ -1,4 +1,4 @@
-from django.views.generic import ListView, DetailView, TemplateView
+from django.views.generic import ListView, DetailView, TemplateView, View
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse
 from django.core import serializers
@@ -16,7 +16,13 @@ class LaserDetailView(DetailView):
     def get_context_data(self, **kwargs):
         Laser = super().get_object()
         return { 'laser' : json.loads(serializers.serialize('json', [Laser]))[0]['fields'] }
+
+class LaserControlView(View):
+	model = laser
 	
+	def get(self, request, *args, **kwargs):
+		Laser = get_object_or_404(self.model, name=kwargs['laser_name'])
+		
 def laser(request, slug):
 	response = {}
 	r_dict = json.loads( request.body.decode())
