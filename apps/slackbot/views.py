@@ -1,34 +1,40 @@
-from django.shortcuts import render, get_object_or_404, get_list_or_404
-from django.http import HttpResponse
+from django.views.generic import ListView, DetailView, View
+from django.shortcuts import render, get_object_or_404
+from django.http import HttpResponse, Http404
 from django.core import serializers
 
-import requests, json, os
+from .models import slackbot
 
+import requests, json, os
 from requests.exceptions import HTTPError
 from urllib.parse import parse_qs
 
 # Create your views here.
+class SlackbotDetailView(DetailView):
+    model = slackbot
+    slug_url_kwarg = 'slackbot_name'
+    slug_field = 'name'
+    template_name = 'slackbot/slackbot.html'
+    
 def slackbot(request):
-	response = {}
-
-	if request.method == 'GET':
-		print(request)
-		return render(request, 'slackbot/slackbot.html')
-		
-	r_dict = json.loads(request.body.decode())
-	print(r_dict)
-	response = {}
-	
-	if r_dict['command'] == 'ALERT':
-		redirect_url = "http://localhost:8000/" + r_dict['device_url']
-		text = ":fire: ALERT!!! \n The laser is out of lock!"
-	else:
-		redirect_url = "https://mir-s3-cdn-cf.behance.net/project_modules/disp/8faa1a12225183.562654f31f78a.gif"
-		text = "Greetings from the cyberspace! - " + r_dict['message']
-	
-	channel_id = "C02F1MWPLM7" # naka_laserlock channel
-	url = "https://slack.com/api/chat.postMessage"
-	payload = {
+    if request.method == 'GET':
+        print(request)
+        return render(request, 'slackbot/slackbot.html')
+        
+    r_dict = json.loads(request.body.decode())
+    print(r_dict)
+    response = {}
+    
+    if r_dict['command'] == 'ALERT':
+        redirect_url = "http://localhost:8000/" + r_dict['device_url']
+        text = ":fire: ALERT!!! \n The laser is out of lock!"
+    else:
+        redirect_url = "https://mir-s3-cdn-cf.behance.net/project_modules/disp/8faa1a12225183.562654f31f78a.gif"
+        text = "Greetings from the cyberspace! - " + r_dict['message']
+        
+    channel_id = "C02F1MWPLM7" # naka_laserlock channel
+    url = "https://slack.com/api/chat.postMessage"
+    payload = {
 		"channel": "C02F1MWPLM7",
 		#"text": "",
 		"attachments": [{
@@ -53,25 +59,25 @@ def slackbot(request):
             ]
         }]
 	}
-	headers = { 
-		"Content-type" : "application/json",
-		"Authorization" : "Bearer " + os.getenv("SLACKBOT_TOKEN"),
-	}
-	
-	try:
-		r = requests.post(url, json=payload, headers=headers)
-		r.raise_for_status()
-		print(r.text)
-		#for ch in r.json()['channels']:
-		#	print(ch['name'] + '---' + ch['id'])
-	except HTTPError as http_err:
-		response['message'] = str(http_err) 
-	except Exception as err:
-		response['message'] = str(err)
-	else:
-		response['message'] = 'Message send!'
-			
-	return HttpResponse(json.dumps(response))
+    headers = { 
+        "Content-type" : "application/json",
+        "Authorization" : "Bearer " + os.getenv("SLACKBOT_TOKEN"),
+    }
+    
+    try:
+        r = requests.post(url, json=payload, headers=headers)
+        r.raise_for_status()
+        print(r.text)
+        #for ch in r.json()['channels']:
+        #	print(ch['name'] + '---' + ch['id'])
+    except HTTPError as http_err:
+        response['message'] = str(http_err) 
+    except Exception as err:
+        response['message'] = str(err)
+    else:
+        response['message'] = 'Message send!'	
+        
+    return HttpResponse(json.dumps(response))
 
 def commands(request):
 	qstring = request.body.decode()

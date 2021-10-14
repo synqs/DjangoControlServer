@@ -18,55 +18,75 @@ class LaserDetailView(DetailView):
         return { 'laser' : json.loads(serializers.serialize('json', [Laser]))[0]['fields'] }
 
 class LaserControlView(View):
-	model = laser
-	
-	def get(self, request, *args, **kwargs):
-		Laser = get_object_or_404(self.model, name=kwargs['laser_name'])
-		
-def laser(request, slug):
-	response = {}
-	r_dict = json.loads( request.body.decode())
-	print(r_dict)
-	command = r_dict['command']
-
-	if command == 'PING':
-		ip = r_dict['payload']
-		parameter = '-n' if platform.system().lower()=='windows' else '-c'
-		command = ['ping', parameter, '1', ip]
-		success = subprocess.call(command, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-	
-		if success == 0 : response['message'] =  'Device ready.'
-		else : response['message'] = 'Failed to connect.'
-
-	if command == 'TOGGLE':
-		toggle = r_dict['payload']
-		print('toggle : ', toggle)
-		os.system("apps\laser\static\laser\toggle_laser_diode.bat " + toggle)
-		response['message'] = "Laser Diode " + toggle + "."
+    model = laser
+    
+    def get(self, request, *args, **kwargs): # Function for monitoring ?
+        Laser = get_object_or_404(self.model, name=kwargs['laser_name'])
+        return HttpResponse(json.dumps({ 'message' : 'LOL' }))
         
-	if command == 'TOGGLE_EDFA':
-		toggle = r_dict['payload']
-		print('toggle_edfa')
-		# os.system("apps\laser\static\laser\toggle_edfa.bat " + toggle)
-		response['message'] = "EDFAs " + toggle + "."
+    def post(self, request, **kwargs):
+        Laser = get_object_or_404(self.model, name=kwargs['laser_name'])
+        r_dict = json.loads(request.body.decode())
+        command = r_dict['command']; arg = r_dict['payload']
+        response = { 'success' : True }
+        
+        if command == 'PING':
+            ip = Laser.ip
+            parameter = '-n' if platform.system().lower()=='windows' else '-c'
+            command = ['ping', parameter, '1', ip]
+            success = subprocess.call(command, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+	
+            if success == 0 : response['message'] =  'Device ready.'
+            else : 
+                response['message'] = 'Failed to connect.'
+                response['success'] = False
+        
+        else :
 
-	if command == 'UPDATE_EDFA':
-		voltage = r_dict['payload'] * 0.01
-		print(voltage)
-		# os.system("apps\laser\static\laser\toggle_laser_diode.bat " + voltage)
-		response['message'] = "Power parameter updated."
+            try : session = telnet_command(Laser.ip)
+            except Exception as excp :
+                response['message'] = str(excp)
+                response['success'] = False
+        
+            else :
+        
+                if command == 'TOGGLE':
+                    print('toggle : ', arg)
+                    session.toggle_LD(arg)
+                    response['message'] = "Laser Diode " + arg + "."
+        
+                elif command == 'TOGGLE_EDFA':
+                    print('toggle_edfa')
+                    session.toggle_edfa(arg)
+                    response['message'] = "EDFAs " + arg + "."
 
-	return HttpResponse(json.dumps(response))
+                elif command == 'SET_EDFA':
+                    voltage = arg * 0.01
+                    print(voltage)
+                    response['message'] = "Power parameter updated."
+            
+                else : 
+                    response['message'] = "Bad request."
+                    response['success'] = False 
+
+        return HttpResponse(json.dumps(response))
 	
 class telnet_command:
-	
-	def __init__(self, server, data={}):
-		host = telnetlib.Telnet( server )
-		self.__host = host
-		
-		self.__functionable = { 'write' : self.write,
-					'exit' : host.close }
-		
-	def write(self, text):
-		self.__host.write( '{}\n'.format( text ) )
-	
+    
+    def __init__(self, server, data={}):
+        host = telnetlib.Telnet( server )
+        self.__host = host
+        
+    def write(self, text):
+        self.__host.write( '{}\n'.format( text ) )
+
+    def toggle_LD(self, toggle):
+       	self.write('ls_tool Enable_Current_Laser_Diode ' + toggle)
+    
+    def toggle_edfa(self, toggle):
+       	self.write('ls_tool edfa_shutdown edfa1')
+       	self.read_until('# ')
+       	self.write('ls_tool edfa_shutdown edfa0')
+    
+    def set_edfa(self, setpoint):
+       	self.write('ls_tool edfa_set_phdout edfa1 ' + setpoint)

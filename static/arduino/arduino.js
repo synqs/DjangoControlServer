@@ -134,6 +134,7 @@ ArduinoDetail.component('arduino', {
 			this.config = config;
 			axios(config)
 				.then(response => {
+					if ( response.data['value'] ) {
 					if ( this.init ) { 
 						this.key = response.data['keys']; 
 						this.init_plot(response.data['keys']);
@@ -144,12 +145,14 @@ ArduinoDetail.component('arduino', {
 						ch = Object.keys(this.setup['convert'])[k];
 						response.data['value'][ch] = this.conversion(response.data['value'][ch]);
 					}
-					this.data = response.data['value'];
-					this.datas.unshift(response.data['value']);
-					this.setup['status'] = response.data['message'];
-					this.update_plot(response.data['value']);
+						this.data = response.data['value'];
+						this.datas.unshift(response.data['value']);
+						this.update_plot(response.data['value']);
 					
-					this.check_time()
+						this.check_time()
+					}
+					
+					this.setup['status'] = response.data['message'];
 				})
 				.catch(error => {
 					this.setup['status'] = error;
@@ -243,7 +246,7 @@ ArduinoDetail.component('arduino', {
 		},
 		slackbot(command) {
 			config = {	method : 'POST',
-						url : '/slackbot/',
+						url : 'localost:8000/slackbot/',
 						xsrfCookieName : 'csrftoken',
 						xsrfHeaderName : 'X-CSRFTOKEN',
 						data : { 	device_url : this.model + '/' + this.device['name'] + '/',

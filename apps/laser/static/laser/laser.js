@@ -34,15 +34,15 @@ LaserDetail.component('laser', {
 		<tbody>
 			<tr>
 				<td>1. Turn on the laser</td>
-				<td><button class="btn btn-primary" v-on:click="this.toggle_laser()">toggle POWER</button></td>
+				<td><button class="btn btn-primary" v-on:click="this.toggle_laser()" id="toggle_LD" disabled>toggle POWER</button></td>
 			</tr>
 			<tr>
 				<td>2. Set setpoint for edfa1 (const. current OR const. voltage mode)</td>
-				<td>EDFA1 voltage : <input v-model="this.editForm['power']" placeholder="power setpoint"/> V <button class="btn btn-primary" v-on:click="this.update_edfa()">update setpoint</button></td>
+				<td>EDFA1 voltage : <input v-model="this.editForm['power']" placeholder="power setpoint"/> V <button class="btn btn-primary" v-on:click="this.set_edfa()" id="set_edfa" disabled>update edfa</button></td>
 			</tr>
 			<tr>
 				<td>3. Turn emission on/off</td>
-				<td><button class="btn btn-warning" v-on:click="this.toggle_edfa()">toggle Emission</button></td>
+				<td><button class="btn btn-warning" v-on:click="this.toggle_edfa()" id="toggle_edfa" disabled>toggle Emission</button></td>
 			</tr>
 			<tr>
 				<td>(4. Wait for the laser to warm up before locking)</td>
@@ -53,6 +53,10 @@ LaserDetail.component('laser', {
 	`,
 	mounted () {
 		this.control('PING', this.laser['ip'])
+		if ( this.setup['laser'] ) { 
+					$("#toggle_LD").removeClass("disabled");
+					this.toggle_counter();
+		}
 	},
 	updated () {
 		if ( this.setup['counter'] == 0 ) {
@@ -69,9 +73,11 @@ LaserDetail.component('laser', {
 			if (this.setup['laser']) { this.control('TOGGLE', 'OFF'); }
 			else { 
 				this.control('TOGGLE', 'ON');
-				this.toggle_counter();
+				if ( this.setup['laser'] ) { 
+					$("#toggle_edfa").removeClass("disabled");
+					$("#set_edfa").removeClass("disabled");
+					this.toggle_counter(); }
 			}
-			this.setup['laser'] =! this.setup['laser'];
 		},
 		toggle_counter() {
 			this.timer = setInterval(() => { this.setup['counter']--}, 1000)
@@ -84,8 +90,8 @@ LaserDetail.component('laser', {
 			}
 			else { this.setup['status'] = 'Power setpoint invalid!' }
 		},
-		update_edfa() {
-			this.control('UPDATE_EDFA', editForm);
+		set_edfa() {
+			this.control('SET_EDFA', editForm);
 		},
 		control(command, payload="") {
 			config = {	method : 'POST',
@@ -96,7 +102,8 @@ LaserDetail.component('laser', {
 			};
 			axios(config).then( response => {
 				console.log(response);
-				this.setup['status'] = response.data['message'] });
+				this.setup['status'] = response.data['message'];
+				this.setup['laser'] = response.data['success']});
 		},
 	},
 })

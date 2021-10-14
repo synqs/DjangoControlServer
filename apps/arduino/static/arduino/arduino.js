@@ -246,7 +246,7 @@ ArduinoDetail.component('arduino', {
 		},
 		slackbot(command) {
 			config = {	method : 'POST',
-						url : '/slackbot/',
+						url : 'localost:8000/slackbot/',
 						xsrfCookieName : 'csrftoken',
 						xsrfHeaderName : 'X-CSRFTOKEN',
 						data : { 	device_url : this.model + '/' + this.device['name'] + '/',

@@ -3,10 +3,10 @@
 
 {% block content %}
 
-<p>{{ slackbot }}</p>
+{{ object }}
 
-<!-- div class="container-fluid" id="slackbot">
-	<slackbot></slackbot>
+<div class="container-fluid" id="slackbot">
+	<slackbot v-bind:slackbot={{ object }}></slackbot>
 </div>
 
 <script src="{% static 'main/slackbot.js' %}?rand=23423422"></script -->
