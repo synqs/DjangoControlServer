@@ -2,12 +2,11 @@
 {% load static %}
 
 {% block content %}
-
-{{ object }}
+{% csrf_token %}
 
 <div class="container-fluid" id="slackbot">
-	<slackbot v-bind:slackbot={{ object }}></slackbot>
+	<slackbot v-bind:slackbot="{{ slackbot }}"></slackbot>
 </div>
 
-<script src="{% static 'main/slackbot.js' %}?rand=23423422"></script -->
+<script src="{% static 'slackbot/slackbot.js' %}"></script -->
 {% endblock content %}

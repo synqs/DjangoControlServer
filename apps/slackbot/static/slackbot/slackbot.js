@@ -9,9 +9,8 @@ SlackBot.component('slackbot', {
 	compilerOptions: {
 		delimiters: ['[[', ']]'],
 	},
-	props: ['slackbot']
+	props: ['slackbot'],
 	template: `
-	[[ this.slackbot ]]
 	<div class="input-group mb-3">
 		<input v-model="message" class="form-control" placeholder="Text to send via SlackBot">
 		<button class="btn btn-outline-secondary" v-on:click="this.talk_slackbot()">SEND!</button>
@@ -23,7 +22,7 @@ SlackBot.component('slackbot', {
 	methods: {
 		talk_slackbot() {
 			config = {	method : 'POST',
-					url : '/' + this.slackbot['name'] + '/',
+					url : '/slackbot/' + this.slackbot['name'] + '/send/',
 					xsrfCookieName: 'csrftoken',
 					xsrfHeaderName: 'X-CSRFTOKEN',
 					data : { command :'TALK', message : this.message, }

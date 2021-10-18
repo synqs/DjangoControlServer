@@ -9,7 +9,7 @@ SlackBot.component('slackbot', {
 	compilerOptions: {
 		delimiters: ['[[', ']]'],
 	},
-	props: ['slackbot']
+	props: ['slackbot'],
 	template: `
 	[[ this.slackbot ]]
 	<div class="input-group mb-3">
