@@ -8,9 +8,12 @@ class slackbot(models.Model):
 	id = models.BigAutoField(primary_key=True)
 	name = models.CharField(max_length=20, unique=True)			# should match DNS name eg. nakayun1
 	description = models.CharField(max_length=100, blank=True)	# add. description eg. 2D-MOT path
-	
+
+	bot_token = os.getenv("SLACKBOT_TOKEN")                     # secret token for verification
+	verification_token = os.getenv("VERIFICATION_TOKEN")
+
 	class Meta:
-		verbose_name = "Slackbot"
+        	verbose_name = "Slackbot"
 		
 	def __str__(self):
 		return self.name
@@ -26,7 +29,7 @@ class slackbot(models.Model):
         	}
         	headers = { 
             		"Content-type" : "application/json",
-            		"Authorization" : "Bearer " + os.getenv("SLACKBOT_TOKEN"),
+            		"Authorization" : "Bearer " + self.token,
         	}
 		
         	try : 

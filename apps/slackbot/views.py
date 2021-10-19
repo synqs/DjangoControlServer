@@ -7,7 +7,7 @@ from django.utils.decorators import method_decorator
 
 from .models import slackbot
 
-import requests, json, os
+import requests, json
 from requests.exceptions import HTTPError
 from urllib.parse import parse_qs
 
@@ -26,6 +26,7 @@ class SlackbotSendView(View):
     model = slackbot
     
     def post(self, request, *args, **kwargs):
+        Slackbot = get_object_or_404(slackbot, name=kwargs['slackbot_name'])
         r_dict = json.loads(request.body.decode())
         print(r_dict)
         response = {}
@@ -66,7 +67,7 @@ class SlackbotSendView(View):
         }
         headers = { 
             "Content-type" : "application/json",
-            "Authorization" : "Bearer " + os.getenv("SLACKBOT_TOKEN"),
+            "Authorization" : "Bearer " + Slackbot.bot_token,
         }
     
         try:
@@ -121,7 +122,7 @@ class SlackbotEventsView(View):
         json_dict = json.loads(request.body.decode('utf-8'))
         print(json_dict)
 	
-        if json_dict['token'] != os.getenv("VERIFICATION_TOKEN"):
+        if json_dict['token'] != Slackbot.verification_token:
             return HttpResponse(status=403)
 		
         #return the challenge code here
