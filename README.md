@@ -5,16 +5,16 @@ This is a minimalistic control server for small lab devices.
 - device classes:
 	- [x] t_control
 	- [x] pd_monitor
-	- [ ] rp_control
-	- [ ] mokugo
-	- [ ] slackbot
-	- [ ] laser
+	- [x]rp_control
+	- [x mokugo
+	- [x slackbot
+	- [x laser
 - [x] visualization with e.g. plotly
 - [x] exporting and saving data as csv
 - [x] editable home screen for monitoring several devices at the same time
 - [ ] more warnings when editing/deleting stuff
 - [ ] maximum values/valid inputs for parameters
-- [ ] slackbot communication
+- [x slackbot communication
 - [ ] laser control
 
 ## how to 
