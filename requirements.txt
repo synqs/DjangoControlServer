@@ -5,3 +5,4 @@ pyrpl==0.9.4.0
 moku==1.3.1
 PyQt5==5.15.5
 pymba==0.3.7
+quamash==0.6.1
