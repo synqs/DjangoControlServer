@@ -11,6 +11,8 @@ SlackBot.component('slackbot', {
 	},
 	props: ['slackbot'],
 	template: `
+	
+	[[ this.slackbot ]]
 	<div class="input-group mb-3">
 		<input v-model="message" class="form-control" placeholder="Text to send via SlackBot">
 		<button class="btn btn-outline-secondary" v-on:click="this.talk_slackbot()">SEND!</button>

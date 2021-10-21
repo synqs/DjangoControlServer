@@ -62,9 +62,8 @@ def arduino(request, arduino_name):
 
 	else: 
 		try:
-			url = arduino.http_str() + 'data/get'
-			print('http://' + arduino.ip + ':80')
-			r = requests.get(url, proxies={ 'http' : 'http://' + arduino.ip + ':80' })
+			url = arduino.http_str() + 'data/get/'
+			r = requests.get(url)
 			r.raise_for_status()
 		except HTTPError as http_err:
 			response['message'] = str(http_err) 

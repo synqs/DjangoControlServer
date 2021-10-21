@@ -32,8 +32,8 @@ class SlackbotSendView(View):
         response = {}
     
         if r_dict['command'] == 'ALERT':
-            redirect_url = "http://localhost:8000/" + r_dict['device_url']
-            text = ":fire: ALERT!!! \n The laser is out of lock!"
+            redirect_url = "https://hydra.kip.uni-heidelberg.de:8443/f21server/#/"
+            text = ":fire: ALERT!!! \n The laser is out of lock! Check the NaKaControl"
         else:
             redirect_url = "https://mir-s3-cdn-cf.behance.net/project_modules/disp/8faa1a12225183.562654f31f78a.gif"
             text = "Greetings from the cyberspace! - " + r_dict['message']
@@ -61,7 +61,7 @@ class SlackbotSendView(View):
                         "type": "button",
                         "style": "danger",
                         "url": "https://media.tenor.co/images/dd7ce8ef69ccfe64aa3ad4d173390c66/tenor.gif"
-                    }
+                    },
                 ]
             }]
         }

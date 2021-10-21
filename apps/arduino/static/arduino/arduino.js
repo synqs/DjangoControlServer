@@ -246,10 +246,10 @@ ArduinoDetail.component('arduino', {
 		},
 		slackbot(command) {
 			config = {	method : 'POST',
-						url : 'localost:8000/slackbot/',
+						url : 'http://localhost:8000/slackbot/naka_lockbot/send/',
 						xsrfCookieName : 'csrftoken',
 						xsrfHeaderName : 'X-CSRFTOKEN',
-						data : { 	device_url : this.model + '/' + this.device['name'] + '/',
+						data : { 	device_url : 'arduino/' + this.device['model'] + '/' + this.device['name'] + '/',
 									command : command , message : 'Hello.', },
 			};
 					
