@@ -2,6 +2,8 @@ from django.db import models
 from main.models import create_device
 from django.db.models.signals import post_save
 
+import requests
+
 # Create your models here.
 class pdmon(models.Model):
 	id = models.BigAutoField(primary_key=True)

@@ -138,7 +138,7 @@ ArduinoDetail.component('arduino', {
 					if ( this.init ) { 
 						this.key = response.data['keys']; 
 						this.init_plot(response.data['keys']);
-						this.setup['name'] = this.device.name + '_' + response.data['value']['updated'].slice(0,10);
+						this.setup['name'] = this.device['name'] + '_' + response.data['value']['updated'].slice(0,10);
 						this.init = !this.init;
 					}
 					for ( k in Object.keys(this.setup['convert']) ) {
@@ -165,7 +165,9 @@ ArduinoDetail.component('arduino', {
 			config['data']['params'] = this.editForm;
 			axios(config)
 				.then(response => {this.setup['status'] = response.data['message'];})
-				.catch(error => console.log(error));
+				.catch(error => {
+					console.log(error);
+					this.setup['status'] = error;});
 		},
 		init_plot(init_keys) {
 			INIT_PLOT = document.getElementById('init_plot');
@@ -216,10 +218,12 @@ ArduinoDetail.component('arduino', {
 			console.log('And is ' + parseInt(now.slice(-1)) + ' smaller than ' + parseInt(this.setup['sleep']) + ' ?');
 			if (now.slice(0,7) == save && ( parseInt(now.slice(-1)) < parseInt(this.setup['sleep']) ) ) {
 				this.get_CSV();
+				this.setup['name'] = this.device['name'] + '_' + this.data['value']['updated'].slice(0,10);
 				this.datas = [];
 				Plotly.deleteTraces('init_plot', [0,1,2,3,4,5]);
 				//this.init_plot(Object.keys(this.key));
 				this.init = !this.init;
+				
 			}
 		},
 		get_CSV() {
@@ -246,10 +250,10 @@ ArduinoDetail.component('arduino', {
 		},
 		slackbot(command) {
 			config = {	method : 'POST',
-						url : 'http://localost:8000/slackbot/naka_lockbot/send/',
+						url : 'http://localhost:8000/slackbot/naka_lockbot/send/',
 						xsrfCookieName : 'csrftoken',
 						xsrfHeaderName : 'X-CSRFTOKEN',
-						data : { 	device_url : 'arduino' + this.model + '/' + this.device['name'] + '/',
+						data : { 	device_url : 'arduino/' + this.device['model'] + '/' + this.device['name'] + '/',
 									command : command , message : 'Hello.', },
 			};
 					
