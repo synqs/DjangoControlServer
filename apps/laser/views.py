@@ -81,12 +81,12 @@ class telnet_command:
         self.__host.write( '{}\n'.format( text ) )
 
     def toggle_LD(self, toggle):
-       	self.write('ls_tool Enable_Current_Laser_Diode ' + toggle)
+       	self.write('l_tool Enable_Current_Laser_Diode ' + toggle)
     
     def toggle_edfa(self, toggle):
-       	self.write('ls_tool edfa_shutdown edfa1')
+       	self.write('l_tool edfa_shutdown edfa1')
        	self.read_until('# ')
-       	self.write('ls_tool edfa_shutdown edfa0')
+       	self.write('l_tool edfa_shutdown edfa0')
     
     def set_edfa(self, setpoint):
-       	self.write('ls_tool edfa_set_phdout edfa1 ' + setpoint)
+       	self.write('l_tool edfa_set_phdout edfa1 ' + setpoint)

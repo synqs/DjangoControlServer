@@ -51,7 +51,7 @@ class tctrl(models.Model):
 
 	def keys(self):
 		keys = {	'updated':'true', 'setpoint':'true', 'T':'true', 'error':'true',
-					'output':'true', 'P':'true', 'I':'true', 'D':'true'}
+				'output':'true', 'P':'true', 'I':'true', 'D':'true'}
 		return keys
 
 	def set(self, key, param):
@@ -64,6 +64,30 @@ class tctrl(models.Model):
 			return False
 
 post_save.connect(create_device, sender=tctrl)
+
+class thsen(models.Model):
+	id = models.BigAutoField(primary_key=True)
+	name = models.CharField(max_length=20, unique=True)		# should match DNS name eg. nakayun1
+	description = models.CharField(max_length=100, blank=True)	# add. description eg. 2D-MOT path
+	ip = models.CharField(max_length=20, blank=True)		# device ip
+
+	class Meta:
+		verbose_name = "THsen"
+		
+	def __str__(self):
+		return self.name
+		
+	def get_absolute_url(self):
+		return "arduino/thsen/%s/" % self.name
+
+	def http_str(self):
+		return 'http://' + self.ip + '/'
+
+	def keys(self):
+		keys = {'updated':'true', 'T':'true', 'H':'true'}
+		return keys
+			
+post_save.connect(create_device, sender=thsen)	
 
 class psupp(models.Model):
 	id = models.BigAutoField(primary_key=True)

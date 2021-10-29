@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from arduino.models import pdmon, tctrl, psupp
+from arduino.models import pdmon, tctrl, thsen
 from mokugo.models import mokugo
 from redpitaya.models import redpitaya
 from slackbot.models import slackbot
@@ -12,9 +12,9 @@ from .models import device
 admin.site.register(laser)
 admin.site.register(mokugo)
 admin.site.register(pdmon)
-admin.site.register(psupp)
 admin.site.register(redpitaya)
 admin.site.register(slackbot)
 admin.site.register(tctrl)
+admin.site.register(thsen)
 
 admin.site.register(device)

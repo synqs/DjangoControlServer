@@ -53,9 +53,9 @@ LaserDetail.component('laser', {
 	`,
 	mounted () {
 		this.control('PING', this.laser['ip'])
-		if ( this.setup['laser'] ) { 
-					$("#toggle_LD").removeClass("disabled");
-					this.toggle_counter();
+		if ( this.setup['status'] == 'Device ready.' ) { 
+			$("#toggle_LD").removeClass("disabled");
+			this.toggle_counter();
 		}
 	},
 	updated () {
@@ -70,7 +70,10 @@ LaserDetail.component('laser', {
 				response = await this.control('TOGGLE', 'ON');
 				this.setup['status'] = response.data['message'];
 			})() */
-			if (this.setup['laser']) { this.control('TOGGLE', 'OFF'); }
+			if (this.setup['laser']) { 
+				$("#toggle_edfa").removeClass("enabled");
+				$("#set_edfa").removeClass("enabled");
+				this.control('TOGGLE', 'OFF'); }
 			else { 
 				this.control('TOGGLE', 'ON');
 				if ( this.setup['laser'] ) { 

@@ -3,7 +3,7 @@ from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse, Http404
 from django.core import serializers
 
-from .models import pdmon, tctrl
+from .models import pdmon, tctrl, thsen
 
 import requests, json
 from requests.exceptions import HTTPError
@@ -35,6 +35,19 @@ class TctrlDetailView(DetailView):
         context['arduino']['model'] = 'tctrl'
         return context
 	
+class THsenDetailView(DetailView):
+    model = thsen
+    slug_url_kwarg = 'arduino_name'
+    slug_field = 'name'
+    template_name = 'arduino/arduino.html'
+    
+    def get_context_data(self, **kwargs):
+        Arduino = super().get_object()
+        context = {}
+        context['arduino'] = json.loads(serializers.serialize('json', [Arduino]))[0]['fields']
+        context['arduino']['model'] = 'thsen'
+        return context
+       
 def arduino(request, arduino_name):
 	response = {}
 	
