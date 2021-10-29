@@ -24,8 +24,7 @@ void setup() {
 static bool measure_environment( float *temperature, float *humidity ) {
   static unsigned long measurement_timestamp = millis( );
 
-  /* Measure once every four seconds. */
-  if( millis( ) - measurement_timestamp > 3000ul )
+  if( millis( ) - measurement_timestamp > 1000ul )
   {
     if( dht_sensor.measure( temperature, humidity ) == true )
     {
@@ -46,15 +45,13 @@ void loop( ) {
   float temperature;
   float humidity;
 
+  //dht_sensor.measure( temperature, humidity )
+
   /* Measure temperature and humidity.  If the functions returns
      true, then a measurement is available. */
-  if( measure_environment( &temperature, &humidity ) == true )
+  //if( measure_environment( &temperature, &humidity ) == true ) 
+  if( dht_sensor.measure( &temperature, &humidity ) == true )
   {
-    /* Serial.print( "T = " );
-    Serial.print( temperature, 1 );
-    Serial.print( " deg. C, H = " );
-    Serial.print( humidity, 1 );
-    Serial.println( "%" ); */
 
     char tbuff[3];
     dtostrf(temperature, sizeof(tbuff), 1, tbuff); // read and convert value
