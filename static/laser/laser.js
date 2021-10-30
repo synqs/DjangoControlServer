@@ -22,7 +22,8 @@ LaserDetail.component('laser', {
 	
 	<div class="alert alert-info" role="alert">[[ this.setup['status'] ]]</div>
 	
-	[[ this.setup['laser'] ]]
+	laser : [[ this.setup['laser'] ]]
+	edfa : [[ this.setup['edfa'] ]]
 	
 	<table class="table table-striped">
 		<thead>
@@ -59,6 +60,10 @@ LaserDetail.component('laser', {
 		}
 	},
 	updated () {
+		if ( this.setup['laser'] ) { 
+			$("#toggle_LD").removeClass("disabled");
+			// this.toggle_counter();
+		}
 		if ( this.setup['counter'] == 0 ) {
 			clearInterval(this.timer);
 			this.setup['status'] = 'Laser ready!';

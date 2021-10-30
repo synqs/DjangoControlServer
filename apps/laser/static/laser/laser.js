@@ -22,7 +22,8 @@ LaserDetail.component('laser', {
 	
 	<div class="alert alert-info" role="alert">[[ this.setup['status'] ]]</div>
 	
-	[[ this.setup['laser'] ]]
+	laser : [[ this.setup['laser'] ]]
+	edfa : [[ this.setup['edfa'] ]]
 	
 	<table class="table table-striped">
 		<thead>
@@ -34,7 +35,7 @@ LaserDetail.component('laser', {
 		<tbody>
 			<tr>
 				<td>1. Turn on the laser</td>
-				<td><button class="btn btn-primary" v-on:click="this.toggle_laser()" id="toggle_LD" disabled>toggle POWER</button></td>
+				<td><button class="btn btn-primary" v-on:click="this.toggle_laser()" id="toggle_LD">toggle POWER</button></td>
 			</tr>
 			<tr>
 				<td>2. Set setpoint for edfa1 (const. current OR const. voltage mode)</td>
@@ -53,16 +54,8 @@ LaserDetail.component('laser', {
 	`,
 	mounted () {
 		this.control('PING', this.laser['ip'])
-		if ( this.setup['status'] == 'Device ready.' ) { 
-			$("#toggle_LD").removeClass("disabled");
-			this.toggle_counter();
-		}
 	},
 	updated () {
-		if ( this.setup['status'] == 'Device ready.' ) { 
-			$("#toggle_LD").removeClass("disabled");
-			// this.toggle_counter();
-		}
 		if ( this.setup['counter'] == 0 ) {
 			clearInterval(this.timer);
 			this.setup['status'] = 'Laser ready!';
@@ -74,17 +67,16 @@ LaserDetail.component('laser', {
 				response = await this.control('TOGGLE', 'ON');
 				this.setup['status'] = response.data['message'];
 			})() */
-			if (this.setup['laser']) { 
-				$("#toggle_edfa").removeClass("enabled");
-				$("#set_edfa").removeClass("enabled");
+			if ( this.setup['laser'] ) { 
 				this.control('TOGGLE', 'OFF'); }
 			else { 
 				this.control('TOGGLE', 'ON');
 				if ( this.setup['laser'] ) { 
-					$("#toggle_edfa").removeClass("disabled");
-					$("#set_edfa").removeClass("disabled");
 					this.toggle_counter(); }
 			}
+			this.setup['laser'] = !this.setup['laser']
+			document.getElementById("toggle_edfa").disabled = !document.getElementById("toggle_edfa").disabled;
+			document.getElementById("set_edfa").disabled = !document.getElementById("set_edfa").disabled;
 		},
 		toggle_counter() {
 			this.timer = setInterval(() => { this.setup['counter']--}, 1000)
@@ -110,7 +102,7 @@ LaserDetail.component('laser', {
 			axios(config).then( response => {
 				console.log(response);
 				this.setup['status'] = response.data['message'];
-				this.setup['laser'] = response.data['success']});
+				});
 		},
 	},
 })
