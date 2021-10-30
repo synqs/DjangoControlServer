@@ -1,67 +1,60 @@
 /* Load all necessary libraries */
 #include <Bridge.h> // library for communication with linux processor
 #include <Process.h> // library for running processes on the linux processor
-#include <dht_nonblocking.h>
-#define DHT_SENSOR_TYPE DHT_TYPE_11
+#include <DHT.h>
+
+#define DHTPIN 2     // Digital pin connected to the DHT sensor
+#define DHTTYPE DHT11   // DHT 11
+DHT dht(DHTPIN, DHTTYPE);
 
 /* Start processes */
 Process date; // process used to get the date
 
-static const int DHT_SENSOR_PIN = 2;
-DHT_nonblocking dht_sensor( DHT_SENSOR_PIN, DHT_SENSOR_TYPE );
-
 /* Setup the arduino */
 void setup() {
   Bridge.begin(); // setup external communication with bridge startup
+  dht.begin();
 }
 
+void loop() {
+  // Wait a few seconds between measurements.
+  delay(2000);
 
+  // Reading temperature or humidity takes about 250 milliseconds!
+  // Sensor readings may also be up to 2 seconds 'old' (its a very slow sensor)
+  float h = dht.readHumidity();
+  // Read temperature as Celsius (the default)
+  float t = dht.readTemperature();
 
-/*
- * Poll for a measurement, keeping the state machine alive.  Returns
- * true if a measurement is available.
- */
-static bool measure_environment( float *temperature, float *humidity ) {
-  static unsigned long measurement_timestamp = millis( );
-
-  if( millis( ) - measurement_timestamp > 1000ul )
-  {
-    if( dht_sensor.measure( temperature, humidity ) == true )
-    {
-      measurement_timestamp = millis( );
-      return( true );
-    }
+  // Check if any reads failed and exit early (to try again).
+  if (isnan(h) || isnan(t)) {
+    Bridge.put("error", "Failed to read from DHT sensor!");
+    return;
   }
 
-  return( false );
-}
+  // Compute heat index in Celsius (isFahreheit = false)
+  float hic = dht.computeHeatIndex(t, h, false);
 
+  /* Serial.print(F(" Humidity: "));
+  Serial.print(h);
+  Serial.print(F("%  Temperature: "));
+  Serial.print(t);
+  Serial.print(F("C "));
+  Serial.print(f);
+  Serial.print(F("F  Heat index: "));
+  Serial.print(hic);
+  Serial.print(F("C "));
+  Serial.print(hif);
+  Serial.println(F("F")); */
+  
+  char tbuff[3];
+  dtostrf(t, sizeof(tbuff), 1, tbuff); // read and convert value
+  char hbuff[3];
+  dtostrf(h, sizeof(hbuff), 1, hbuff); // read and convert value
 
-
-/*
- * Main program loop.
- */
-void loop( ) {
-  float temperature;
-  float humidity;
-
-  //dht_sensor.measure( temperature, humidity )
-
-  /* Measure temperature and humidity.  If the functions returns
-     true, then a measurement is available. */
-  //if( measure_environment( &temperature, &humidity ) == true ) 
-  if( dht_sensor.measure( &temperature, &humidity ) == true )
-  {
-
-    char tbuff[3];
-    dtostrf(temperature, sizeof(tbuff), 1, tbuff); // read and convert value
-    char hbuff[3];
-    dtostrf(humidity, sizeof(hbuff), 1, hbuff); // read and convert value
-
-    Bridge.put("T", tbuff); // store the results
-    Bridge.put("H", hbuff);
-  }
-
+  Bridge.put("T", tbuff); // store the results
+  Bridge.put("H", hbuff);
+  
   // get the current time
   if (!date.running()) { // check whether the process isn't running
     date.begin("date");
