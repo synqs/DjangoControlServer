@@ -78,7 +78,7 @@ class telnet_command:
         self.__host = host
         
     def write(self, text):
-        self.__host.write( '{}\n'.format( text ) )
+        self.__host.write( '{}\n'.format( str( text ) ))
 
     def toggle_LD(self, toggle):
        	self.write('l_tool Enable_Current_Laser_Diode ' + toggle)

@@ -18,42 +18,27 @@ void setup() {
 
 void loop() {
   // Wait a few seconds between measurements.
-  delay(2000);
+  delay(3000);
 
   // Reading temperature or humidity takes about 250 milliseconds!
   // Sensor readings may also be up to 2 seconds 'old' (its a very slow sensor)
   float h = dht.readHumidity();
   // Read temperature as Celsius (the default)
   float t = dht.readTemperature();
-
+  
   // Check if any reads failed and exit early (to try again).
   if (isnan(h) || isnan(t)) {
     Bridge.put("error", "Failed to read from DHT sensor!");
     return;
   }
-
-  // Compute heat index in Celsius (isFahreheit = false)
-  float hic = dht.computeHeatIndex(t, h, false);
-
-  /* Serial.print(F(" Humidity: "));
-  Serial.print(h);
-  Serial.print(F("%  Temperature: "));
-  Serial.print(t);
-  Serial.print(F("C "));
-  Serial.print(f);
-  Serial.print(F("F  Heat index: "));
-  Serial.print(hic);
-  Serial.print(F("C "));
-  Serial.print(hif);
-  Serial.println(F("F")); */
   
-  char tbuff[3];
-  dtostrf(t, sizeof(tbuff), 1, tbuff); // read and convert value
-  char hbuff[3];
-  dtostrf(h, sizeof(hbuff), 1, hbuff); // read and convert value
+  char tbuff[5];
+  dtostrf(t, sizeof(tbuff), 2, tbuff); // read and convert value
+  char hbuff[5];
+  dtostrf(h, sizeof(hbuff), 2, hbuff); // read and convert value
 
   Bridge.put("T", tbuff); // store the results
-  Bridge.put("H", hbuff);
+  Bridge.put("H", hbuff); 
   
   // get the current time
   if (!date.running()) { // check whether the process isn't running
