@@ -6,6 +6,8 @@ from django.core import serializers
 from .models import laser
 import telnetlib, json, subprocess, platform
 
+import numpy as np
+
 # Create your views here.
 class LaserDetailView(DetailView):
     model = laser
@@ -61,8 +63,9 @@ class LaserControlView(View):
                     response['message'] = "EDFAs " + arg + "."
 
                 elif command == 'SET_EDFA':
-                    voltage = arg * 0.01
+                    voltage = ( np.log( float(arg) + 0.6 ) + 0.5 ) / 0.35
                     print(voltage)
+                    session.set_edfa(str(voltage))
                     response['message'] = "Power parameter updated."
             
                 else : 
@@ -72,21 +75,47 @@ class LaserControlView(View):
         return HttpResponse(json.dumps(response))
 	
 class telnet_command:
-    
     def __init__(self, server, data={}):
-        host = telnetlib.Telnet( server )
-        self.__host = host
-        
+        try : 
+            host = telnetlib.Telnet(server)
+            self.__host = host
+        except Error as err : 
+            print(err)
+            return false
+            
     def write(self, text):
-        self.__host.write( '{}\n'.format( str( text ) ))
+        try : 
+            self.__host.write(bytes('{}\n'.format(text), 'utf-8'))
+        except OSError as err : 
+            print(err)
+            return false
 
     def toggle_LD(self, toggle):
-       	self.write('l_tool Enable_Current_Laser_Diode ' + toggle)
+        try :
+            # self.write('l_tool Enable_Current_Laser_Diode ' + toggle)
+            self.__host.read_until(b'laser-Virtual-Machine login: ')
+            self.write('root')
+            self.__host.read_until(b'laser-Virtual-Machine password: ')
+            self.write('ls')
+            self.write('exit')
+            print(self.__host.read_all().decode('ascii'))
+        except OSError as err : 
+        	print(err)
+        	return false
+        print(self.__host.read_all().decode('ascii'))
     
     def toggle_edfa(self, toggle):
-       	self.write('l_tool edfa_shutdown edfa1')
-       	self.read_until('# ')
-       	self.write('l_tool edfa_shutdown edfa0')
+        try :
+            self.write('l_tool edfa_shutdown edfa1')
+            self.read_until('# ')
+            self.write('l_tool edfa_shutdown edfa0')
+        except OSError as err : 
+            print(err)
+            return false
     
     def set_edfa(self, setpoint):
-       	self.write('l_tool edfa_set_phdout edfa1 ' + setpoint)
+        try : 
+            self.write('l_tool edfa_set_phdout edfa1 ' + setpoint)
+        except OSError as err :
+            print(err)
+            return false

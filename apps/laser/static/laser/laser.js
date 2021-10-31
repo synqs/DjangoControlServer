@@ -7,7 +7,7 @@ LaserDetail.component('laser', {
 		datas : [],
 		setup : {'status' : 'Trying to connect...', 'counter' : 180, 'edfa' : false, 'laser' : false, },
 		config : {},
-		editForm : {},
+		editForm : [],
 		}
 	},
 	compilerOptions: {
@@ -71,8 +71,7 @@ LaserDetail.component('laser', {
 				this.control('TOGGLE', 'OFF'); }
 			else { 
 				this.control('TOGGLE', 'ON');
-				if ( this.setup['laser'] ) { 
-					this.toggle_counter(); }
+				this.toggle_counter();
 			}
 			this.setup['laser'] = !this.setup['laser']
 			document.getElementById("toggle_edfa").disabled = !document.getElementById("toggle_edfa").disabled;
@@ -90,7 +89,7 @@ LaserDetail.component('laser', {
 			else { this.setup['status'] = 'Power setpoint invalid!' }
 		},
 		set_edfa() {
-			this.control('SET_EDFA', editForm);
+			this.control('SET_EDFA', this.editForm);
 		},
 		control(command, payload="") {
 			config = {	method : 'POST',
