@@ -30,7 +30,7 @@ ArduinoDetail.component('arduino', {
 		data : [],
 		datas : [],
 		setup : {	'status' : 'Trying to connect...', 'sleep' : '5', 'save' : '00:00:00', 'name' : 'test',
-					'convert' : {}, 'lock' : ''},
+				'convert' : {}, 'lock' : ''},
 		key : {},
 		config : [],
 		editForm : {},
@@ -255,7 +255,7 @@ ArduinoDetail.component('arduino', {
 						xsrfCookieName : 'csrftoken',
 						xsrfHeaderName : 'X-CSRFTOKEN',
 						data : { 	device_url : 'arduino/' + this.device['model'] + '/' + this.device['name'] + '/',
-									command : command , message : 'Hello.', },
+								command : command , message : 'Hello.', },
 			};
 					
 			axios(config)
