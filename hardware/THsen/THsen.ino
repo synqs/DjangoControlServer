@@ -17,9 +17,6 @@ void setup() {
 }
 
 void loop() {
-  // Wait a few seconds between measurements.
-  delay(3000);
-
   // Reading temperature or humidity takes about 250 milliseconds!
   // Sensor readings may also be up to 2 seconds 'old' (its a very slow sensor)
   float h = dht.readHumidity();
@@ -27,18 +24,18 @@ void loop() {
   float t = dht.readTemperature();
   
   // Check if any reads failed and exit early (to try again).
-  if (isnan(h) || isnan(t)) {
+  /* if (isnan(h) || isnan(t)) {
     Bridge.put("error", "Failed to read from DHT sensor!");
     return;
-  }
+  } */
   
   char tbuff[5];
   dtostrf(t, sizeof(tbuff), 2, tbuff); // read and convert value
+  Bridge.put("T", tbuff); // store the results
+  
   char hbuff[5];
   dtostrf(h, sizeof(hbuff), 2, hbuff); // read and convert value
-
-  Bridge.put("T", tbuff); // store the results
-  Bridge.put("H", hbuff); 
+  Bridge.put("H", hbuff); // store the results
   
   // get the current time
   if (!date.running()) { // check whether the process isn't running

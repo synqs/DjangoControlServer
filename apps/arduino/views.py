@@ -55,8 +55,11 @@ def arduino(request, arduino_name):
 	except Http404:
 		try: arduino = get_object_or_404(tctrl, name=arduino_name)
 		except Http404:
-			response['message'] = 'New arduino added.'
-			return HttpResponse(json.dumps(response))
+			try: arduino = get_object_or_404(thsen, name=arduino_name)
+			except Http404:
+                response['message'] = 'Device not found.'
+                return HttpResponse(json.dumps(response))
+                
 	finally: pass
 	
 	# THIS IS FOR PROCESSING THE AXIOS REQUESTS #
