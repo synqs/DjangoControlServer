@@ -60,13 +60,16 @@ LaserDetail.component('laser', {
 			clearInterval(this.timer);
 			this.setup['status'] = 'Laser ready!';
 		};
+		if ( this.setup['laser'] ) {
+			document.getElementById("toggle_edfa").disabled = false;
+			document.getElementById("set_edfa").disabled = false;
+		}
+		if ( this.setup['edfa'] ) {
+			document.getElementById("toggle_LD").disabled = true;
+		}
 	},
 	methods: {
 		toggle_laser() {
-			/* (async () => { 
-				response = await this.control('TOGGLE', 'ON');
-				this.setup['status'] = response.data['message'];
-			})() */
 			if ( this.setup['laser'] ) { 
 				this.control('TOGGLE', 'OFF'); }
 			else { 
@@ -74,8 +77,6 @@ LaserDetail.component('laser', {
 				this.toggle_counter();
 			}
 			this.setup['laser'] = !this.setup['laser']
-			document.getElementById("toggle_edfa").disabled = !document.getElementById("toggle_edfa").disabled;
-			document.getElementById("set_edfa").disabled = !document.getElementById("set_edfa").disabled;
 		},
 		toggle_counter() {
 			this.timer = setInterval(() => { this.setup['counter']--}, 1000)
@@ -101,6 +102,7 @@ LaserDetail.component('laser', {
 			axios(config).then( response => {
 				console.log(response);
 				this.setup['status'] = response.data['message'];
+				this.setup['laser'] = response.data['laser'];
 				});
 		},
 	},

@@ -7,6 +7,7 @@ from .models import laser
 import telnetlib, json, subprocess, platform
 
 import numpy as np
+import time
 
 # Create your views here.
 class LaserDetailView(DetailView):
@@ -38,14 +39,32 @@ class LaserControlView(View):
             command = ['ping', parameter, '1', ip]
             success = subprocess.call(command, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 	
-            if success == 0 : response['message'] =  'Device ready.'
+            if success == 0 :
+                response['laser'] = True
+                session = telnetlib.Telnet(Laser.ip)        # start telnet session
+                
+                session.write(b'ls_tool cplot\n')           # check status of laser
+                time.sleep(3)                               # wait for the output
+                session.write(b'\x1b \x5d \x34')
+                session.write(b'\x03')                      # quit the cplot...
+                session.write(b'exit\n')
+                output = session.read_all().decode('ascii')
+                print(output)
+                status = output.find('ON')
+                if status != -1 :
+                    response['message'] =  'Laser diode ON.'
+                else :
+                    response['message'] =  'Laser diode OFF.'
+                session.close()                             # clear session to save resources
             else : 
                 response['message'] = 'Failed to connect.'
-                response['success'] = False
+                response['laser'] = False
         
         else :
 
-            try : session = telnet_command(Laser.ip)
+            try : 
+                print('session')
+                session = telnetlib.Telnet(Laser.ip)
             except Exception as excp :
                 response['message'] = str(excp)
                 response['success'] = False
@@ -53,25 +72,28 @@ class LaserControlView(View):
             else :
         
                 if command == 'TOGGLE':
-                    print('toggle : ', arg)
-                    session.toggle_LD(arg)
-                    response['message'] = "Laser Diode " + arg + "."
+                    session.write(b'ls_tool Enable_Current_Laser_Diode' + bytes(arg +'\n', 'ascii'))
+                    response['message'] = 'Laser Diode ' + arg + '.'
         
                 elif command == 'TOGGLE_EDFA':
                     print('toggle_edfa')
                     session.toggle_edfa(arg)
-                    response['message'] = "EDFAs " + arg + "."
+                    response['message'] = 'EDFAs ' + arg + '.'
 
                 elif command == 'SET_EDFA':
                     voltage = ( np.log( float(arg) + 0.6 ) + 0.5 ) / 0.35
                     print(voltage)
                     session.set_edfa(str(voltage))
-                    response['message'] = "Power parameter updated."
+                    response['message'] = 'Power parameter updated.'
             
                 else : 
-                    response['message'] = "Bad request."
+                    response['message'] = 'Bad request.'
                     response['success'] = False 
-
+                    
+                session.write(b'exit\n')
+                print(session.read_all().decode('ascii'))
+                session.close() # clear session to save resources
+                
         return HttpResponse(json.dumps(response))
 	
 class telnet_command:
@@ -92,17 +114,10 @@ class telnet_command:
 
     def toggle_LD(self, toggle):
         try :
-            # self.write('l_tool Enable_Current_Laser_Diode ' + toggle)
-            self.__host.read_until(b'laser-Virtual-Machine login: ')
-            self.write('root')
-            self.__host.read_until(b'laser-Virtual-Machine password: ')
-            self.write('ls')
-            self.write('exit')
-            print(self.__host.read_all().decode('ascii'))
+            self.write('l_tool Enable_Current_Laser_Diode ' + toggle)
         except OSError as err : 
         	print(err)
         	return false
-        print(self.__host.read_all().decode('ascii'))
     
     def toggle_edfa(self, toggle):
         try :
