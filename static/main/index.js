@@ -122,7 +122,8 @@ IndexTable.component('device-widget', {
 		},
 		detail_device() {
 			var windowFeatures = "menubar=yes,location=yes,resizable=yes,scrollbars=yes,status=yes";
-			window.open('http://localhost:8000/' + this.device['url']);
+			domain = window.location.href.slice(0,22)
+			window.open(domain + this.device['url']);
 		},
 	},
 });

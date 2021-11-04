@@ -30,7 +30,7 @@ ArduinoDetail.component('arduino', {
 		data : [],
 		datas : [],
 		setup : {	'status' : 'Trying to connect...', 'sleep' : '5', 'save' : '00:00:00', 'name' : 'test',
-					'convert' : {}, 'lock' : ''},
+				'convert' : {}, 'lock' : ''},
 		key : {},
 		config : [],
 		editForm : {},
@@ -65,6 +65,7 @@ ArduinoDetail.component('arduino', {
 			<button class="btn btn-danger" v-on:click="stop_device()">stop</button>
 			<button class="btn btn-secondary" v-on:click="get_device()">get</button>
 			<button class="btn btn-primary" v-on:click="get_CSV()">export as CSV</button>
+			<button class="btn btn-info" v-on:click="exportTableToCSV()">export as fCSV</button>
 			<button class="btn btn-warning" v-on:click="this.reset()">reset</button>
 			</div>
 			
@@ -218,7 +219,7 @@ ArduinoDetail.component('arduino', {
 			console.log('And is ' + parseInt(now.slice(-1)) + ' smaller than ' + parseInt(this.setup['sleep']) + ' ?');
 			if (now.slice(0,7) == save && ( parseInt(now.slice(-1)) < parseInt(this.setup['sleep']) ) ) {
 				this.get_CSV();
-				this.setup['name'] = this.device['name'] + '_' + this.data['value']['updated'].slice(0,10);
+				this.setup['name'] = this.device['name'] + '_' + this.data['updated'].slice(0,10);
 				this.datas = [];
 				Plotly.deleteTraces('init_plot', [0,1,2,3,4,5]);
 				//this.init_plot(Object.keys(this.key));
@@ -254,7 +255,7 @@ ArduinoDetail.component('arduino', {
 						xsrfCookieName : 'csrftoken',
 						xsrfHeaderName : 'X-CSRFTOKEN',
 						data : { 	device_url : 'arduino/' + this.device['model'] + '/' + this.device['name'] + '/',
-									command : command , message : 'Hello.', },
+								command : command , message : 'Hello.', },
 			};
 					
 			axios(config)
@@ -289,19 +290,21 @@ function downloadCSV(csv, filename) {
 	downloadLink.click(); // Click download link
 }
 
-function exportTableToCSV() {
-	var name = this.setup['name'] + '.csv';
-	
-	var array = typeof arr != 'object' ? JSON.parse(arr) : arr;
-	var str = Object.keys(arr[0]).toString() + '\r\n';
+/* Currently not used as it somehow can't be called by any button in the app...
+Also, this function is rather downloading the table shown instead of the data (complications with rows etc) */
+function exportTableToCSV(name) {
+	var csv = [];
+	var rows = document.querySelectorAll("table tr");
+    
+	for (var i = 0; i < rows.length; i++) {
+        	var row = [], cols = rows[i].querySelectorAll("td, th");
+        
+        	for (var j = 0; j < cols.length; j++) 
+        		row.push(cols[j].innerText);
+        
+        	csv.push(row.join(","));        
+	}
 
-	for (var i = 0; i < array.length; i++) {
-		var line = '';
-		for (var index in array[i]) {
-			if (line != '') line += ','
-				line += array[i][index];
-		}
-		str += line + '\r\n';
-	}	
-	downloadCSV(str, name); // Download CSV file
+    	// Download CSV file
+	downloadCSV(csv.join("\n"), filename);
 }
