@@ -204,7 +204,7 @@ ArduinoDetail.component('arduino', {
 		is_locked() {
 			if ( this.setup['lock'] in this.key ) {
 				ch = this.setup['lock'];
-				if ( (this.data[ch] < 2.8 || 4.8 < this.data[ch]) && this.alert ) {
+				if ( (this.data[ch] < 1.85 || 3.85 < this.data[ch]) && this.alert ) {
 					this.alert = !this.alert;
 					this.setup['status'] = "Laser is not locked !!!";
 					alert("Laser out of lock!");
