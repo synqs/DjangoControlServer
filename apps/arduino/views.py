@@ -5,7 +5,8 @@ from django.core import serializers
 
 from .models import pdmon, tctrl, thsen
 
-import requests, json
+import requests, json, csv, os
+from pathlib import Path
 from requests.exceptions import HTTPError
 
 # Create your views here.
@@ -86,14 +87,23 @@ def arduino(request, arduino_name):
         else:
             if command == 'STATUS':
                 response = r.json()
+                day = response['value']['updated'][:10]
+                path = Path.home().as_posix()
+                full_path = Path(path+'/Dropbox (CoQuMa)/LabNotes/NaKa/'+day[:7]+'/'+day+'/')
+                
+                try :
+                    with open(str(full_path)+'\\'+arduino_name+'_'+day+'.csv', 'a',newline='', encoding='UTF8') as f:
+                        writer = csv.writer(f)
+                        writer.writerow([value for key, value in response['value'].items()])
+                        f.close()
+                except FileNotFoundError : 
+                    with open(Path.cwd().as_posix()+'\\data\\'+arduino_name+'_'+day+'.csv', 'a',newline='', encoding='UTF8') as f:
+                        writer = csv.writer(f)
+                        writer.writerow([value for key, value in response['value'].items()])
+                        f.close()
+                    
                 response['keys'] = arduino.keys()
                 response['message'] = 'Arduino ready.'
-            elif command == 'DETAIL':
-                detail = serializers.serialize('json', [arduino])
-                response['arduino'] = json.loads(detail[1:-1])
-                response['message'] = 'Arduino available.'
-                
-                return render(request, 'main/detail.html', response)
             elif command == 'EDIT':
                 for p in r_dict['params']: arduino.set(p, r_dict['params'][p])
                 arduino.save()
@@ -101,5 +111,5 @@ def arduino(request, arduino_name):
             else:
                 response['message'] = 'Invalid operation.'
                 
-    print(response)
+    #print(response)
     return HttpResponse(json.dumps(response))
