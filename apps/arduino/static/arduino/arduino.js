@@ -29,7 +29,7 @@ ArduinoDetail.component('arduino', {
 	data() { return {
 		data : [],
 		datas : [],
-		setup : {	'status' : 'Trying to connect...', 'sleep' : '5', 'save' : '00:00:00', 'name' : 'test',
+		setup : {	'status' : 'Trying to connect...', 'sleep' : '10', 'save' : '00:00:00', 'name' : 'test',
 				'convert' : {}, 'lock' : ''},
 		key : {},
 		config : [],
@@ -218,8 +218,7 @@ ArduinoDetail.component('arduino', {
 			console.log('Is ' + now.slice(0,7) + ' equal to ' + save + ' ?');
 			console.log('And is ' + parseInt(now.slice(-1)) + ' smaller than ' + parseInt(this.setup['sleep']) + ' ?');
 			if (now.slice(0,7) == save && ( parseInt(now.slice(-1)) < parseInt(this.setup['sleep']) ) ) {
-				this.get_CSV();
-				this.setup['name'] = this.device['name'] + '_' + this.data['updated'].slice(0,10);
+				//this.get_CSV();
 				this.datas = [];
 				Plotly.deleteTraces('init_plot', [0,1,2,3,4,5]);
 				//this.init_plot(Object.keys(this.key));

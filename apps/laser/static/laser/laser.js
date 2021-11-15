@@ -7,7 +7,7 @@ LaserDetail.component('laser', {
 		datas : [],
 		setup : {'status' : 'Trying to connect...', 'counter' : 180, 'edfa' : false, 'laser' : false, },
 		config : {},
-		editForm : [],
+		editForm : {},
 		}
 	},
 	compilerOptions: {
@@ -24,6 +24,7 @@ LaserDetail.component('laser', {
 	
 	laser : [[ this.setup['laser'] ]]
 	edfa : [[ this.setup['edfa'] ]]
+	editform : [[ this.editForm ]]
 	
 	<table class="table table-striped">
 		<thead>
@@ -39,7 +40,7 @@ LaserDetail.component('laser', {
 			</tr>
 			<tr>
 				<td>2. Set setpoint for edfa1 (const. current OR const. voltage mode)</td>
-				<td>EDFA1 voltage : <input v-model="this.editForm['power']" placeholder="power setpoint"/> V <button class="btn btn-primary" v-on:click="this.set_edfa()" id="set_edfa" disabled>update edfa</button></td>
+				<td>EDFA1 voltage : <input v-model="this.editForm['power']" placeholder="power setpoint"/> V <button class="btn btn-primary" v-on:click="this.set_edfa()" id="set_edfa">update edfa</button></td>
 			</tr>
 			<tr>
 				<td>3. Turn emission on/off</td>
@@ -51,6 +52,19 @@ LaserDetail.component('laser', {
 			</tr>
 		</tbody>
 	</table>
+	
+	<div class="table-responsive" style="height: 200px;"><table class="table table-striped mh-100">
+		<thead class="sticky-top">
+			<tr class="bg-dark text-light">
+				<th v-for="k in Object.keys(this.data)">[[ k ]]</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr v-for="d in datas"><td v-for="k in Object.keys(this.data)">
+				[[ d[k] ]]
+			</td></tr>
+		</tbody>
+	</table></div>
 	`,
 	mounted () {
 		this.control('PING', this.laser['ip'])
@@ -90,7 +104,7 @@ LaserDetail.component('laser', {
 			else { this.setup['status'] = 'Power setpoint invalid!' }
 		},
 		set_edfa() {
-			this.control('SET_EDFA', this.editForm);
+			this.control('SET_EDFA', this.editForm['power']);
 		},
 		control(command, payload="") {
 			config = {	method : 'POST',
@@ -103,6 +117,8 @@ LaserDetail.component('laser', {
 				console.log(response);
 				this.setup['status'] = response.data['message'];
 				this.setup['laser'] = response.data['laser'];
+				this.data = Object.assign({}, response.data['value'], {'status' : response.data['message']});
+				this.datas.unshift(this.data);
 				});
 		},
 	},
