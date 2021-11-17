@@ -53,6 +53,9 @@ class LaserControlView(View):
                     session.read_until(b'EDFA1_PhdOut : ')
                     EDFA = session.read_until(b'V').decode('ascii')
                     
+                    if float(EDFA[:-1]) >= 0.01 : response['message'] += ' Emission ON.'
+                    else : response['message'] += ' Emission OFF.'
+                    
                     response['value']['EDFA'] = EDFA[:-1]
                     
                     session.write(b'\x03')                      # quit the cplot...
