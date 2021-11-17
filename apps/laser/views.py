@@ -41,7 +41,7 @@ class LaserControlView(View):
             response['message'] = str(excp)
         
         else :
-            if command == 'PING':
+            if command == 'STATUS':
                 session.write(b'ls_tool cplot\n')           # check status of laser
                 time.sleep(1)                               # wait for the output
                 session.read_until(b'Enable_Current_Laser_Diode : ')
