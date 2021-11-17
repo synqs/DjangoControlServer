@@ -79,20 +79,18 @@ class LaserControlView(View):
                 
                 response['message'] = 'Power parameter updated.'
                 response['value']['EDFA'] = str(np.round(EDFA,6))
-            
-            path = Path.home().as_posix()
-            full_path = Path(path+'/Dropbox (CoQuMa)/LabNotes/NaKa/'+timestamp[:7]+'/'+timestamp[:10]+'/')
                 
+            full_path = Path(Path.home().as_posix()+'/Dropbox (CoQuMa)/LabNotes/NaKa/'+timestamp[:7]+'/'+timestamp[:10]+'/data')
             try :
-                with open(str(full_path)+'\\'+kwargs['laser_name']+'_'+timestamp[:10]+'.csv', 'a',newline='', encoding='UTF8') as f:
-                    writer = csv.writer(f)
-                    writer.writerow([value for key, value in response['value'].items()])
-                    f.close()
-            except FileNotFoundError : 
-                with open(Path.cwd().as_posix()+'\\data\\'+kwargs['laser_name']+'_'+timestamp[:10]+'.csv','a',newline='', encoding='UTF8') as f:
-                    writer = csv.writer(f)
-                    writer.writerow([value for key, value in response['value'].items()])
-                    f.close()
+                full_path.mkdir(parents=True, exist_ok=True)
+            except FileExistsError :
+                print('already exists!')
+                full_path = Path(Path.cwd().as_posix()+'/data')
+                        
+            with open(str(full_path)+'\\'+kwargs['laser_name']+'_'+timestamp[:10]+'.csv', 'a', newline='', encoding='UTF8') as f:
+                writer = csv.writer(f)
+                writer.writerow([value for key, value in response['value'].items()])
+                f.close()
                 
             session.write(b'exit\n')
             session.close() # clear session to save resources

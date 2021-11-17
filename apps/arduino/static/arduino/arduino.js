@@ -29,7 +29,7 @@ ArduinoDetail.component('arduino', {
 	data() { return {
 		data : [],
 		datas : [],
-		setup : {	'status' : 'Trying to connect...', 'sleep' : '10', 'save' : '00:00:00', 'name' : 'test',
+		setup : {	'status' : 'Trying to connect...', 'sleep' : '10', 'save' : 'never', 'name' : 'test',
 				'convert' : {}, 'lock' : ''},
 		key : {},
 		config : [],
@@ -52,7 +52,7 @@ ArduinoDetail.component('arduino', {
 				</div>
 				<div class="col-5">
 					<h6>CSV name : <input v-model="this.setup['name']" placeholder="name for CSV"/>.csv</h6>
-					<h6>Next CSV Download : <input class="w-25" v-model="this.setup['save']" placeholder="savetime in 'hh:mm:ss'"/> today</h6>
+					<h6>Next CSV Download : <input v-model="this.setup['save']" placeholder="savetime in 'hh:mm:ss'"/></h6>
 					<h6>Current Sleeptime : <input class="w-25" v-model="this.setup['sleep']" placeholder="sleeptime in s" v-on:blur="this.stop_device(), this.start_device()"> s</h6>
 				</div>
 			</div></div>
@@ -140,6 +140,7 @@ ArduinoDetail.component('arduino', {
 						this.key = response.data['keys']; 
 						this.init_plot(response.data['keys']);
 						this.setup['name'] = this.device['name'] + '_' + response.data['value']['updated'].slice(0,10);
+						this.setup['save'] = response.data['value']['updated'].slice(0,10) + ' 23:59:59'
 						this.init = !this.init;
 					}
 					for ( k in Object.keys(this.setup['convert']) ) {
@@ -213,17 +214,15 @@ ArduinoDetail.component('arduino', {
 			};
 		},
 		check_time() {
-			var now = this.data['updated'].slice(11,19);
-			var save = this.setup['save'].slice(0,7);
-			console.log('Is ' + now.slice(0,7) + ' equal to ' + save + ' ?');
-			console.log('And is ' + parseInt(now.slice(-1)) + ' smaller than ' + parseInt(this.setup['sleep']) + ' ?');
-			if (now.slice(0,7) == save && ( parseInt(now.slice(-1)) < parseInt(this.setup['sleep']) ) ) {
+			var now = this.data['updated'];
+			var save = this.setup['save'];
+			
+			if (now >= save ) {
 				//this.get_CSV();
 				this.datas = [];
-				Plotly.deleteTraces('init_plot', [0,1,2,3,4,5]);
+				Plotly.deleteTraces('init_plot', Array.from(Array(parseInt(Object.keys(this.data).length)-1).keys()));
 				//this.init_plot(Object.keys(this.key));
 				this.init = !this.init;
-				
 			}
 		},
 		get_CSV() {

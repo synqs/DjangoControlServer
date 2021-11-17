@@ -91,12 +91,12 @@ def arduino(request, arduino_name):
                 
                 full_path = Path(Path.home().as_posix()+'/Dropbox (CoQuMa)/LabNotes/NaKa/'+day[:7]+'/'+day+'/data')
                 try :
-                    full_path.mkdir(parents=true, exist_ok=True)
+                    full_path.mkdir(parents=True, exist_ok=True)
                 except FileExistsError :
                     print('already exists!')
                     full_path = Path(Path.cwd().as_posix()+'/data')
                         
-                with open(full_path+'\\'+arduino_name+'_'+day+'.csv', 'a', newline='', encoding='UTF8') as f:
+                with open(str(full_path)+'\\'+arduino_name+'_'+day+'.csv', 'a', newline='', encoding='UTF8') as f:
                     writer = csv.writer(f)
                     writer.writerow([value for key, value in response['value'].items()])
                     f.close()
