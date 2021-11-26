@@ -16,14 +16,14 @@ class device(models.Model):
 	
 	def __str__(self):
 		return self.name
-		
+
 	def ping(self):
 		import platform, subprocess
 		parameter = '-n' if platform.system().lower()=='windows' else '-c'
 		command = ['ping', parameter, '1', self.ip]
-		success = subprocess.call(command, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-		
-		if success == 0 : return True
+		success = subprocess.check_output(command).decode('utf-8').find('TTL')
+
+		if success != -1 : return True
 		else : return False
 
 def create_device(sender, instance, created, **kwargs):
@@ -39,3 +39,12 @@ def create_device(sender, instance, created, **kwargs):
 	d.ip = instance.ip
 	d.url = instance.get_absolute_url()
 	d.save()
+
+def delete_device(sender, instance, created, **kwargs):
+	content_type = ContentType.objects.get_for_model(instance)
+	
+	try: d = device.objects.get(content_type=content_type, object_id=instance.id)
+	except device.DoesNotExist:
+		d = device(content_type=content_type, object_id=instance.id)
+        
+	d.delete()

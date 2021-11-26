@@ -1,6 +1,6 @@
 from django.db import models
-from main.models import create_device
-from django.db.models.signals import post_save
+from main.models import create_device, delete_device
+from django.db.models.signals import post_save, post_delete
 
 import requests
 
@@ -30,6 +30,7 @@ class pdmon(models.Model):
 		return keys
 
 post_save.connect(create_device, sender=pdmon)
+post_delete.connect(delete_device, sender=pdmon)
 
 class tctrl(models.Model):
 	id = models.BigAutoField(primary_key=True)
@@ -64,6 +65,7 @@ class tctrl(models.Model):
 			return False
 
 post_save.connect(create_device, sender=tctrl)
+post_delete.connect(delete_device, sender=tctrl)
 
 class thsen(models.Model):
 	id = models.BigAutoField(primary_key=True)
@@ -87,7 +89,8 @@ class thsen(models.Model):
 		keys = {'updated':'true', 'T':'true', 'H':'true'}
 		return keys
 			
-post_save.connect(create_device, sender=thsen)	
+post_save.connect(create_device, sender=thsen)
+post_delete.connect(delete_device, sender=thsen)
 
 class psupp(models.Model):
 	id = models.BigAutoField(primary_key=True)

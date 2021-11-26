@@ -1,6 +1,6 @@
 from django.db import models
-from main.models import create_device
-from django.db.models.signals import post_save
+from main.models import create_device, delete_device
+from django.db.models.signals import post_save, post_delete
 
 # Create your models here.
 class mokugo(models.Model):
@@ -52,3 +52,4 @@ class mokugo(models.Model):
 		return data
 		
 post_save.connect(create_device, sender=mokugo)
+post_delete.connect(delete_device, sender=mokugo)

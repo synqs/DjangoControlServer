@@ -1,6 +1,6 @@
 from django.db import models
-from main.models import create_device
-from django.db.models.signals import post_save
+from main.models import create_device, delete_device
+from django.db.models.signals import post_save, post_delete
 
 # Create your models here.
 class redpitaya(models.Model):
@@ -19,3 +19,4 @@ class redpitaya(models.Model):
 		return "redpitaya/%s/" % self.name
 		
 post_save.connect(create_device, sender=redpitaya)
+post_delete.connect(delete_device, sender=redpitaya)

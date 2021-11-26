@@ -62,14 +62,15 @@ class LaserControlView(View):
                 else :
                     response['message'] =  'Laser diode OFF.'
             elif command == 'TOGGLE':
-                session.write(b'ls_tool Enable_Current_Laser_Diode' + bytes(arg +'\n', 'ascii'))
+                print('TOGGLE')
+                session.write(bytes('ls_tool Enable_Current_Laser_Diode ' + arg +'\n', 'ascii'))
                 response['message'] = 'Laser Diode ' + arg + '.'
         
             elif command == 'TOGGLE_EDFA':
                 print('toggle_edfa')
-                session.write('ls_tool edfa_shutdown edfa1\n')
+                session.write(b'ls_tool edfa_shutdown edfa1\n')
                 session.read_until('# ')
-                session.write('ls_tool edfa_shutdown edfa0\n')
+                session.write(b'ls_tool edfa_shutdown edfa0\n')
                 response['message'] = 'EDFAs ' + arg + '.'
 
             elif command == 'SET_EDFA':
