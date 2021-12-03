@@ -7,7 +7,7 @@ from .models import redpitaya
 
 import requests, json, pyrpl, datetime
 from requests.exceptions import HTTPError
-from PyQt5.QtCore import QObject, QThread
+from PyQt5.QtCore import QObject, QThread, pyqtSignal
 
 # Create your views here.
 class RedPitayaDetailView(DetailView):
@@ -44,7 +44,14 @@ class RedPitayaControlView(View):
             thread = QThread()
             session = rp_session(hostname=Redpitaya.ip, config=Redpitaya.ip[-3:])
             session.moveToThread(thread)
+            # connect the signals
+            thread.started.connect(session.run)
+            session.connected.connect(thread.quit)
+            session.connected.connect(session.deleteLater)
+            thread.finished.connect(thread.deleteLater)
+            # start the thread
             thread.start()
+            
             r = session.rp
         except Exception as excp :
             print(excp)
@@ -70,6 +77,7 @@ class RedPitayaControlView(View):
         return HttpResponse(json.dumps(response))
         
 class rp_session(QObject):
+    connected = pyqtSignal()
     
     def __init__(self, hostname, config):
         self.hostname = hostname
@@ -78,3 +86,4 @@ class rp_session(QObject):
 
     def run(self):
         p = pyrpl.Pyrpl(hostname=self.hostname, config=self.config)
+        self.connected.emit()
