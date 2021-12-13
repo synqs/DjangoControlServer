@@ -7,7 +7,7 @@ LaserDetail.component('laser', {
 		datas : [],
 		setup : {'status' : 'Trying to connect...', 'counter' : 180, 'sleep' : '10', 'save' : 'never', 'name' : 'test',},
 		config : {},
-		editForm : {},
+		editForm : { 'power' : '1' },
 		}
 	},
 	compilerOptions: {
@@ -44,7 +44,7 @@ LaserDetail.component('laser', {
 	
 	<div class="row mb-3">
 		<div class="col">1. Turn on the laser : <button class="btn btn-primary" v-on:click="this.toggle_laser()" id="toggle_LD">toggle POWER</button></div>
-		<div class="col">2. Set voltage for edfa1 : <input v-model="this.editForm['power']" placeholder="power setpoint"/> V <button class="btn btn-primary" v-on:click="this.set_edfa()" id="set_edfa" disabled>update edfa</button></div>
+		<div class="col">2. Set power for high power output : <input v-model="this.editForm['power']" placeholder="power setpoint"/> W <button class="btn btn-primary" v-on:click="this.set_edfa()" id="set_edfa" disabled>update edfa</button></div>
 		<div class="col">3. Turn emission on/off : <button class="btn btn-warning" v-on:click="this.toggle_edfa()" id="toggle_edfa" disabled>toggle Emission</button></div>
 		<div class="col">(4. Wait for the laser to warm up before locking - Time remaining : [[ this.setup['counter'] ]] s)</div>
 	</div>
@@ -56,12 +56,14 @@ LaserDetail.component('laser', {
 		<thead class="sticky-top">
 			<tr class="bg-dark text-light">
 				<th v-for="k in Object.keys(this.data)">[[ k ]]</th>
+				<th>power setpoint</th>
 			</tr>
 		</thead>
 		<tbody>
-			<tr v-for="d in datas"><td v-for="k in Object.keys(this.data)">
-				[[ d[k] ]]
-			</td></tr>
+			<tr v-for="d in datas">
+				<td v-for="k in Object.keys(this.data)">[[ d[k] ]]</td>
+				<td>[[ this.editForm['power'] ]]</td>
+			</tr>
 		</tbody>
 		</table></div></div>
 	</div>

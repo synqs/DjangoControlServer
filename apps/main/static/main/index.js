@@ -111,7 +111,8 @@ IndexTable.component('device-widget', {
 				});
 		},
 		remove_device() {
-			config = this.config;
+			config = this.config; config['method'] = 'POST';
+			console.log(config);
 			config['url'] = this.device['pk'] + '/delete/';
 			axios(config)
 				.then(response => {this.status = response.data['message'];})
@@ -120,7 +121,7 @@ IndexTable.component('device-widget', {
 					this.status['global'] = error;
 					console.log(error);
 				});
-			location.reload(true);
+			// location.reload(true);
 		},
 		detail_device() {
 			var windowFeatures = "menubar=yes,location=yes,resizable=yes,scrollbars=yes,status=yes";

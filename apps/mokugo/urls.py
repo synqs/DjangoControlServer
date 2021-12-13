@@ -4,5 +4,5 @@ from . import views
 app_name='mokugo'
 urlpatterns = [
 	path('<slug:mokugo_name>/', views.MokugoDetailView.as_view(), name='mokugo'),
-	path('<slug:mokugo_name>/ping/', views.mokugo_ping, name='mokugo_ping'),
+	path('<slug:mokugo_name>/data/', views.MokugoDataView.as_view(), name='mokugo_data'),
 ]

@@ -62,14 +62,15 @@ class LaserControlView(View):
                 else :
                     response['message'] =  'Laser diode OFF.'
                     
-            	full_path = Path(Path.home().as_posix()+'/Dropbox (CoQuMa)/LabNotes/NaKa/'+timestamp[:7]+'/'+timestamp[:10]+'/data')
-    		try :
+                full_path = Path(Path.home().as_posix()+'/Dropbox (CoQuMa)/LabNotes/NaKa/'+timestamp[:7]+'/'+timestamp[:10]+'/data')
+                try :
                 	full_path.mkdir(parents=True, exist_ok=True)
-            	except FileExistsError :
+                    
+                except FileExistsError :
                 	print('already exists!')
                 	full_path = Path(Path.cwd().as_posix()+'/data')
-                        
-            	with open(str(full_path)+'\\'+kwargs['laser_name']+'_'+timestamp[:10]+'.csv', 'a', newline='', encoding='UTF8') as f:
+                    
+                with open(str(full_path)+'\\'+kwargs['laser_name']+'_'+timestamp[:10]+'.csv', 'a', newline='', encoding='UTF8') as f:
                 	writer = csv.writer(f)
                 	writer.writerow([value for key, value in response['value'].items()])
                 	f.close()
@@ -87,18 +88,17 @@ class LaserControlView(View):
                 response['message'] = 'EDFAs ' + arg + '.'
 
             elif command == 'SET_EDFA':
-                if 0 <= float(arg) <= 3 : 
-                	voltage = power_to_voltage(float(arg))
-                	session.write(bytes('ls_tool edfa_set_phdout edfa1 ' + voltage + '\n', 'utf-8'))
-                	session.read_until(b'pid_setpoint = ')
-                	setpoint = session.read_until(b'\n').decode('utf-8')
-                
-                	EDFA = float(setpoint) * 2.999725 / 39321.6
-                
-                	response['message'] = 'Power parameter updated.'
-                	response['value']['EDFA'] = str(np.round(voltage_to_power(EDFA),6))
-        	else :
-        		response['message'] = 'Invalid input!'
+                if 0 <= float(arg) <= 3 :
+                    voltage = power_to_voltage(float(arg))
+                    session.write(bytes('ls_tool edfa_set_phdout edfa1 ' + str(voltage) + '\n', 'utf-8'))
+                    session.read_until(b'pid_setpoint = ')
+                    setpoint = session.read_until(b'\n').decode('utf-8')
+                    EDFA = float(setpoint) * 2.999725 / 39321.6
+                    
+                    response['message'] = 'Power parameter updated.'
+                    response['value']['EDFA'] = str(np.round(voltage_to_power(EDFA),6))
+                else :
+                    response['message'] = 'Invalid input!'
                 
             session.write(b'exit\n')
             session.close() # clear session to save resources
