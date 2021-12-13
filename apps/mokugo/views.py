@@ -26,6 +26,9 @@ class MokugoDetailView(DetailView):
 	
 class MokugoDataView(DetailView):
 	model = mokugo
+	slug_url_kwarg = 'mokugo_name'
+	slug_field = 'name'
+	template_name = 'mokugo/mokugo.html'
 
 	def get_context_data(self, **kwargs):
 		response = { 'value' : ''}

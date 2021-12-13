@@ -40,7 +40,7 @@ def create_device(sender, instance, created, **kwargs):
 	d.url = instance.get_absolute_url()
 	d.save()
 
-def delete_device(sender, instance, created, **kwargs):
+def delete_device(sender, instance, **kwargs):
 	content_type = ContentType.objects.get_for_model(instance)
 	
 	try: d = device.objects.get(content_type=content_type, object_id=instance.id)
