@@ -22,27 +22,10 @@ MokugoDetail.component('mokugo', {
 	},
 	methods: {
 		get_mokugo() {
-			ip = '129.206.180.142'
-			config = {	method : 'POST',
-					url : '/mokugo/' + this.mokugo.fields['name'] + '/',
+			config = {	method : 'GET',
+					url : '/' + this.mokugo.fields['name'] + '/data/',
 					xsrfCookieName: 'csrftoken',
 					xsrfHeaderName: 'X-CSRFTOKEN',
-					data : { 'ip' : ip, 'command' : 'DATA', }
-			};
-			axios(config)
-				.then(response => {
-					console.log(response.data);
-					this.data = response.data;
-				})
-				.catch(error => {console.log(error);});
-		},
-		exit_mokugo() {
-			ip = '129.206.180.142'
-			config = {	method : 'POST',
-					url : '/mokugo/' + this.mokugo.fields['name'] + '/',
-					xsrfCookieName: 'csrftoken',
-					xsrfHeaderName: 'X-CSRFTOKEN',
-					data : { 'ip' : ip, 'command' : 'EXIT', }
 			};
 			axios(config)
 				.then(response => {

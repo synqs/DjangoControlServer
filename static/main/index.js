@@ -24,6 +24,7 @@ IndexTable.component('index-table', {
 	
 	<table class="table table-striped align-middle">
 		<thead class="table-dark"><tr>
+                        <th>ID</th>
 			<th>Name</th>
 			<th>Description</th>
 			<th>IP</th>
@@ -76,6 +77,7 @@ IndexTable.component('device-widget', {
 		delimiters: ['[[', ']]'],
 	},
 	template: `
+        <td>[[ this.device['pk'] ]]</td>
 	<td>
 		<button class="btn btn-secondary" v-on:click="detail_device()">[[ this.device['name'] ]]</button>
 	</td>
@@ -93,7 +95,7 @@ IndexTable.component('device-widget', {
 	methods : {
 		ping_device() {
 			config = {	method : 'GET',
-					url : 'ping/' + this.device['name'] + '/',
+					url : this.device['name'] + '/ping/',
 					xsrfCookieName: 'csrftoken',
 					xsrfHeaderName: 'X-CSRFTOKEN',
 					data: { 'ip' : this.device['ip'] },
@@ -109,8 +111,9 @@ IndexTable.component('device-widget', {
 				});
 		},
 		remove_device() {
-			config = this.config;
-			config['data']['command'] = 'DELETE';
+			config = this.config; config['method'] = 'POST';
+			console.log(config);
+			config['url'] = this.device['pk'] + '/delete/';
 			axios(config)
 				.then(response => {this.status = response.data['message'];})
 				.catch(error => {
@@ -118,7 +121,7 @@ IndexTable.component('device-widget', {
 					this.status['global'] = error;
 					console.log(error);
 				});
-			location.reload(true);
+			// location.reload(true);
 		},
 		detail_device() {
 			var windowFeatures = "menubar=yes,location=yes,resizable=yes,scrollbars=yes,status=yes";
