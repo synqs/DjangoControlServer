@@ -6,7 +6,7 @@ from django.core import serializers
 
 from .models import mokugo
 
-import json
+import json, platform, datetime, time, csv
 import numpy as np
 from pathlib import Path
 from moku.instruments import ArbitraryWaveformGenerator
@@ -31,9 +31,11 @@ class MokugoDataView(DetailView):
 	slug_field = 'name'
 
 	def get(self, request, *args, **kwargs):
-		response = { 'value' : ''}
 		Mokugo = super().get_object()
 		print(Mokugo._meta.get_fields())
+
+		timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+		response = { 'value' : {'updated' : timestamp }}
 
 		try:
 			i = ArbitraryWaveformGenerator(Mokugo.ip, force_connect=True)
@@ -43,7 +45,8 @@ class MokugoDataView(DetailView):
 			offset = np.round(i.read_power_supply(1)['set_voltage'],3)
 			response['message'] = 'Data available.'
 			response['value']['offset'] = str(offset)
-
+			print(offset)
+            
 			full_path = Path(Path.home().as_posix()+'/Dropbox (CoQuMa)/LabNotes/NaKa/'+timestamp[:7]+'/'+timestamp[:10]+'/data')
 			try :
 				full_path.mkdir(parents=True, exist_ok=True)
@@ -54,6 +57,8 @@ class MokugoDataView(DetailView):
 				writer = csv.writer(f)
 				writer.writerow([value for key, value in response['value'].items()])
 				f.close()
+			
+			i.relinquish_ownership()
 
 		print(response)
 		return HttpResponse(json.dumps(response))
