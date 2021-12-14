@@ -23,7 +23,7 @@ MokugoDetail.component('mokugo', {
 	methods: {
 		get_mokugo() {
 			config = {	method : 'GET',
-					url : '/' + this.mokugo.fields['name'] + '/data/',
+					url : '/mokugo/' + this.mokugo['name'] + '/data/',
 					xsrfCookieName: 'csrftoken',
 					xsrfHeaderName: 'X-CSRFTOKEN',
 			};

@@ -7,6 +7,7 @@ from django.core import serializers
 from .models import mokugo
 
 import json
+import numpy as np
 from pathlib import Path
 from moku.instruments import ArbitraryWaveformGenerator
 
@@ -28,16 +29,14 @@ class MokugoDataView(DetailView):
 	model = mokugo
 	slug_url_kwarg = 'mokugo_name'
 	slug_field = 'name'
-	template_name = 'mokugo/mokugo.html'
 
-	def get_context_data(self, **kwargs):
+	def get(self, request, *args, **kwargs):
 		response = { 'value' : ''}
 		Mokugo = super().get_object()
-		print(self.object)
-		print(Mokugo)
+		print(Mokugo._meta.get_fields())
 
 		try:
-			i = AbritrarySignalGenerator(Mokugo['ip'], force_connect=True)
+			i = ArbitraryWaveformGenerator(Mokugo.ip, force_connect=True)
 		except Exception as e:
 			response['message'] = str(e)
 		else:
@@ -51,9 +50,10 @@ class MokugoDataView(DetailView):
 			except FileExistsError :
 				print('already exists!')
 				full_path = Path(Path.cwd().as_posix()+'/data')
-			with open(str(full_path)+'\\'+kwargs['laser_name']+'_'+timestamp[:10]+'.csv', 'a', newline='', encoding='UTF8') as f:
+			with open(str(full_path)+'\\'+kwargs['mokugo_name']+'_'+timestamp[:10]+'.csv', 'a', newline='', encoding='UTF8') as f:
 				writer = csv.writer(f)
 				writer.writerow([value for key, value in response['value'].items()])
 				f.close()
 
+		print(response)
 		return HttpResponse(json.dumps(response))
