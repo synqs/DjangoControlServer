@@ -80,6 +80,38 @@ MokugoDetail.component('mokugo', {
 				})
 				.catch(error => {console.log(error);});
 		},
+		get_mokugo() {
+			config = {	method : 'GET',
+					url : '/mokugo/' + this.mokugo['name'] + '/data/',
+					xsrfCookieName: 'csrftoken',
+					xsrfHeaderName: 'X-CSRFTOKEN',
+			};
+			axios(config)
+				.then(response => {
+					console.log(response.data);
+					this.setup['status'] = response.data['message'];
+					this.data = response.data['value'];
+					this.datas.unshift(this.data);
+				})
+				.catch(error => {console.log(error);});
+		},
+		get_mokugo() {
+			config = {	method : 'POST',
+					url : '/mokugo/' + this.mokugo['id'] + '/edit/',
+					xsrfCookieName: 'csrftoken',
+					xsrfHeaderName: 'X-CSRFTOKEN',
+					payload = this.EditForm
+			};
+			axios(config)
+				.then(response => {
+					console.log(response.data);
+					this.setup['status'] = response.data['message'];
+				})
+				.catch(error => {console.log(error);});
+		},
+		reset() {
+			location.reload(true);
+		},
 		get_CSV() {
 			var csv = [];
 			var rows = document.querySelectorAll("table tr");

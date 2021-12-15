@@ -56,13 +56,11 @@ LaserDetail.component('laser', {
 		<thead class="sticky-top">
 			<tr class="bg-dark text-light">
 				<th v-for="k in Object.keys(this.data)">[[ k ]]</th>
-				<th>power setpoint</th>
 			</tr>
 		</thead>
 		<tbody>
 			<tr v-for="d in datas">
 				<td v-for="k in Object.keys(this.data)">[[ d[k] ]]</td>
-				<td>[[ this.editForm['power'] ]]</td>
 			</tr>
 		</tbody>
 		</table></div></div>
@@ -104,7 +102,7 @@ LaserDetail.component('laser', {
 		},
                 get_laser() {
                         this.control('STATUS').then( data=> {
-				this.data = Object.assign({}, data, {'status' : this.setup['status']});
+				this.data = Object.assign({}, data, {'status' : this.setup['status'], 'power setpoint' : this.editForm['power'] });
 				this.datas.unshift(this.data);
 				this.update_plot(data);
 				this.check_time()

@@ -32,7 +32,6 @@ class MokugoDataView(DetailView):
 
 	def get(self, request, *args, **kwargs):
 		Mokugo = super().get_object()
-		print(Mokugo._meta.get_fields())
 
 		timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 		response = { 'value' : {'updated' : timestamp }}
@@ -45,7 +44,6 @@ class MokugoDataView(DetailView):
 			offset = np.round(i.read_power_supply(1)['set_voltage'],3)
 			response['message'] = 'Data available.'
 			response['value']['offset'] = str(offset)
-			print(offset)
             
 			full_path = Path(Path.home().as_posix()+'/Dropbox (CoQuMa)/LabNotes/NaKa/'+timestamp[:7]+'/'+timestamp[:10]+'/data')
 			try :
@@ -59,6 +57,28 @@ class MokugoDataView(DetailView):
 				f.close()
 			
 			i.relinquish_ownership()
-
-		print(response)
+			
+		return HttpResponse(json.dumps(response))
+		
+class MokugoEditView(UpdateView):
+	model = mokugo
+	
+	def post(self, request, *args, **kwargs):
+		Mokugo = super().get_object()
+		
+		timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+		response = { 'value' : {'updated' : timestamp }}
+		
+		try:
+			i = ArbitraryWaveformGenerator(Mokugo.ip, force_connect=True)
+		except Exception as e:
+			response['message'] = str(e)
+		else:
+			offset = float(kwargs['offset'])
+			if -5 <= offset <= 5:
+				i.set_power_supply(1, enable=True, voltage=offset, current=0.15)
+				response['message'] = 'Offset updated successfully!'
+			else:
+				response['message'] = 'Invalid input...'
+				
 		return HttpResponse(json.dumps(response))
