@@ -22,7 +22,50 @@ class PDmonDetailView(DetailView):
         context['arduino'] = json.loads(serializers.serialize('json', [Arduino]))[0]['fields']
         context['arduino']['model'] = 'pdmon'
         return context
-		
+
+class PDmonControlView(View):
+    model = pdmon
+    slug_url_kwarg = 'arduino_name'
+    slug_field = 'name'
+    template_name = 'arduino/arduino.html'
+    
+    def get(self, request, *args, **kwargs):
+        response = {}
+    
+        try: arduino = get_object_or_404(pdmon, name=arduino_name)
+        except Http404:
+            response['message'] = 'Device not found.'
+            return HttpResponse(json.dumps(response))
+    
+        try:
+            url = arduino.http_str() + 'data/get/'
+            r = requests.get(url)
+            r.raise_for_status()
+        except HTTPError as http_err:
+            response['message'] = str(http_err) 
+        except Exception as err:
+            response['message'] = str(err)
+        else:
+            response = r.json()
+            day = response['value']['updated'][:10]
+            full_path = Path(Path.home().as_posix()+'/Dropbox (CoQuMa)/LabNotes/NaKa/'+day[:7]+'/'+day+'/data')
+            try :
+                full_path.mkdir(parents=True, exist_ok=True)
+            except FileExistsError :
+                print('already exists!')
+                full_path = Path(Path.cwd().as_posix()+'/data')
+                       
+            with open(str(full_path)+'\\'+arduino_name+'_'+day+'.csv', 'a', newline='', encoding='UTF8') as f:
+                writer = csv.writer(f)
+                writer.writerow([value for key, value in response['value'].items()])
+                f.close()
+                    
+            response['keys'] = arduino.keys()
+            response['message'] = 'Arduino ready.'
+                
+        return HttpResponse(json.dumps(response))
+        
+        
 class TctrlDetailView(DetailView):
     model = tctrl
     slug_url_kwarg = 'arduino_name'
@@ -35,6 +78,7 @@ class TctrlDetailView(DetailView):
         context['arduino'] = json.loads(serializers.serialize('json', [Arduino]))[0]['fields']
         context['arduino']['model'] = 'tctrl'
         return context
+
 	
 class THsenDetailView(DetailView):
     model = thsen
@@ -48,7 +92,8 @@ class THsenDetailView(DetailView):
         context['arduino'] = json.loads(serializers.serialize('json', [Arduino]))[0]['fields']
         context['arduino']['model'] = 'thsen'
         return context
-   
+
+ 
 def arduino(request, arduino_name):
     response = {}
     

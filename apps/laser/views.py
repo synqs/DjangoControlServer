@@ -41,7 +41,8 @@ class LaserControlView(View):
             response['message'] = str(excp)
         
         else :
-            if command == 'STATUS':
+            if command: # == 'STATUS':
+                print('Status')
                 session.write(b'ls_tool cplot\n')           # check status of laser
                 time.sleep(1)                               # wait for the output
                 session.read_until(b'Enable_Current_Laser_Diode : ')
@@ -53,7 +54,7 @@ class LaserControlView(View):
                     session.read_until(b'EDFA1_PhdOut : ')
                     EDFA = session.read_until(b'V').decode('ascii')
                     
-                    if float(EDFA[:-1]) >= 0.01 : response['message'] += ' Emission ON.'
+                    if float(EDFA[:-1]) >= 0.1 : response['message'] += ' Emission ON.'
                     else : response['message'] += ' Emission OFF.'
                     
                     response['value']['EDFA'] = EDFA[:-1]
@@ -75,10 +76,10 @@ class LaserControlView(View):
                 	writer.writerow([value for key, value in response['value'].items()])
                 	f.close()
                 	
-            elif command == 'TOGGLE':
-                print('TOGGLE')
-                session.write(bytes('ls_tool Enable_Current_Laser_Diode ' + arg +'\n', 'ascii'))
-                response['message'] = 'Laser Diode ' + arg + '.'
+            if command == 'TOGGLE':
+                print('TOGGLE', arg)
+                print(bytes('ls_tool Enable_Current_Laser_Diode ' + arg +'\n', 'utf-8'))
+                session.write(bytes('ls_tool Enable_Current_Laser_Diode ' + arg +'\n', 'utf-8'))
         
             elif command == 'TOGGLE_EDFA':
                 print('toggle_edfa')
@@ -88,6 +89,7 @@ class LaserControlView(View):
                 response['message'] = 'EDFAs ' + arg + '.'
 
             elif command == 'SET_EDFA':
+                print('set')
                 if 0 <= float(arg) <= 3 :
                     voltage = power_to_voltage(float(arg))
                     session.write(bytes('ls_tool edfa_set_phdout edfa1 ' + str(voltage) + '\n', 'utf-8'))

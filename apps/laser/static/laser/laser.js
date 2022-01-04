@@ -78,9 +78,16 @@ LaserDetail.component('laser', {
 			document.getElementById("toggle_edfa").disabled = false;
 			document.getElementById("set_edfa").disabled = false;
 		}
+		else {
+			document.getElementById("toggle_edfa").disabled = true;
+			document.getElementById("set_edfa").disabled = true;
+		};
 		if ( this.setup['status'].includes('Emission ON.') ) {
 			document.getElementById("toggle_LD").disabled = true;
 		}
+		else {
+			document.getElementById("toggle_LD").disabled = false;
+		};
 	},
 	methods: {
 		init_laser() {
