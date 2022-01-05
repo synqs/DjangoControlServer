@@ -6,6 +6,7 @@ from django.core import serializers
 from .models import pdmon, tctrl, thsen
 
 import requests, json, csv, os
+import numpy as np
 from pathlib import Path
 from requests.exceptions import HTTPError
 
@@ -21,12 +22,11 @@ class PDmonDetailView(DetailView):
         Arduino = super().get_object()
         context['arduino'] = json.loads(serializers.serialize('json', [Arduino]))[0]['fields']
         context['arduino']['model'] = 'pdmon'
+        context['arduino']['pk'] = Arduino.pk
         return context
 
-class PDmonDataView(View):
+class PDmonDataView(DetailView):
     model = pdmon
-    slug_url_kwarg = 'arduino_name'
-    slug_field = 'name'
     
     def get(self, request, *args, **kwargs):
         response = {}
@@ -43,8 +43,12 @@ class PDmonDataView(View):
             response['message'] = str(err)
         else:
             response = r.json()
-            print(response)
-            #for V in response['value']
+            temp = r.json()['value']
+            temp.pop('updated')
+            
+            '''for k,V in temp.items():
+                response['value'][k] = int(v_to_p(float(V)*1e3))'''
+                
             day = response['value']['updated'][:10]
             full_path = Path(Path.home().as_posix()+'/Dropbox (CoQuMa)/LabNotes/NaKa/'+day[:7]+'/'+day+'/data')
             try :
@@ -53,7 +57,7 @@ class PDmonDataView(View):
                 print('already exists!')
                 full_path = Path(Path.cwd().as_posix()+'/data')
                        
-            with open(str(full_path)+'\\'+arduino_name+'_'+day+'.csv', 'a', newline='', encoding='UTF8') as f:
+            with open(str(full_path)+'\\'+arduino.name+'_'+day+'.csv', 'a', newline='', encoding='UTF8') as f:
                 writer = csv.writer(f)
                 writer.writerow([value for key, value in response['value'].items()])
                 f.close()
@@ -64,7 +68,7 @@ class PDmonDataView(View):
         return HttpResponse(json.dumps(response))
 
 def v_to_p(v):
-    return 0.45106464*v + 8.10074837
+    return 0.45383986*v + 7.74290467
         
         
 class TctrlDetailView(DetailView):
@@ -109,7 +113,6 @@ def arduino(request, arduino_name):
     
     # THIS IS FOR PROCESSING THE AXIOS REQUESTS #
     r_dict = json.loads(request.body.decode())
-    print(r_dict)
     command = r_dict['command']
     
     if command == 'DELETE':

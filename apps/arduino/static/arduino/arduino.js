@@ -132,7 +132,9 @@ ArduinoDetail.component('arduino', {
 					xsrfHeaderName: 'X-CSRFTOKEN',
 					data : { command :'STATUS', }
 			};
-			if ( this.device['model'] == 'pdmon' ) { config['url'] = '/arduino/'  + this.device['name'] + '/data/',
+			if ( this.device['model'] == 'pdmon' ) {
+			    config['method'] = 'GET'
+			    config['url'] = '/arduino/pdmon/'  + this.device['pk'] + '/data/'; }
 			this.config = config;
 			axios(config)
 				.then(response => {
