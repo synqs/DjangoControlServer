@@ -23,19 +23,15 @@ class PDmonDetailView(DetailView):
         context['arduino']['model'] = 'pdmon'
         return context
 
-class PDmonControlView(View):
+class PDmonDataView(View):
     model = pdmon
     slug_url_kwarg = 'arduino_name'
     slug_field = 'name'
-    template_name = 'arduino/arduino.html'
     
     def get(self, request, *args, **kwargs):
         response = {}
     
-        try: arduino = get_object_or_404(pdmon, name=arduino_name)
-        except Http404:
-            response['message'] = 'Device not found.'
-            return HttpResponse(json.dumps(response))
+        arduino = super().get_object()
     
         try:
             url = arduino.http_str() + 'data/get/'
@@ -47,6 +43,8 @@ class PDmonControlView(View):
             response['message'] = str(err)
         else:
             response = r.json()
+            print(response)
+            #for V in response['value']
             day = response['value']['updated'][:10]
             full_path = Path(Path.home().as_posix()+'/Dropbox (CoQuMa)/LabNotes/NaKa/'+day[:7]+'/'+day+'/data')
             try :
@@ -64,6 +62,9 @@ class PDmonControlView(View):
             response['message'] = 'Arduino ready.'
                 
         return HttpResponse(json.dumps(response))
+
+def v_to_p(v):
+    return 0.45106464*v + 8.10074837
         
         
 class TctrlDetailView(DetailView):
