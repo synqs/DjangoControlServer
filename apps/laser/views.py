@@ -57,7 +57,7 @@ class LaserControlView(View):
                     if float(EDFA[:-1]) >= 0.1 : response['message'] += ' Emission ON.'
                     else : response['message'] += ' Emission OFF.'
                     
-                    response['value']['EDFA'] = EDFA[:-1]
+                    response['value']['power'] = str(np.round(voltage_to_power(float(EDFA[:-1])),6))
                     
                     session.write(b'\x03')                      # quit the cplot...
                 else :
@@ -98,7 +98,7 @@ class LaserControlView(View):
                     EDFA = float(setpoint) * 2.999725 / 39321.6
                     
                     response['message'] = 'Power parameter updated.'
-                    response['value']['EDFA'] = str(np.round(voltage_to_power(EDFA),6))
+                    response['value']['power'] = str(np.round(voltage_to_power(EDFA),6))
                 else :
                     response['message'] = 'Invalid input!'
                 

@@ -157,7 +157,7 @@ LaserDetail.component('laser', {
 			var k = {
 				x: [],
 				y: [],
-				name: 'EDFA1',
+				name: 'power',
 				mode: 'lines+markers',
 				type: 'scatter'
 			};
@@ -166,7 +166,7 @@ LaserDetail.component('laser', {
 		},
 		update_plot(update_data) {
 			var update_x = [update_data['updated']];
-			var update_y = [update_data['EDFA']]; 
+			var update_y = [update_data['power']]; 
 			
 			Plotly.extendTraces('init_plot', {x:[update_x],y:[update_y],},[0]); 
 		},
