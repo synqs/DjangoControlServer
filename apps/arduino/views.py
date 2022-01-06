@@ -42,7 +42,9 @@ class PDmonDataView(DetailView):
         except Exception as err:
             response['message'] = str(err)
         else:
-            response = r.json()
+            r_dict = json.loads(request.body.decode())
+            print(r_dict)
+            response = r.json()['value']
             temp = r.json()['value']
             temp.pop('updated')
             

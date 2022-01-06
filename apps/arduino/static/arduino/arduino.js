@@ -30,7 +30,7 @@ ArduinoDetail.component('arduino', {
 		data : [],
 		datas : [],
 		setup : {	'status' : 'Trying to connect...', 'sleep' : '10', 'save' : 'never', 'name' : 'test',
-				'convert' : {}, 'lock' : ''},
+				'convert' : {}, 'power' : false},
 		key : {},
 		config : [],
 		editForm : {},
@@ -90,7 +90,11 @@ ArduinoDetail.component('arduino', {
   			<input v-model="this.setup['convert'][k]" class="form-check-input" type="checkbox">[[ k ]]
   			</div>
   		</div>
-		<div class="col-3 text-center">laser lock : <input class="w-50" v-model="this.setup['lock']" placeholder="channel (e.g. A3)"></div>
+		<div class="col-3 text-center">
+		    <div class="form-check form-switch">
+		        convert to power ? : <input v-model="this.setup['power']" class="form-check-input" type="checkbox">
+		    </div>
+	    </div>
   	</div>
 	
 	<!-- button class="btn btn-info w-100" v-on:click="this.slackbot('TALK')">talk to me!</button -->
@@ -133,26 +137,27 @@ ArduinoDetail.component('arduino', {
 					data : { command :'STATUS', }
 			};
 			if ( this.device['model'] == 'pdmon' ) {
-			    config['method'] = 'GET'
-			    config['url'] = '/arduino/pdmon/'  + this.device['pk'] + '/data/'; }
+			    config['method'] = 'GET';
+			    config['url'] = '/arduino/pdmon/'  + this.device['pk'] + '/data/';
+			    config['data'] = this.setup['power']; }
 			this.config = config;
 			axios(config)
 				.then(response => {
-					if ( response.data['value'] ) {
+					if ( response.data ) {
 					if ( this.init ) { 
 						this.key = response.data['keys']; 
 						this.init_plot(response.data['keys']);
-						this.setup['name'] = this.device['name'] + '_' + response.data['value']['updated'].slice(0,10);
-						this.setup['save'] = response.data['value']['updated'].slice(0,10) + ' 23:59:59'
+						this.setup['name'] = this.device['name'] + '_' + response.data['updated'].slice(0,10);
+						this.setup['save'] = response.data['updated'].slice(0,10) + ' 23:59:59'
 						this.init = !this.init;
 					}
 					for ( k in Object.keys(this.setup['convert']) ) {
 						ch = Object.keys(this.setup['convert'])[k];
-						response.data['value'][ch] = this.conversion(response.data['value'][ch]);
+						response.data[ch] = this.conversion(response.data[ch]);
 					}
-						this.data = response.data['value'];
-						this.datas.unshift(response.data['value']);
-						this.update_plot(response.data['value']);
+						this.data = response.data;
+						this.datas.unshift(response.data);
+						this.update_plot(response.data);
 					
 						this.check_time()
 					}
