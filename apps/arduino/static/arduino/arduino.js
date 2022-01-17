@@ -84,15 +84,16 @@ ArduinoDetail.component('arduino', {
 	</div>
 	
 	<div v-if="this.device['model'] == 'pdmon'" class="row mb-3">
-		<div class="col-2">Convert to measure 0-12V :</div>
-		<div class="col text-center" v-for="k in Object.keys(this.key).splice(1)">
+		<div class="col-2">Convert to measure 0-12V:</div>
+		<div class="col-1 text-center" v-for="k in Object.keys(this.key).splice(1)">
   			<div class="form-check form-switch">
   			<input v-model="this.setup['convert'][k]" class="form-check-input" type="checkbox">[[ k ]]
   			</div>
   		</div>
-		<div class="col-3 text-center">
+		<div class="col-2 text-center">
+		    convert to power ?:
 		    <div class="form-check form-switch">
-		        convert to power ? : <input v-model="this.setup['power']" class="form-check-input" type="checkbox">
+		        <input v-model="this.setup['power']" class="form-check-input" type="checkbox">
 		    </div>
 	    </div>
   	</div>
@@ -137,27 +138,27 @@ ArduinoDetail.component('arduino', {
 					data : { command :'STATUS', }
 			};
 			if ( this.device['model'] == 'pdmon' ) {
-			    config['method'] = 'GET';
 			    config['url'] = '/arduino/pdmon/'  + this.device['pk'] + '/data/';
-			    config['data'] = this.setup['power']; }
+			    config['data']['conversion'] = this.setup['power']; }
 			this.config = config;
 			axios(config)
 				.then(response => {
 					if ( response.data ) {
+					    //console.log(response.data);
 					if ( this.init ) { 
 						this.key = response.data['keys']; 
 						this.init_plot(response.data['keys']);
-						this.setup['name'] = this.device['name'] + '_' + response.data['updated'].slice(0,10);
-						this.setup['save'] = response.data['updated'].slice(0,10) + ' 23:59:59'
+						this.setup['name'] = this.device['name'] + '_' + response.data['value']['updated'].slice(0,10);
+						this.setup['save'] = response.data['value']['updated'].slice(0,10) + ' 23:59:59'
 						this.init = !this.init;
 					}
 					for ( k in Object.keys(this.setup['convert']) ) {
 						ch = Object.keys(this.setup['convert'])[k];
-						response.data[ch] = this.conversion(response.data[ch]);
+						response.data['value'][ch] = this.conversion(response.data['value'][ch]);
 					}
-						this.data = response.data;
-						this.datas.unshift(response.data);
-						this.update_plot(response.data);
+						this.data = response.data['value'];
+						this.datas.unshift(response.data['value']);
+						this.update_plot(response.data['value']);
 					
 						this.check_time()
 					}
@@ -199,6 +200,7 @@ ArduinoDetail.component('arduino', {
 			var update_x = []; var update_y = []; var traces = [];
 			
 			for ( k in Object.keys(update_data).splice(1) ) {
+			        console.log(k, Object.keys(this.key).splice(1)[k]);
 					update_x[k] = [update_data['updated']];
 					update_y[k] = [update_data[Object.keys(this.key).splice(1)[k]]]; 
 					traces.push(parseInt(k));

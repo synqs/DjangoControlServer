@@ -28,7 +28,7 @@ class PDmonDetailView(DetailView):
 class PDmonDataView(DetailView):
     model = pdmon
     
-    def get(self, request, *args, **kwargs):
+    def post(self, request, *args, **kwargs):
         response = {}
     
         arduino = super().get_object()
@@ -42,14 +42,14 @@ class PDmonDataView(DetailView):
         except Exception as err:
             response['message'] = str(err)
         else:
-            r_dict = json.loads(request.body.decode())
-            print(r_dict)
-            response = r.json()['value']
+            conversion = json.loads(request.body.decode())['conversion']
+            response = r.json()
             temp = r.json()['value']
             temp.pop('updated')
             
-            '''for k,V in temp.items():
-                response['value'][k] = int(v_to_p(float(V)*1e3))'''
+            if conversion :
+                for k,V in temp.items():
+                    response['value'][k] = int(v_to_p(float(V)*1e3))
                 
             day = response['value']['updated'][:10]
             full_path = Path(Path.home().as_posix()+'/Dropbox (CoQuMa)/LabNotes/NaKa/'+day[:7]+'/'+day+'/data')
