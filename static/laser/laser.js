@@ -56,13 +56,11 @@ LaserDetail.component('laser', {
 		<thead class="sticky-top">
 			<tr class="bg-dark text-light">
 				<th v-for="k in Object.keys(this.data)">[[ k ]]</th>
-				<th>power setpoint</th>
 			</tr>
 		</thead>
 		<tbody>
 			<tr v-for="d in datas">
 				<td v-for="k in Object.keys(this.data)">[[ d[k] ]]</td>
-				<td>[[ this.editForm['power'] ]]</td>
 			</tr>
 		</tbody>
 		</table></div></div>
@@ -80,9 +78,16 @@ LaserDetail.component('laser', {
 			document.getElementById("toggle_edfa").disabled = false;
 			document.getElementById("set_edfa").disabled = false;
 		}
+		else {
+			document.getElementById("toggle_edfa").disabled = true;
+			document.getElementById("set_edfa").disabled = true;
+		};
 		if ( this.setup['status'].includes('Emission ON.') ) {
 			document.getElementById("toggle_LD").disabled = true;
 		}
+		else {
+			document.getElementById("toggle_LD").disabled = false;
+		};
 	},
 	methods: {
 		init_laser() {
@@ -104,7 +109,7 @@ LaserDetail.component('laser', {
 		},
                 get_laser() {
                         this.control('STATUS').then( data=> {
-				this.data = Object.assign({}, data, {'status' : this.setup['status']});
+				this.data = Object.assign({}, data, {'status' : this.setup['status'], 'power setpoint' : this.editForm['power'] });
 				this.datas.unshift(this.data);
 				this.update_plot(data);
 				this.check_time()
@@ -152,7 +157,7 @@ LaserDetail.component('laser', {
 			var k = {
 				x: [],
 				y: [],
-				name: 'EDFA1',
+				name: 'power',
 				mode: 'lines+markers',
 				type: 'scatter'
 			};
@@ -161,7 +166,7 @@ LaserDetail.component('laser', {
 		},
 		update_plot(update_data) {
 			var update_x = [update_data['updated']];
-			var update_y = [update_data['EDFA']]; 
+			var update_y = [update_data['power']]; 
 			
 			Plotly.extendTraces('init_plot', {x:[update_x],y:[update_y],},[0]); 
 		},

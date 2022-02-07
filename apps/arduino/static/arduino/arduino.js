@@ -100,7 +100,7 @@ ArduinoDetail.component('arduino', {
 	
 	<!-- button class="btn btn-info w-100" v-on:click="this.slackbot('TALK')">talk to me!</button -->
 	
-  	<div id="init_plot" style="width:1600px;height:650px;"></div>
+  	<div id="init_plot" style="width:800px;height:650px;"></div>
   	
   	<div class="table-responsive" style="height: 200px;"><table class="table table-striped mh-100">
 		<thead class="sticky-top">

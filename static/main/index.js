@@ -111,7 +111,7 @@ IndexTable.component('device-widget', {
 				});
 		},
 		remove_device() {
-			config = this.config; config['method'] = 'POST';
+			config = this.config; config['method'] = 'DELETE';
 			console.log(config);
 			config['url'] = this.device['pk'] + '/delete/';
 			axios(config)

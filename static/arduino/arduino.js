@@ -29,8 +29,8 @@ ArduinoDetail.component('arduino', {
 	data() { return {
 		data : [],
 		datas : [],
-		setup : {	'status' : 'Trying to connect...', 'sleep' : '5', 'save' : '00:00:00', 'name' : 'test',
-				'convert' : {}, 'lock' : ''},
+		setup : {	'status' : 'Trying to connect...', 'sleep' : '10', 'save' : 'never', 'name' : 'test',
+				'convert' : {}, 'power' : false},
 		key : {},
 		config : [],
 		editForm : {},
@@ -52,7 +52,7 @@ ArduinoDetail.component('arduino', {
 				</div>
 				<div class="col-5">
 					<h6>CSV name : <input v-model="this.setup['name']" placeholder="name for CSV"/>.csv</h6>
-					<h6>Next CSV Download : <input class="w-25" v-model="this.setup['save']" placeholder="savetime in 'hh:mm:ss'"/> today</h6>
+					<h6>Next CSV Download : <input v-model="this.setup['save']" placeholder="savetime in 'hh:mm:ss'"/></h6>
 					<h6>Current Sleeptime : <input class="w-25" v-model="this.setup['sleep']" placeholder="sleeptime in s" v-on:blur="this.stop_device(), this.start_device()"> s</h6>
 				</div>
 			</div></div>
@@ -84,18 +84,23 @@ ArduinoDetail.component('arduino', {
 	</div>
 	
 	<div v-if="this.device['model'] == 'pdmon'" class="row mb-3">
-		<div class="col-2">Convert to measure 0-12V :</div>
-		<div class="col text-center" v-for="k in Object.keys(this.key).splice(1)">
+		<div class="col-2">Convert to measure 0-12V:</div>
+		<div class="col-1 text-center" v-for="k in Object.keys(this.key).splice(1)">
   			<div class="form-check form-switch">
   			<input v-model="this.setup['convert'][k]" class="form-check-input" type="checkbox">[[ k ]]
   			</div>
   		</div>
-		<div class="col-3 text-center">laser lock : <input class="w-50" v-model="this.setup['lock']" placeholder="channel (e.g. A3)"></div>
+		<div class="col-2 text-center">
+		    convert to power ?:
+		    <div class="form-check form-switch">
+		        <input v-model="this.setup['power']" class="form-check-input" type="checkbox">
+		    </div>
+	    </div>
   	</div>
 	
 	<!-- button class="btn btn-info w-100" v-on:click="this.slackbot('TALK')">talk to me!</button -->
 	
-  	<div id="init_plot" style="width:1600px;height:650px;"></div>
+  	<div id="init_plot" style="width:800px;height:650px;"></div>
   	
   	<div class="table-responsive" style="height: 200px;"><table class="table table-striped mh-100">
 		<thead class="sticky-top">
@@ -132,14 +137,19 @@ ArduinoDetail.component('arduino', {
 					xsrfHeaderName: 'X-CSRFTOKEN',
 					data : { command :'STATUS', }
 			};
+			if ( this.device['model'] == 'pdmon' ) {
+			    config['url'] = '/arduino/pdmon/'  + this.device['pk'] + '/data/';
+			    config['data']['conversion'] = this.setup['power']; }
 			this.config = config;
 			axios(config)
 				.then(response => {
-					if ( response.data['value'] ) {
+					if ( response.data ) {
+					    //console.log(response.data);
 					if ( this.init ) { 
 						this.key = response.data['keys']; 
 						this.init_plot(response.data['keys']);
 						this.setup['name'] = this.device['name'] + '_' + response.data['value']['updated'].slice(0,10);
+						this.setup['save'] = response.data['value']['updated'].slice(0,10) + ' 23:59:59'
 						this.init = !this.init;
 					}
 					for ( k in Object.keys(this.setup['convert']) ) {
@@ -190,6 +200,7 @@ ArduinoDetail.component('arduino', {
 			var update_x = []; var update_y = []; var traces = [];
 			
 			for ( k in Object.keys(update_data).splice(1) ) {
+			        console.log(k, Object.keys(this.key).splice(1)[k]);
 					update_x[k] = [update_data['updated']];
 					update_y[k] = [update_data[Object.keys(this.key).splice(1)[k]]]; 
 					traces.push(parseInt(k));
@@ -204,7 +215,7 @@ ArduinoDetail.component('arduino', {
 		is_locked() {
 			if ( this.setup['lock'] in this.key ) {
 				ch = this.setup['lock'];
-				if ( (this.data[ch] < 2.8 || 4.8 < this.data[ch]) && this.alert ) {
+				if ( (this.data[ch] < 1.85 || 3.85 < this.data[ch]) && this.alert ) {
 					this.alert = !this.alert;
 					this.setup['status'] = "Laser is not locked !!!";
 					alert("Laser out of lock!");
@@ -213,18 +224,15 @@ ArduinoDetail.component('arduino', {
 			};
 		},
 		check_time() {
-			var now = this.data['updated'].slice(11,19);
-			var save = this.setup['save'].slice(0,7);
-			console.log('Is ' + now.slice(0,7) + ' equal to ' + save + ' ?');
-			console.log('And is ' + parseInt(now.slice(-1)) + ' smaller than ' + parseInt(this.setup['sleep']) + ' ?');
-			if (now.slice(0,7) == save && ( parseInt(now.slice(-1)) < parseInt(this.setup['sleep']) ) ) {
-				this.get_CSV();
-				this.setup['name'] = this.device['name'] + '_' + this.data['updated'].slice(0,10);
+			var now = this.data['updated'];
+			var save = this.setup['save'];
+			
+			if (now >= save ) {
+				//this.get_CSV();
 				this.datas = [];
-				Plotly.deleteTraces('init_plot', [0,1,2,3,4,5]);
+				Plotly.deleteTraces('init_plot', Array.from(Array(parseInt(Object.keys(this.data).length)-1).keys()));
 				//this.init_plot(Object.keys(this.key));
 				this.init = !this.init;
-				
 			}
 		},
 		get_CSV() {
