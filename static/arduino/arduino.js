@@ -100,9 +100,9 @@ ArduinoDetail.component('arduino', {
 	
 	<!-- button class="btn btn-info w-100" v-on:click="this.slackbot('TALK')">talk to me!</button -->
 	
-  	<div id="init_plot" style="width:800px;height:650px;"></div>
-  	
-  	<div class="table-responsive" style="height: 200px;"><table class="table table-striped mh-100">
+  	<div class="row mb-3">
+	<div class="col-6"><div id="init_plot" style="height:650px;"></div></div>
+  	<div class="col-6"><div class="table-responsive" style="height: 200px;"><table class="table table-striped mh-100">
 		<thead class="sticky-top">
 			<tr class="bg-dark text-light"><th v-for="k in Object.keys(this.key).filter(key => this.key[key])">[[ k ]]</th></tr>
 			<tr class="bg-info"><td v-for="k in Object.keys(this.key).filter(key => this.key[key])">
@@ -115,6 +115,7 @@ ArduinoDetail.component('arduino', {
 			</td></tr>
 		</tbody>
 	</table></div>
+	</div>
 	`,
 	mounted () {
 		this.get_device();
